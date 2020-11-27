@@ -4,21 +4,20 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".SplashScreenActivity"
-    android:background="@color/white">
-
+    android:background="@color/white"
+    tools:context=".SplashScreenActivity">
 
     <ImageView
         android:id="@+id/background"
         android:layout_width="wrap_content"
-        android:layout_height="900dp"
-        android:src="@drawable/splash_screen_bg"
+        android:layout_height="1100dp"
         android:scaleType="centerCrop"
-        app:layout_constraintVertical_bias="0"
+        android:src="@drawable/splash_screen_bg"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0" />
 
     <ImageView
         android:id="@+id/logo_white"
@@ -26,11 +25,11 @@
         android:layout_height="100dp"
         android:scaleType="centerCrop"
         android:src="@drawable/white_logo"
-        app:layout_constraintVertical_bias=".1"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias=".1" />
 
     <ImageView
         android:id="@+id/travelhut_text_white"
@@ -43,27 +42,18 @@
         app:layout_constraintTop_toBottomOf="@id/logo_white"
         app:layout_constraintVertical_bias="0" />
 
+
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/lottie"
-        app:lottie_autoPlay="true"
         android:layout_width="wrap_content"
         android:layout_height="200dp"
-        app:lottie_rawRes="@raw/splash_animation_icon"
+        android:layout_marginTop="80dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/travelhut_text_white"
         app:layout_constraintVertical_bias="0"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/travelhut_text_white" />
+        app:lottie_autoPlay="true"
+        app:lottie_rawRes="@raw/splash_animation_icon" />
 
-    <ImageView
-        android:id="@+id/logo_blue"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:scaleType="centerCrop"
-        android:src="@drawable/blue_logo"
-        app:layout_constraintVertical_bias=".1"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -4,5 +4,6 @@
         <item name="colorPrimary">@color/light_blue</item>
         <item name="colorPrimaryDark">@color/dark_blue</item>
         <item name="colorAccent">@color/white</item>
+        <item name="android:windowAnimationStyle">@null</item>
     </style>
 </resources>
