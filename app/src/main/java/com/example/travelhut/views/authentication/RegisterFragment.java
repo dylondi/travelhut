@@ -17,13 +17,12 @@ import androidx.lifecycle.ViewModelProviders;
 
 import com.example.travelhut.R;
 import com.example.travelhut.viewmodel.authentication.RegisterViewModel;
-//import com.example.travelhut.views.main.newsfeed.NewsFeedActivity;
-//import com.google.firebase.auth.FirebaseUser;
+import com.example.travelhut.views.main.newsfeed.NewsFeedActivity;
+import com.google.firebase.auth.FirebaseUser;
 
 public class RegisterFragment extends Fragment {
 
-    private EditText emailEditText;
-    private EditText passwordEditText;
+    private EditText emailEditText, usernameEditText, passwordEditText, passwordTwoEditText;
     private Button registerButton;
 
     private RegisterViewModel registerViewModel;
@@ -46,19 +45,23 @@ public class RegisterFragment extends Fragment {
         ViewGroup root = (ViewGroup) inflater.inflate(R.layout.fragment_register, container, false);
 
         emailEditText = root.findViewById(R.id.emailRegister);
+        usernameEditText = root.findViewById(R.id.usernameRegister);
         passwordEditText = root.findViewById(R.id.passwordRegister);
+        passwordTwoEditText = root.findViewById(R.id.passwordTwoRegister);
         registerButton = root.findViewById(R.id.registerBtn);
 
-        registerButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String email = emailEditText.getText().toString();
-                String password = passwordEditText.getText().toString();
+        registerButton.setOnClickListener(view -> {
+            String email = emailEditText.getText().toString();
+            String username = usernameEditText.getText().toString();
+            String password = passwordEditText.getText().toString();
+            String passwordTwo = passwordTwoEditText.getText().toString();
 
-                if(registerViewModel.validateEmail(emailEditText) && registerViewModel.validatePasswordOne(passwordEditText))
-                {
-                    registerViewModel.register(email, password);
-                }
+            if(registerViewModel.validateEmail(emailEditText) &&
+               registerViewModel.validateUsername(usernameEditText) &&
+               registerViewModel.validatePasswordOne(passwordEditText) &&
+               registerViewModel.validatePasswordTwo(passwordEditText, passwordTwoEditText))
+            {
+                registerViewModel.register(email, username, password);
             }
         });
 

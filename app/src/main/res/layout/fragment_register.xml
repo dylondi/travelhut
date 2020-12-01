@@ -7,11 +7,11 @@
     tools:context=".views.authentication.LoginFragment">
 
     <EditText
-        android:id="@+id/fullNameRegister"
+        android:id="@+id/usernameRegister"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="@drawable/edit_text_bg"
-        android:hint="@string/name"
+        android:hint="@string/username"
         android:paddingLeft="20dp"
         android:paddingTop="10dp"
         android:paddingBottom="10dp"
@@ -41,7 +41,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias=".5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/fullNameRegister"
+        app:layout_constraintTop_toBottomOf="@id/usernameRegister"
         app:layout_constraintVertical_bias="0"
         app:layout_constraintWidth_percent=".8" />
 

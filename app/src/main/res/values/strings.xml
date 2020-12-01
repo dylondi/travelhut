@@ -1,8 +1,8 @@
 <resources>
     <string name="app_name">travelhut</string>
-    <string name="email">email</string>
+    <string name="email">Email</string>
     <string name="already_have_an_account_sign_in">Already have an account? Sign In</string>
-    <string name="name">Name</string>
+    <string name="username">Username</string>
     <string name="password">Password</string>
     <string name="register">Register</string>
     <string name="login">login</string>

@@ -60,21 +60,21 @@ public class RegisterLoginFormValidator {
         }
     }
 
-    boolean validatePasswordTwo(EditText passwordForm, EditText passwordFormTwo) {
+    boolean validatePasswordTwo(EditText passwordForm, EditText passwordTwoForm) {
         String passwordInput = passwordForm.getText().toString().trim();
-        String passwordInputTwo = passwordFormTwo.getText().toString().trim();
+        String passwordInputTwo = passwordTwoForm.getText().toString().trim();
 
         if (passwordInput.isEmpty()) {
-            passwordFormTwo.setError("Field can't be empty");
+            passwordTwoForm.setError("Field can't be empty");
             return false;
         } else if (!PASSWORD_PATTERN.matcher(passwordInput).matches()) {
-            passwordFormTwo.setError("Password too weak");
+            passwordTwoForm.setError("Password too weak");
             return false;
         } else if (!passwordInput.equals(passwordInputTwo)) {
-            passwordFormTwo.setError("You've entered two different passwords");
+            passwordTwoForm.setError("You've entered two different passwords");
             return false;
         } else {
-            passwordFormTwo.setError(null);
+            passwordTwoForm.setError(null);
             return true;
         }
     }

@@ -6,25 +6,25 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 
-import com.example.travelhut.model.AppRepository;
+import com.example.travelhut.model.AuthAppRepository;
 import com.google.firebase.auth.FirebaseUser;
 
 public class MainActivityViewModel extends AndroidViewModel {
 
-    private AppRepository appRepository;
+    private AuthAppRepository authAppRepository;
     private MutableLiveData<FirebaseUser> userMutableLiveData;
     private MutableLiveData<Boolean> loggedOutMutableLiveData;
 
     public MainActivityViewModel(@NonNull Application application) {
         super(application);
 
-        appRepository = new AppRepository(application);
-        userMutableLiveData = appRepository.getUserMutableLiveData();
-        loggedOutMutableLiveData = appRepository.getLoggedOutMutableLiveData();
+        authAppRepository = new AuthAppRepository(application);
+        userMutableLiveData = authAppRepository.getUserMutableLiveData();
+        loggedOutMutableLiveData = authAppRepository.getLoggedOutMutableLiveData();
     }
 
     public void logout(){
-        appRepository.logout();
+        authAppRepository.logout();
     }
 
     public MutableLiveData<FirebaseUser> getUserMutableLiveData() {
