@@ -1,4 +1,4 @@
-package com.example.travelhut;
+package com.example.travelhut.views.splash;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -8,6 +8,8 @@ import android.os.Handler;
 import android.widget.ImageView;
 
 import com.airbnb.lottie.LottieAnimationView;
+import com.example.travelhut.R;
+import com.example.travelhut.views.onboarding.OnboardingScreensActivity;
 
 public class SplashScreenActivity extends AppCompatActivity {
 

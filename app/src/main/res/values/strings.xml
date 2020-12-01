@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">travelhut</string>
+    <string name="email">email</string>
+    <string name="already_have_an_account_sign_in">Already have an account? Sign In</string>
+    <string name="name">Name</string>
+    <string name="password">Password</string>
+    <string name="register">Register</string>
+    <string name="login">login</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="not_registered_sign_up">Not Registered? Sign Up</string>
 </resources>

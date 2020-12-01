@@ -1,8 +1,7 @@
-package com.example.travelhut;
+package com.example.travelhut.views.authentication;
 
 import android.content.Context;
 import android.content.Intent;
-import android.transition.Slide;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +11,9 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.viewpager.widget.PagerAdapter;
+
+import com.example.travelhut.R;
+import com.example.travelhut.views.onboarding.OnboardingScreensActivity;
 
 public class SlideViewPagerAdapter extends PagerAdapter {
     Context ctx;
@@ -49,17 +51,12 @@ public class SlideViewPagerAdapter extends PagerAdapter {
         ImageView back = view.findViewById(R.id.back);
         Button getStartedBtn = view.findViewById(R.id.getStartedBtn);
         getStartedBtn.setOnClickListener(view1 -> {
-            Intent intent = new Intent(ctx, MainActivity.class);
+            Intent intent = new Intent(ctx, LoginActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
             ctx.startActivity(intent);
         });
 
-        next.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                OnboardingScreensActivity.viewPager.setCurrentItem(position+1);
-            }
-        });
+        next.setOnClickListener(view12 -> OnboardingScreensActivity.viewPager.setCurrentItem(position+1));
 
         back.setOnClickListener(new View.OnClickListener() {
             @Override

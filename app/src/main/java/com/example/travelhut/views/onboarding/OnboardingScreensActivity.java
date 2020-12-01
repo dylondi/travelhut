@@ -1,4 +1,4 @@
-package com.example.travelhut;
+package com.example.travelhut.views.onboarding;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager.widget.ViewPager;
@@ -6,6 +6,10 @@ import androidx.viewpager.widget.ViewPager;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+
+import com.example.travelhut.R;
+import com.example.travelhut.views.authentication.SlideViewPagerAdapter;
+import com.example.travelhut.views.authentication.LoginActivity;
 
 public class OnboardingScreensActivity extends AppCompatActivity {
 
@@ -22,7 +26,7 @@ public class OnboardingScreensActivity extends AppCompatActivity {
         viewPager.setAdapter(adapter);
 
         if(isOpenAlready()){
-            Intent intent = new Intent(OnboardingScreensActivity.this, MainActivity.class);
+            Intent intent = new Intent(OnboardingScreensActivity.this, LoginActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK );
             startActivity(intent);
         }else{
