@@ -19,8 +19,12 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".views.MainActivity"
+            android:name=".views.main.newsfeed.NewsFeedActivity"
             android:theme="@style/AppTheme" />
+        <activity android:name=".views.main.planner.PlannerActivity"></activity>
+        <activity android:name=".views.main.profile.ProfileActivity"></activity>
+        <activity android:name=".views.main.search.SearchActivity"></activity>
+        <activity android:name=".views.main.trips.TripsActivity"></activity>
 
         <meta-data
             android:name="preloaded_fonts"

@@ -17,8 +17,8 @@ import androidx.lifecycle.ViewModelProviders;
 
 import com.example.travelhut.R;
 import com.example.travelhut.viewmodel.authentication.LoginViewModel;
-//import com.example.travelhut.views.main.newsfeed.NewsFeedActivity;
-//import com.google.firebase.auth.FirebaseUser;
+import com.example.travelhut.views.main.newsfeed.NewsFeedActivity;
+import com.google.firebase.auth.FirebaseUser;
 
 
 public class LoginFragment extends Fragment {
@@ -74,8 +74,8 @@ public class LoginFragment extends Fragment {
                 loginViewModel.login(email, password);
                 loginViewModel.getUserMutableLiveData().observe(getViewLifecycleOwner(), firebaseUser -> {
             if(firebaseUser != null){
-//                Intent myIntent = new Intent(getActivity(), NewsFeedActivity.class);
-//                startActivity(myIntent);
+                Intent myIntent = new Intent(getActivity(), NewsFeedActivity.class);
+                startActivity(myIntent);
             }
         });
             }
