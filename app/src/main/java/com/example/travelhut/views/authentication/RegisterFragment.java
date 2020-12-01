@@ -1,5 +1,6 @@
 package com.example.travelhut.views.authentication;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,7 +17,8 @@ import androidx.lifecycle.ViewModelProviders;
 
 import com.example.travelhut.R;
 import com.example.travelhut.viewmodel.authentication.RegisterViewModel;
-import com.google.firebase.auth.FirebaseUser;
+//import com.example.travelhut.views.main.newsfeed.NewsFeedActivity;
+//import com.google.firebase.auth.FirebaseUser;
 
 public class RegisterFragment extends Fragment {
 
@@ -31,14 +33,11 @@ public class RegisterFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         registerViewModel = ViewModelProviders.of(this).get(RegisterViewModel.class);
-        registerViewModel.getUserMutableLiveData().observe(this, new Observer<FirebaseUser>() {
-            @Override
-            public void onChanged(FirebaseUser firebaseUser) {
-                if(firebaseUser != null){
-                    Toast.makeText(getContext(), "User created", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
+//        registerViewModel.getUserMutableLiveData().observe(this, firebaseUser -> {
+//            if(firebaseUser != null){
+//
+//            }
+//        });
     }
 
     @Nullable
@@ -58,7 +57,6 @@ public class RegisterFragment extends Fragment {
 
                 if(registerViewModel.validateEmail(emailEditText) && registerViewModel.validatePasswordOne(passwordEditText))
                 {
-
                     registerViewModel.register(email, password);
                 }
             }

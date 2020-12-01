@@ -5,6 +5,7 @@ import android.widget.Toast;
 
 import androidx.lifecycle.MutableLiveData;
 
+import com.example.travelhut.views.authentication.LoginActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -32,6 +33,8 @@ public class  AppRepository {
         firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(application.getMainExecutor(), task -> {
             if(task.isSuccessful()){
                 userMutableLiveData.postValue(firebaseAuth.getCurrentUser());
+                Toast.makeText(application, "User Created", Toast.LENGTH_SHORT).show();
+                LoginActivity.viewPager.setCurrentItem(0);
             }else if(task.getException().getMessage() != null){
                 Toast.makeText(application, "Registration Failed" + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
             } else{

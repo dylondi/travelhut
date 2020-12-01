@@ -17,8 +17,8 @@ import androidx.lifecycle.ViewModelProviders;
 
 import com.example.travelhut.R;
 import com.example.travelhut.viewmodel.authentication.LoginViewModel;
-import com.example.travelhut.views.MainActivity;
-import com.google.firebase.auth.FirebaseUser;
+//import com.example.travelhut.views.main.newsfeed.NewsFeedActivity;
+//import com.google.firebase.auth.FirebaseUser;
 
 
 public class LoginFragment extends Fragment {
@@ -36,14 +36,7 @@ public class LoginFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         loginViewModel = ViewModelProviders.of(this).get(LoginViewModel.class);
-        loginViewModel.getUserMutableLiveData().observe(this, new Observer<FirebaseUser>() {
-            @Override
-            public void onChanged(FirebaseUser firebaseUser) {
-                if(firebaseUser != null){
-                    Intent myIntent = new Intent(getActivity(), MainActivity.class);
-                    startActivity(myIntent);                }
-            }
-        });
+
     }
     @Nullable
     @Override
@@ -72,16 +65,19 @@ public class LoginFragment extends Fragment {
         loginButton.animate().translationY(0).alpha(1).setDuration(1000).setStartDelay(400);
 
 
-        loginButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String email = emailLogin.getText().toString();
-                String password = passwordLogin.getText().toString();
+        loginButton.setOnClickListener(view -> {
+            String email = emailLogin.getText().toString();
+            String password = passwordLogin.getText().toString();
 
-                if(loginViewModel.validateEmail(emailLogin) && loginViewModel.validatePasswordOne(passwordLogin))
-                {
-                    loginViewModel.login(email, password);
-                }
+            if(loginViewModel.validateEmail(emailLogin) && loginViewModel.validatePasswordOne(passwordLogin))
+            {
+                loginViewModel.login(email, password);
+                loginViewModel.getUserMutableLiveData().observe(getViewLifecycleOwner(), firebaseUser -> {
+            if(firebaseUser != null){
+//                Intent myIntent = new Intent(getActivity(), NewsFeedActivity.class);
+//                startActivity(myIntent);
+            }
+        });
             }
         });
 

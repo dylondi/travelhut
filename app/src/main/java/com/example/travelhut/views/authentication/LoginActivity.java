@@ -12,7 +12,7 @@ import com.google.android.material.tabs.TabLayout;
 public class LoginActivity extends AppCompatActivity {
 
     TabLayout tabLayout;
-    ViewPager viewPager;
+    public static ViewPager viewPager;
     FloatingActionButton google;
     float v = 0;
 
@@ -57,6 +57,10 @@ public class LoginActivity extends AppCompatActivity {
 
             }
         });
+    }
+    @Override
+    public void onBackPressed() {
+        // Simply Do noting!
     }
 
 
