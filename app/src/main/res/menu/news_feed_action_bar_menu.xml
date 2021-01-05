@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+   xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/camera_icon"
+        android:title="Camera"
+        android:paddingLeft="-8dp"
+        android:icon="@drawable/ic_camera"
+        app:showAsAction="ifRoom|collapseActionView"/>
+    <item
+        android:id="@+id/search_icon"
+        android:title="search"
+        android:icon="@drawable/ic_user_search"
+        app:showAsAction="ifRoom|collapseActionView"
+        app:actionViewClass="androidx.appcompat.widget.SearchView"/>
+
+    <item
+        android:id="@+id/messages_icon"
+        android:title="Messages"
+        android:icon="@drawable/ic_messages"
+        app:showAsAction="ifRoom|collapseActionView"/>
+
+</menu>

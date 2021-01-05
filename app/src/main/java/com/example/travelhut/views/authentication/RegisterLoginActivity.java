@@ -9,7 +9,7 @@ import com.example.travelhut.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 
-public class LoginActivity extends AppCompatActivity {
+public class RegisterLoginActivity extends AppCompatActivity {
 
     TabLayout tabLayout;
     public static ViewPager viewPager;

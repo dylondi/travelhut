@@ -10,12 +10,9 @@
             android:layout_height="match_parent"
             android:background="@color/dark_blue">
 
-            <com.google.android.material.tabs.TabLayout
-                android:id="@+id/tabs"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-            </com.google.android.material.tabs.TabLayout>
+            <include
+                android:id="@+id/toolbar"
+                layout="@layout/toolbar" />
         </com.google.android.material.appbar.AppBarLayout>
 
     </RelativeLayout>
