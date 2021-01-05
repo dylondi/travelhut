@@ -9,10 +9,10 @@ import android.view.MenuItem;
 import androidx.annotation.NonNull;
 
 import com.example.travelhut.R;
+import com.example.travelhut.views.main.map_search.MapSearchActivity;
 import com.example.travelhut.views.main.newsfeed.NewsFeedActivity;
 import com.example.travelhut.views.main.planner.PlannerActivity;
 import com.example.travelhut.views.main.profile.ProfileActivity;
-import com.example.travelhut.views.main.map_search.MapSearchActivity;
 import com.example.travelhut.views.main.trips.TripsActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;

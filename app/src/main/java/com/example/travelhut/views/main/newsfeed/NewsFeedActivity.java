@@ -27,7 +27,6 @@ import com.example.travelhut.R;
 import com.example.travelhut.model.User;
 import com.example.travelhut.utils.BottomNavigationViewHelper;
 import com.example.travelhut.viewmodel.newsfeed.NewsFeedActivityViewModel;
-import com.example.travelhut.viewmodel.newsfeed.NewsFeedActivityViewModelFactory;
 import com.example.travelhut.views.ProfileFragment;
 import com.example.travelhut.views.main.newsfeed.toolbar.user_search.UserSearchAdapter;
 import com.example.travelhut.views.main.profile.ProfileActivity;
@@ -42,7 +41,7 @@ import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import java.util.ArrayList;
 import java.util.List;
 
-public class NewsFeedActivity extends AppCompatActivity implements UserSearchAdapter.OnItemClickedListener{
+public class NewsFeedActivity extends AppCompatActivity{
 
     private final static String TAG = "NewsFeedActivity";
     private Context mContext = NewsFeedActivity.this;
@@ -75,7 +74,7 @@ public class NewsFeedActivity extends AppCompatActivity implements UserSearchAda
 
         mUsers = new ArrayList<>();
         readUsers();
-        userSearchAdapter = new UserSearchAdapter(this, mUsers, this);
+        userSearchAdapter = new UserSearchAdapter(this, mUsers);
         recyclerView.setAdapter(userSearchAdapter);
 
         //readUsers();
@@ -270,21 +269,21 @@ public class NewsFeedActivity extends AppCompatActivity implements UserSearchAda
 
     @Override
     public void onBackPressed() {
-  }
-
-    @Override
-    public void onItemClick(int position) {
-
-        Log.v("Your Filter", "HOWYE HOWYE HOWYE HOWYE HOWYE HOWYE HOWYE HOWYE HOWYE HOWYE HOWYE HOWYE HOWYE HOWYE ");
-
-        SharedPreferences.Editor editor = mContext.getSharedPreferences("PREFS", Context.MODE_PRIVATE).edit();
-        editor.putString("profileid", mUsers.get(position).getId());
-        editor.apply();
-
-        //mContext.startActivity(new Intent(mContext, ProfileFragment.class));
-
-        ((FragmentActivity) mContext).getSupportFragmentManager().beginTransaction().replace(R.id.relLayout2, new ProfileFragment()).commit();
-//        Intent intent = new Intent(this, ProfileActivity.class);
-//        startActivity(intent);
     }
+
+//    @Override
+//    public void onItemClick(int position) {
+//
+//        Log.v("Your Filter", "HOWYE HOWYE HOWYE HOWYE HOWYE HOWYE HOWYE HOWYE HOWYE HOWYE HOWYE HOWYE HOWYE HOWYE ");
+//
+//        SharedPreferences.Editor editor = mContext.getSharedPreferences("PREFS", Context.MODE_PRIVATE).edit();
+//        editor.putString("profileid", mUsers.get(position).getId());
+//        editor.apply();
+//
+//        //mContext.startActivity(new Intent(mContext, ProfileFragment.class));
+//
+//        ((FragmentActivity) mContext).getSupportFragmentManager().beginTransaction().replace(R.id.relLayout2, new ProfileFragment()).commit();
+////        Intent intent = new Intent(this, ProfileActivity.class);
+////        startActivity(intent);
+//    }
 }

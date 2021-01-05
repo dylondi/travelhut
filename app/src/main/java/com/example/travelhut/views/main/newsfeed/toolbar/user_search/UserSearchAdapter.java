@@ -39,13 +39,11 @@ public class UserSearchAdapter extends RecyclerView.Adapter<UserSearchAdapter.Vi
     private Context mContext;
     private List<User> mUsers;
     private FirebaseUser firebaseUser;
-    private RelativeLayout relativeLayout;;
-    private OnItemClickedListener mOnItemClickedListener;
+    private RecyclerView recyclerView;
 
-    public UserSearchAdapter(Context mContext, List<User> mUsers, OnItemClickedListener onItemClickedListener) {
+    public UserSearchAdapter(Context mContext, List<User> mUsers) {
         this.mContext = mContext;
         this.mUsers = mUsers;
-        this.mOnItemClickedListener = onItemClickedListener;
     }
 
 
@@ -55,7 +53,8 @@ public class UserSearchAdapter extends RecyclerView.Adapter<UserSearchAdapter.Vi
         Log.v("Your Filter", "CLICKED ROW CLICKED ROW CLICKED ROW CLICKED ROW CLICKED ROW CLICKED ROW CLICKED ROW CLICKED ROW CLICKED ROW " );
         View view = LayoutInflater.from(mContext)
                 .inflate(R.layout.user_item, parent, false);
-        return new ViewHolder(view, mOnItemClickedListener);
+        recyclerView = view.findViewById(R.id.recycler_view);
+        return new ViewHolder(view);
     }
 
 
@@ -100,6 +99,7 @@ public class UserSearchAdapter extends RecyclerView.Adapter<UserSearchAdapter.Vi
 
                 //mContext.startActivity(new Intent(mContext, ProfileFragment.class));
 
+                recyclerView.setAlpha(0);
                 ((FragmentActivity) mContext).getSupportFragmentManager().beginTransaction().replace(R.id.relLayout2, new ProfileFragment()).commit();
             }
         });
@@ -125,28 +125,21 @@ public class UserSearchAdapter extends RecyclerView.Adapter<UserSearchAdapter.Vi
         return mUsers.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    public class ViewHolder extends RecyclerView.ViewHolder{
 
         public TextView username;
         public TextView email;
         public CircleImageView image_profile;
         public Button btn_follow;
-        OnItemClickedListener onItemClickedListener;
 
-        @Override
-        public void onClick(View v) {
-            onItemClickedListener.onItemClick(getAdapterPosition());
-        }
 
-        public ViewHolder(@NonNull View itemView, OnItemClickedListener onItemClickedListener) {
+        public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
             username = itemView.findViewById(R.id.username);
             email = itemView.findViewById(R.id.email);
             image_profile = itemView.findViewById(R.id.image_profile);
             btn_follow = itemView.findViewById(R.id.btn_follow);
-            this.onItemClickedListener = onItemClickedListener;
-            itemView.setOnClickListener(this);
         }
     }
 
@@ -170,7 +163,4 @@ public class UserSearchAdapter extends RecyclerView.Adapter<UserSearchAdapter.Vi
         });
     }
 
-    public interface OnItemClickedListener{
-        void onItemClick(int position);
-    }
 }
