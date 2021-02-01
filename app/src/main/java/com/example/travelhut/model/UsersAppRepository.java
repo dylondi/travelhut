@@ -1,4 +1,4 @@
-package com.example.travelhut.model;
+        package com.example.travelhut.model;
 
 import android.util.Log;
 
@@ -13,24 +13,34 @@ import com.google.firebase.database.ValueEventListener;
 
 public class UsersAppRepository extends LiveData<DataSnapshot> {
 
-    private final MyValueEventListener listener = new MyValueEventListener();
+    private final  MyValueEventListener listener = new MyValueEventListener();
     private static final String LOG_TAG = "UsersAppRepository";
 
     private final Query query;
+    private String s;
+    private DatabaseReference reference;
 
-    public UsersAppRepository(Query query) {
-        this.query = query;
-    }
-
-    public UsersAppRepository(DatabaseReference ref) {
-        this.query = ref;
-    }
-
-
-    public Query getUserSearchQuery(String s){
-        return FirebaseDatabase.getInstance().getReference("Users").orderByChild("username")
+    public UsersAppRepository(String s) {
+        this.s = s;
+        this.query = FirebaseDatabase.getInstance().getReference("Users").orderByChild("username")
                 .startAt(s)
                 .endAt(s+"\uf8ff");
+        //reference = FirebaseDatabase.getInstance().getReference("Users");
+
+    }
+    public UsersAppRepository() {
+
+        reference = FirebaseDatabase.getInstance().getReference("Users");
+        query = (Query) reference;
+
+    }
+
+    public Query getUserSearchQuery(){
+        return query;
+    }
+
+    public DatabaseReference getReference() {
+        return reference;
     }
 
     @Override

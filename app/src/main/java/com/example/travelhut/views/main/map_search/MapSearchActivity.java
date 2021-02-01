@@ -76,7 +76,7 @@ public class MapSearchActivity extends AppCompatActivity implements OnMapReadyCa
         Log.d(TAG, "onCreate: started.");
         // View view = getLayoutInflater().inflate(R.layout.activity_map_search, null, false);
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
-        button = findViewById(R.id.user_location_btn);
+        //button = findViewById(R.id.user_location_btn);
         searchView = findViewById(R.id.search_view);
         supportMapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -120,12 +120,7 @@ public class MapSearchActivity extends AppCompatActivity implements OnMapReadyCa
                 //txtLocation.setText(String.format(Locale.US, "%s -- %s", wayLatitude, wayLongitude));
             }
         });
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                getLastKnownLocation();
-            }
-        });
+
 
 
 

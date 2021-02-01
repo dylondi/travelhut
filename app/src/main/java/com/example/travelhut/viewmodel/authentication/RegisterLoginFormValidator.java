@@ -17,12 +17,23 @@ public class RegisterLoginFormValidator {
                     ".{6,}" +               //at least 6 characters
                     "$");
 
+    private static final Pattern EMAIL_ADDRESS
+            = Pattern.compile(
+            "[a-zA-Z0-9\\+\\.\\_\\%\\-\\+]{1,256}" +
+                    "\\@" +
+                    "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,64}" +
+                    "(" +
+                    "\\." +
+                    "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,25}" +
+                    ")+"
+    );
+
     public boolean validateEmail(EditText emailEditText) {
         String emailInput = emailEditText.getText().toString().trim();
         if (emailInput.isEmpty()) {
             emailEditText.setError("Field can't be empty");
             return false;
-        } else if (!Patterns.EMAIL_ADDRESS.matcher(emailInput).matches()) {
+        } else if (!EMAIL_ADDRESS.matcher(emailInput).matches()) {
             emailEditText.setError("Please enter a valid email address");
             return false;
         } else {

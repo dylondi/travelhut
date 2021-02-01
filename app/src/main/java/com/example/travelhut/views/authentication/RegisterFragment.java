@@ -51,10 +51,10 @@ public class RegisterFragment extends Fragment {
         registerButton = root.findViewById(R.id.registerBtn);
 
         registerButton.setOnClickListener(view -> {
-            String email = emailEditText.getText().toString();
-            String username = usernameEditText.getText().toString();
-            String password = passwordEditText.getText().toString();
-            String passwordTwo = passwordTwoEditText.getText().toString();
+            String email = emailEditText.getText().toString().trim();
+            String username = usernameEditText.getText().toString().trim();
+            String password = passwordEditText.getText().toString().trim();
+            String passwordTwo = passwordTwoEditText.getText().toString().trim();
 
             if(registerViewModel.validateEmail(emailEditText) &&
                registerViewModel.validateUsername(usernameEditText) &&

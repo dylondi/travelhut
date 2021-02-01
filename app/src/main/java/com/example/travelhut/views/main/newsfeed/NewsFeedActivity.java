@@ -6,6 +6,9 @@ import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.MenuItemCompat;
 import androidx.fragment.app.FragmentActivity;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
@@ -22,11 +25,13 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ViewFlipper;
 
 import com.example.travelhut.R;
 import com.example.travelhut.model.User;
 import com.example.travelhut.utils.BottomNavigationViewHelper;
 import com.example.travelhut.viewmodel.newsfeed.NewsFeedActivityViewModel;
+import com.example.travelhut.viewmodel.newsfeed.toolbar.users.UserSearchAdapterViewModel;
 import com.example.travelhut.views.ProfileFragment;
 import com.example.travelhut.views.main.newsfeed.toolbar.user_search.UserSearchAdapter;
 import com.example.travelhut.views.main.profile.ProfileActivity;
@@ -41,7 +46,7 @@ import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import java.util.ArrayList;
 import java.util.List;
 
-public class NewsFeedActivity extends AppCompatActivity{
+public class NewsFeedActivity extends AppCompatActivity implements LifecycleOwner {
 
     private final static String TAG = "NewsFeedActivity";
     private Context mContext = NewsFeedActivity.this;
@@ -51,6 +56,7 @@ public class NewsFeedActivity extends AppCompatActivity{
     private UserSearchAdapter userSearchAdapter;
     private List<User> mUsers;
     private SearchView searchView;
+    private ViewFlipper viewFlipper;
 
     private TextView loggedInUserTextView;
     private Button logoutButton;
@@ -66,6 +72,7 @@ public class NewsFeedActivity extends AppCompatActivity{
         setSupportActionBar(toolbar);
         //toolbar.setTitle(null);
         getSupportActionBar().setTitle("");
+        viewFlipper = findViewById(R.id.viewflipper);
 
 
         recyclerView = findViewById(R.id.recycler_view);
@@ -74,8 +81,9 @@ public class NewsFeedActivity extends AppCompatActivity{
 
         mUsers = new ArrayList<>();
         readUsers();
-        userSearchAdapter = new UserSearchAdapter(this, mUsers);
+        userSearchAdapter = new UserSearchAdapter(this, this, mUsers);
         recyclerView.setAdapter(userSearchAdapter);
+//        getLifecycle().addObserver(userSearchAdapter);
 
         //readUsers();
 
@@ -123,18 +131,6 @@ public class NewsFeedActivity extends AppCompatActivity{
         menuItem.setChecked(true);
     }
 
-    private void setupViewPager(){
-        SectionsPagerAdapter adapter = new SectionsPagerAdapter(this);
-        adapter.addFragment(new CameraFragment());
-        adapter.addFragment(new SearchFragment());
-        adapter.addFragment(new MessagesFragment());
-        ViewPager2 viewPager2 = findViewById(R.id.container);
-        viewPager2.setAdapter(adapter);
-
-        //TabLayout tabLayout = findViewById(R.id.tabs);
-        //tabLayout.setUpw
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.news_feed_action_bar_menu, menu);
@@ -155,10 +151,11 @@ public class NewsFeedActivity extends AppCompatActivity{
             }
         });
 
-        searchView.setOnCloseListener(() -> {
-            recyclerView.setAlpha(0);
-            return true;
-        });
+//        searchView.setOnCloseListener(() -> {
+//            recyclerView.setAlpha(0);
+//            recyclerView.setClickable(false);
+//            return true;
+//        });
 
         menuItemCamera.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
             @Override
@@ -176,40 +173,18 @@ public class NewsFeedActivity extends AppCompatActivity{
 
             @Override
             public boolean onMenuItemActionExpand(MenuItem menuItem) {
-                Toast.makeText(NewsFeedActivity.this, "onMenuItemActionExpand called", Toast.LENGTH_SHORT).show();
                 readUsers();
-                recyclerView.setAlpha(1);
+                viewFlipper.showNext();
                 return true;
             }
 
             @Override
             public boolean onMenuItemActionCollapse(MenuItem menuItem) {
-                //Toast.makeText(NewsFeedActivity.this, "onMenutItemActionCollapse called", Toast.LENGTH_SHORT).show();
-                recyclerView.setAlpha(0);
-                //searchView.setQuery("", true);
-
+                searchView.setQuery("", true);
+                viewFlipper.showPrevious();
                 userSearchAdapter.notifyDataSetChanged();
                 return true;
             }
-
-
-//            @Override
-//            public boolean onMenuItemActionExpand(MenuItem item) {
-//                Toast.makeText(NewsFeedActivity.this, "onMenuItemActionExpand called", Toast.LENGTH_SHORT).show();
-//                readUsers();
-//                recyclerView.setAlpha(1);
-//                return true;
-//            }
-//
-//            @Override
-//            public boolean onMenuItemActionCollapse(MenuItem item) {
-//                //Toast.makeText(NewsFeedActivity.this, "onMenutItemActionCollapse called", Toast.LENGTH_SHORT).show();
-//                recyclerView.setAlpha(0);
-//               searchView.setQuery("", true);
-//
-//                userSearchAdapter.notifyDataSetChanged();
-//                return true;
-//            }
         });
 
 
@@ -217,73 +192,40 @@ public class NewsFeedActivity extends AppCompatActivity{
     }
 
     private void searchUsers(String s){
-        //recyclerView.setAlpha(1);
-        //newsFeedActivityViewModel = new NewsFeedActivityViewModel(s);
-        //newsFeedActivityViewModel = ViewModelProvider(this, new NewsFeedActivityViewModelFactory(this.getApplication(), "my awesome param")).get(MyViewModel.class);
 
-        Query query = FirebaseDatabase.getInstance().getReference("Users").orderByChild("username")
-                .startAt(s)
-                .endAt(s+"\uf8ff");
+        Log.v("Your Filter", "CLICKED ROW CLICKED ROW CLICKED ROW CLICKED ROW CLICKED ROW CLICKED ROW CLICKED ROW CLICKED ROW CLICKED ROW " + s);
+        newsFeedActivityViewModel = new NewsFeedActivityViewModel(s);
+        LiveData<DataSnapshot> liveData = newsFeedActivityViewModel.getDataSnapshotLiveData();
 
-        query.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+        liveData.observe(this, dataSnapshot -> {
+            mUsers.clear();
+            for (DataSnapshot snapshot : dataSnapshot.getChildren()){
+                User user = snapshot.getValue(User.class);
+                mUsers.add(user);
+            }
+
+            userSearchAdapter.notifyDataSetChanged();
+        });
+
+    }
+
+    private void readUsers() {
+        //recyclerView.setAlpha(0);
+        //recyclerView.setClickable(false);
+        //DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Users");
+        newsFeedActivityViewModel = new NewsFeedActivityViewModel();
+        LiveData<DataSnapshot> liveData = newsFeedActivityViewModel.getDataSnapshotLiveData();
+
+        liveData.observe(this, dataSnapshot -> {
+            if ((searchView != null) && (searchView.getQuery().toString().equals(""))) {
                 mUsers.clear();
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()){
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     User user = snapshot.getValue(User.class);
                     mUsers.add(user);
                 }
 
                 userSearchAdapter.notifyDataSetChanged();
             }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-            }
         });
     }
-
-    private void readUsers(){
-        recyclerView.setAlpha(0);
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Users");
-        reference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if((searchView!=null) && (searchView.getQuery().toString().equals(""))){
-                    mUsers.clear();
-                    for(DataSnapshot snapshot : dataSnapshot.getChildren()){
-                        User user = snapshot.getValue(User.class);
-                        mUsers.add(user);
-                    }
-
-                    userSearchAdapter.notifyDataSetChanged();
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-    }
-
-    @Override
-    public void onBackPressed() {
-    }
-
-//    @Override
-//    public void onItemClick(int position) {
-//
-//        Log.v("Your Filter", "HOWYE HOWYE HOWYE HOWYE HOWYE HOWYE HOWYE HOWYE HOWYE HOWYE HOWYE HOWYE HOWYE HOWYE ");
-//
-//        SharedPreferences.Editor editor = mContext.getSharedPreferences("PREFS", Context.MODE_PRIVATE).edit();
-//        editor.putString("profileid", mUsers.get(position).getId());
-//        editor.apply();
-//
-//        //mContext.startActivity(new Intent(mContext, ProfileFragment.class));
-//
-//        ((FragmentActivity) mContext).getSupportFragmentManager().beginTransaction().replace(R.id.relLayout2, new ProfileFragment()).commit();
-////        Intent intent = new Intent(this, ProfileActivity.class);
-////        startActivity(intent);
-//    }
 }
