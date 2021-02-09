@@ -30,6 +30,7 @@ import com.example.travelhut.R;
 import com.example.travelhut.utils.BottomNavigationViewHelper;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -41,23 +42,31 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.model.RectangularBounds;
+import com.google.android.libraries.places.api.net.PlacesClient;
+import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
+import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
+import com.google.firebase.database.annotations.NotNull;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
 public class MapSearchActivity extends AppCompatActivity implements OnMapReadyCallback {
-    private static final String TAG = "SearchActivity";
+    private static final String TAG = "MapSearchActivity";
     private Context mContext = MapSearchActivity.this;
     private static final int ACTIVITY_NUM = 0;
     private boolean mLocationPermissionGranted = false;
     private GoogleMap mMap;
-    private Button button;
     private SupportMapFragment supportMapFragment;
     static final int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 23;
     private FusedLocationProviderClient mFusedLocationProviderClient;
@@ -67,6 +76,8 @@ public class MapSearchActivity extends AppCompatActivity implements OnMapReadyCa
     private LocationRequest locationRequest;
     private LocationCallback locationCallback;
     private SearchView searchView;
+    private Marker currentMarker;
+
 
 
     @Override
@@ -74,42 +85,92 @@ public class MapSearchActivity extends AppCompatActivity implements OnMapReadyCa
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map_search);
         Log.d(TAG, "onCreate: started.");
-        // View view = getLayoutInflater().inflate(R.layout.activity_map_search, null, false);
+
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
-        button = findViewById(R.id.user_location_btn);
-        searchView = findViewById(R.id.search_view);
+
         supportMapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         setupBottomNavigationView();
         checkPermission();
 
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+        String apiKey = getString(R.string.google_api_key);
+
+        if(!Places.isInitialized()){
+            Places.initialize(getApplicationContext(), apiKey);
+        }
+
+        PlacesClient placesClient = Places.createClient(this);
+
+        // Initialize the AutocompleteSupportFragment.
+        AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment)
+                getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
+
+        autocompleteFragment.setLocationBias(RectangularBounds.newInstance(
+                new LatLng(-33.880490, 151.184363),
+                new LatLng(-33.858754, 151.229596)
+        ));
+
+        // Specify the types of place data to return.
+        autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG));
+
+        // Set up a PlaceSelectionListener to handle the response.
+        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
-            public boolean onQueryTextSubmit(String query) {
-                String location = searchView.getQuery().toString();
-                List<Address> addressList = null;
+            public void onPlaceSelected(@NotNull Place place) {
+                // TODO: Get info about the selected place.
+                Log.i(TAG, "Place: " + place.getName() + ", " + place.getId());
 
-                if(location != null || !location.equals("")){
+                currentMarker.remove();
+                 if(place.getName() != null || !place.getName().equals("")){
                     Geocoder geocoder = new Geocoder(MapSearchActivity.this);
-                    try{
-                        addressList = geocoder.getFromLocationName(location, 1);
-                    }catch(IOException e){
-                        e.printStackTrace();
-                    }
+//                    try{
+//                        addressList = geocoder.getFromLocationName(place.getName(), 1);
+//                    }catch(IOException e){
+//                        e.printStackTrace();
+//                    }
 
-                    Address address = addressList.get(0);
-                    LatLng latlng = new LatLng(address.getLatitude(), address.getLongitude());
-                    mMap.addMarker(new MarkerOptions().position(latlng).title(location));
-                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latlng, 10));
+                    //Address address = addressList.get(0);
+
+                    currentMarker = mMap.addMarker(new MarkerOptions().position(place.getLatLng()).title(place.getName()));
+                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(place.getLatLng(), 10));
                 }
-                return false;
             }
 
+
             @Override
-            public boolean onQueryTextChange(String newText) {
-                return false;
+            public void onError(@NotNull Status status) {
+                // TODO: Handle the error.
+                Log.i(TAG, "An error occurred: " + status);
             }
         });
+
+//        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+//            @Override
+//            public boolean onQueryTextSubmit(String query) {
+//                String location = searchView.getQuery().toString();
+//                List<Address> addressList = null;
+//
+//                if(location != null || !location.equals("")){
+//                    Geocoder geocoder = new Geocoder(MapSearchActivity.this);
+//                    try{
+//                        addressList = geocoder.getFromLocationName(location, 1);
+//                    }catch(IOException e){
+//                        e.printStackTrace();
+//                    }
+//
+//                    Address address = addressList.get(0);
+//                    LatLng latlng = new LatLng(address.getLatitude(), address.getLongitude());
+//                    mMap.addMarker(new MarkerOptions().position(latlng).title(location));
+//                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latlng, 10));
+//                }
+//                return false;
+//            }
+//
+//            @Override
+//            public boolean onQueryTextChange(String newText) {
+//                return false;
+//            }
+//        });
 
 
         supportMapFragment.getMapAsync(this);
@@ -120,34 +181,29 @@ public class MapSearchActivity extends AppCompatActivity implements OnMapReadyCa
                 //txtLocation.setText(String.format(Locale.US, "%s -- %s", wayLatitude, wayLongitude));
             }
         });
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                getLastKnownLocation();
-            }
-        });
 
 
 
 
-        locationRequest = LocationRequest.create();
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        locationRequest.setInterval(20 * 1000);
-        locationCallback = new LocationCallback() {
-            @Override
-            public void onLocationResult(LocationResult locationResult) {
-                if (locationResult == null) {
-                    return;
-                }
-                for (Location location : locationResult.getLocations()) {
-                    if (location != null) {
-                        wayLatitude = location.getLatitude();
-                        wayLongitude = location.getLongitude();
-                        //txtLocation.setText(String.format(Locale.US, "%s -- %s", wayLatitude, wayLongitude));
-                    }
-                }
-            }
-        };
+
+//        locationRequest = LocationRequest.create();
+//        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+//        locationRequest.setInterval(20 * 1000);
+//        locationCallback = new LocationCallback() {
+//            @Override
+//            public void onLocationResult(LocationResult locationResult) {
+//                if (locationResult == null) {
+//                    return;
+//                }
+//                for (Location location : locationResult.getLocations()) {
+//                    if (location != null) {
+//                        wayLatitude = location.getLatitude();
+//                        wayLongitude = location.getLongitude();
+//                        //txtLocation.setText(String.format(Locale.US, "%s -- %s", wayLatitude, wayLongitude));
+//                    }
+//                }
+//            }
+//        };
     }
 
     private void getLastKnownLocation() {

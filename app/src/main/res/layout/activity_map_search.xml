@@ -14,27 +14,33 @@
     android:layout_height="match_parent"
     tools:context=".views.main.map_search.MapSearchActivity"/>
 
-    <SearchView
-        android:id="@+id/search_view"
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="32dp"
-        android:layout_marginEnd="16dp"
-        android:background="@drawable/bg_search_round"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginLeft="10dp">
+
+        <fragment
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/autocomplete_fragment"
+            android:name="com.google.android.libraries.places.widget.AutocompleteSupportFragment"/>
 
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="80dp"
-        android:background="@drawable/ic_map_search"
-        android:id="@+id/user_location_btn"/>
+<!--    <SearchView-->
+<!--        android:id="@+id/search_view"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginStart="16dp"-->
+<!--        android:layout_marginTop="32dp"-->
+<!--        android:layout_marginEnd="16dp"-->
+<!--        android:background="@drawable/bg_search_round"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent" />-->
+
+    </androidx.cardview.widget.CardView>
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
