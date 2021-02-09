@@ -51,17 +51,15 @@ public class RegisterFragment extends Fragment {
         registerButton = root.findViewById(R.id.registerBtn);
 
         registerButton.setOnClickListener(view -> {
-            String email = emailEditText.getText().toString();
-            String username = usernameEditText.getText().toString();
-            String password = passwordEditText.getText().toString();
-            String passwordTwo = passwordTwoEditText.getText().toString();
 
-            if(registerViewModel.validateEmail(emailEditText) &&
-               registerViewModel.validateUsername(usernameEditText) &&
-               registerViewModel.validatePasswordOne(passwordEditText) &&
-               registerViewModel.validatePasswordTwo(passwordEditText, passwordTwoEditText))
+            boolean isEmailValid = registerViewModel.validateEmail(emailEditText);
+            boolean isUsernameValid = registerViewModel.validateEmail(usernameEditText);
+            boolean isPasswordValid = registerViewModel.validatePasswordOne(passwordEditText);
+            boolean isPasswordTwoValid = registerViewModel.validatePasswordTwo(passwordEditText, passwordTwoEditText);
+
+            if(isEmailValid && isUsernameValid && isPasswordValid && isPasswordTwoValid)
             {
-                registerViewModel.register(email, username, password);
+                registerViewModel.register(emailEditText.getText().toString(), usernameEditText.getText().toString(), passwordEditText.getText().toString());
             }
         });
 

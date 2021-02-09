@@ -38,6 +38,7 @@ public class LoginFragment extends Fragment {
         loginViewModel = ViewModelProviders.of(this).get(LoginViewModel.class);
 
     }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -69,15 +70,17 @@ public class LoginFragment extends Fragment {
             String email = emailLogin.getText().toString();
             String password = passwordLogin.getText().toString();
 
-            if(loginViewModel.validateEmail(emailLogin) && loginViewModel.validatePasswordOne(passwordLogin))
-            {
+            boolean isEmailValid = loginViewModel.validateEmail(emailLogin);
+            boolean isPasswordValid = loginViewModel.validatePasswordOne(passwordLogin);
+
+            if (isEmailValid && isPasswordValid) {
                 loginViewModel.login(email, password);
                 loginViewModel.getUserMutableLiveData().observe(getViewLifecycleOwner(), firebaseUser -> {
-            if(firebaseUser != null){
-                Intent myIntent = new Intent(getActivity(), NewsFeedActivity.class);
-                startActivity(myIntent);
-            }
-        });
+                    if (firebaseUser != null) {
+                        Intent myIntent = new Intent(getActivity(), NewsFeedActivity.class);
+                        startActivity(myIntent);
+                    }
+                });
             }
         });
 
