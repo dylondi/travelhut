@@ -11,7 +11,7 @@ import android.os.Bundle;
 import com.example.travelhut.R;
 import com.example.travelhut.viewmodel.OnboardingScreensViewModel;
 import com.example.travelhut.views.authentication.SlideViewPagerAdapter;
-import com.example.travelhut.views.authentication.LoginActivity;
+import com.example.travelhut.views.authentication.RegisterLoginActivity;
 import com.example.travelhut.views.main.newsfeed.NewsFeedActivity;
 
 public class OnboardingScreensActivity extends AppCompatActivity {
@@ -38,7 +38,7 @@ public class OnboardingScreensActivity extends AppCompatActivity {
         });
 
         if(isOpenAlready()){
-            Intent intent = new Intent(OnboardingScreensActivity.this, LoginActivity.class);
+            Intent intent = new Intent(OnboardingScreensActivity.this, RegisterLoginActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK );
             startActivity(intent);
         }else{

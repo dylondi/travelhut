@@ -51,7 +51,7 @@ public class SlideViewPagerAdapter extends PagerAdapter {
         ImageView back = view.findViewById(R.id.back);
         Button getStartedBtn = view.findViewById(R.id.getStartedBtn);
         getStartedBtn.setOnClickListener(view1 -> {
-            Intent intent = new Intent(ctx, LoginActivity.class);
+            Intent intent = new Intent(ctx, RegisterLoginActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
             ctx.startActivity(intent);
         });

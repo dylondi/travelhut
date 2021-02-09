@@ -2,6 +2,17 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.travelhut">
 
+    <uses-feature
+        android:glEsVersion="0x00020000"
+        android:required="true"/>
+
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -9,7 +20,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".views.authentication.LoginActivity"></activity>
+        <activity android:name=".views.authentication.RegisterLoginActivity"></activity>
         <activity android:name=".views.onboarding.OnboardingScreensActivity" />
         <activity android:name=".views.splash.SplashScreenActivity">
             <intent-filter>
@@ -23,12 +34,24 @@
             android:theme="@style/AppTheme" />
         <activity android:name=".views.main.planner.PlannerActivity"></activity>
         <activity android:name=".views.main.profile.ProfileActivity"></activity>
-        <activity android:name=".views.main.search.SearchActivity"></activity>
+        <activity android:name=".views.main.map_search.MapSearchActivity"></activity>
         <activity android:name=".views.main.trips.TripsActivity"></activity>
 
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="${mapsApiKey}" />
+
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+
+        <uses-library
+            android:name="org.apache.http.legacy"
+            android:required="false" />
     </application>
 
 </manifest>

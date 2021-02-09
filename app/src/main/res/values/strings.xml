@@ -8,4 +8,8 @@
     <string name="login">login</string>
     <string name="sign_up">Sign Up</string>
     <string name="not_registered_sign_up">Not Registered? Sign Up</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="google_maps_api_key">AIzaSyBR9SRynpeNN5rJeDmgIVlElzvCZYofld4</string>
 </resources>
