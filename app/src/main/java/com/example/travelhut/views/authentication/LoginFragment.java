@@ -67,8 +67,8 @@ public class LoginFragment extends Fragment {
 
 
         loginButton.setOnClickListener(view -> {
-            String email = emailLogin.getText().toString();
-            String password = passwordLogin.getText().toString();
+            String email = emailLogin.getText().toString().trim();
+            String password = passwordLogin.getText().toString().trim();
 
             boolean isEmailValid = loginViewModel.validateEmail(emailLogin);
             boolean isPasswordValid = loginViewModel.validatePasswordOne(passwordLogin);

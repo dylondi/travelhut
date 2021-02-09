@@ -17,7 +17,7 @@
         app:layout_constraintHeight_percent=".32"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0" />
+        app:layout_constraintVertical_bias="0"/>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout"
@@ -65,7 +65,8 @@
             app:layout_constraintVertical_bias="0"
             app:tabIndicatorColor="@color/light_blue"
             app:tabRippleColor="@android:color/transparent"
-            app:tabMaxWidth="220dp" />
+            app:tabMaxWidth="220dp"
+            android:backgroundTint="@android:color/transparent"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

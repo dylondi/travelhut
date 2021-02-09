@@ -1,4 +1,4 @@
-package com.example.travelhut.views.main.trips;
+package com.example.travelhut.views.main.search;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -8,30 +8,21 @@ import android.view.MenuItem;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.viewpager.widget.ViewPager;
 
 import com.example.travelhut.R;
 import com.example.travelhut.utils.BottomNavigationViewHelper;
-import com.example.travelhut.views.main.newsfeed.SectionsPagerAdapter;
-import com.google.android.material.tabs.TabLayout;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 
-public class TripsActivity extends AppCompatActivity {
-    private static final String TAG = "TripsActivity";
-    private Context mContext = TripsActivity.this;
-    private static final int ACTIVITY_NUM = 1;
+public class MapSearchActivity extends AppCompatActivity {
+    private static final String TAG = "SearchActivity";
+    private Context mContext = MapSearchActivity.this;
+    private static final int ACTIVITY_NUM = 0;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_trips);
-        TripsSectionsPagerAdapter sectionsPagerAdapter = new TripsSectionsPagerAdapter(this, getSupportFragmentManager());
-        ViewPager viewPager = findViewById(R.id.view_pager_trips);
+        setContentView(R.layout.activity_main);
         Log.d(TAG, "onCreate: started.");
-        viewPager.setAdapter(sectionsPagerAdapter);
-        TabLayout tabs = findViewById(R.id.tabs);
-        tabs.setupWithViewPager(viewPager);
-
 
         setupBottomNavigationView();
     }
