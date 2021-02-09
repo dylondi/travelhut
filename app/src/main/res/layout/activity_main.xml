@@ -24,16 +24,16 @@
         <!--middle section-->
 
 
-<FrameLayout
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_below="@+id/relLayout1"
-    android:id="@+id/frame_layout">
+<!--<FrameLayout-->
+<!--    android:layout_width="match_parent"-->
+<!--    android:layout_height="wrap_content"-->
+<!--    android:layout_below="@+id/relLayout1"-->
+<!--    android:id="@+id/frame_layout">-->
         <RelativeLayout
             android:id="@+id/relLayout2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            >
+            android:layout_below="@+id/relLayout1">
 
             <ViewFlipper
                 android:layout_width="match_parent"
@@ -62,7 +62,7 @@
 
 
         </RelativeLayout>
-</FrameLayout>
+<!--</FrameLayout>-->
 
 
         <!--bottom navigation-->

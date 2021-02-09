@@ -81,7 +81,7 @@ public class NewsFeedActivity extends AppCompatActivity implements LifecycleOwne
 
         mUsers = new ArrayList<>();
         readUsers();
-        userSearchAdapter = new UserSearchAdapter(this, this, mUsers);
+        userSearchAdapter = new UserSearchAdapter(this, mUsers);
         recyclerView.setAdapter(userSearchAdapter);
 //        getLifecycle().addObserver(userSearchAdapter);
 
@@ -151,11 +151,6 @@ public class NewsFeedActivity extends AppCompatActivity implements LifecycleOwne
             }
         });
 
-//        searchView.setOnCloseListener(() -> {
-//            recyclerView.setAlpha(0);
-//            recyclerView.setClickable(false);
-//            return true;
-//        });
 
         menuItemCamera.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
             @Override

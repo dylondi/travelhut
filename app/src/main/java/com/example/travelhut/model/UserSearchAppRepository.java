@@ -1,12 +1,14 @@
 package com.example.travelhut.model;
 
 import android.app.Application;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -15,48 +17,26 @@ import com.google.firebase.database.ValueEventListener;
 
 public class UserSearchAppRepository extends LiveData<DataSnapshot> {
 
-    //private Application application;
     private MutableLiveData<Boolean> isFollowing;
-   //private MutableLiveData<Boolean> userMutableLiveData;
-    //private FirebaseUser firebaseUser;
+    private MutableLiveData<FirebaseUser> userMutableLiveData;
+    private MutableLiveData<DatabaseReference> referenceMutableLiveData;
+    private FirebaseAuth firebaseAuth;
+
 
 
     public UserSearchAppRepository() {
-        //this.application = application;
-        //this.userMutableLiveData = new MutableLiveData<>();
         isFollowing = new MutableLiveData<>();
+        userMutableLiveData = new MutableLiveData<>();
+        referenceMutableLiveData = new MutableLiveData<>();
+        firebaseAuth = FirebaseAuth.getInstance();
+
+        if(firebaseAuth.getCurrentUser() != null){
+            userMutableLiveData.postValue(firebaseAuth.getCurrentUser());
+            referenceMutableLiveData.postValue(FirebaseDatabase.getInstance().getReference()
+                    .child("Follow").child(firebaseAuth.getCurrentUser().getUid()).child("following"));
+        }
 
 
-    }
-
-//    public MutableLiveData<FirebaseUser> getUserMutableLiveData() {
-//        return userMutableLiveData;
-//    }
-
-    public boolean isFollowing(String userId) {
-        final boolean[] x = new boolean[1];
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference()
-                .child("Follow").child(userId).child("following");
-        reference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.child(userId).exists()) {
-                    //isFollowing.setValue(true);
-                    x[0] = true;
-                    //button.setText("following");
-                } else {
-                    isFollowing.setValue(false);
-                    x[0] = false;
-                    //button.setText("follow");
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-        return x[0];
     }
 
     public void follow(String userId) {
@@ -73,8 +53,37 @@ public class UserSearchAppRepository extends LiveData<DataSnapshot> {
                 .child("followers").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).removeValue();
     }
 
-//    public MutableLiveData<Boolean> getIsFollowing(String userId){
-//        isFollowing(userId);
-//        return isFollowing;
-//    }
+    public MutableLiveData<FirebaseUser> getUserMutableLiveData() {
+        return userMutableLiveData;
+    }
+    public MutableLiveData<DatabaseReference> getReferenceMutableLiveData() {
+        return referenceMutableLiveData;
+    }
+
+
+    public MutableLiveData<Boolean> getIsFollowing(String userid){
+        final FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference()
+                  .child("Follow").child(firebaseUser.getUid()).child("following");
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.child(userid).exists()) {
+
+
+                    isFollowing.setValue(true);
+                    Log.d("logging", "change text to following : " + userid);
+                } else {
+                    isFollowing.setValue(false);
+                    Log.d("logging", "change text to follow : " + userid);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        return isFollowing;
+    }
 }
