@@ -1,47 +1,32 @@
 package com.example.travelhut.views.main.newsfeed;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.view.MenuItemCompat;
-import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.viewpager2.widget.ViewPager2;
 
 
 import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.ViewFlipper;
 
 import com.example.travelhut.R;
+import com.example.travelhut.model.UniversalImageLoader;
 import com.example.travelhut.model.User;
 import com.example.travelhut.utils.BottomNavigationViewHelper;
-import com.example.travelhut.viewmodel.newsfeed.NewsFeedActivityViewModel;
-import com.example.travelhut.viewmodel.newsfeed.toolbar.users.UserSearchAdapterViewModel;
-import com.example.travelhut.views.ProfileFragment;
+import com.example.travelhut.viewmodel.main.newsfeed.NewsFeedActivityViewModel;
 import com.example.travelhut.views.main.newsfeed.toolbar.user_search.UserSearchAdapter;
-import com.example.travelhut.views.main.profile.ProfileActivity;
 import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
+import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,6 +53,7 @@ public class NewsFeedActivity extends AppCompatActivity implements LifecycleOwne
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setupBottomNavigationView();
+        initImageLoader();
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         //toolbar.setTitle(null);
@@ -222,5 +208,11 @@ public class NewsFeedActivity extends AppCompatActivity implements LifecycleOwne
                 userSearchAdapter.notifyDataSetChanged();
             }
         });
+    }
+
+
+    private void initImageLoader(){
+        UniversalImageLoader universalImageLoader = new UniversalImageLoader(mContext);
+        ImageLoader.getInstance().init(universalImageLoader.getConfig());
     }
 }

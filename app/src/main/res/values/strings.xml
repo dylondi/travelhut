@@ -15,4 +15,6 @@
     <string name="tab_text_1">Previous</string>
     <string name="tab_text_2">Current</string>
     <string name="tab_text_3">Future</string>
+    <string name="edit_profile">Edit Profile</string>
+    <string name="sign_out">Sign Out</string>
 </resources>

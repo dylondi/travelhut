@@ -1,4 +1,4 @@
-package com.example.travelhut.viewmodel.newsfeed;
+package com.example.travelhut.viewmodel.main.newsfeed;
 
 import android.app.Application;
 

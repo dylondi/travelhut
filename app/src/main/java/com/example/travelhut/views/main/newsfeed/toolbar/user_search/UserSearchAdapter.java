@@ -16,8 +16,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.travelhut.R;
 import com.example.travelhut.model.User;
-import com.example.travelhut.viewmodel.newsfeed.toolbar.users.UserSearchAdapterViewModel;
+import com.example.travelhut.viewmodel.main.newsfeed.toolbar.users.UserSearchAdapterViewModel;
 import com.example.travelhut.views.ProfileFragment;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -69,8 +70,8 @@ public class UserSearchAdapter extends RecyclerView.Adapter<UserSearchAdapter.Vi
         final User user = mUsers.get(position);
 
         userSearchAdapterViewModel = new UserSearchAdapterViewModel(user.getId());
-        firebaseUser = userSearchAdapterViewModel.getUserMutableLiveData().getValue();
-
+        //firebaseUser = userSearchAdapterViewModel.getUserMutableLiveData().getValue();
+        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         setUserItem(holder, user);
         isFollowing(user.getId(),holder.btn_follow);
 
@@ -105,7 +106,7 @@ public class UserSearchAdapter extends RecyclerView.Adapter<UserSearchAdapter.Vi
         editor.putString("profileid", user.getId());
         editor.apply();
         ProfileFragment profileFragment = new ProfileFragment();
-        ((FragmentActivity) mContext).getSupportFragmentManager().beginTransaction().replace(R.id.relLayout2, profileFragment).commit();
+        ((FragmentActivity) mContext).getSupportFragmentManager().beginTransaction().replace(R.id.frame_layout, profileFragment).commit();
     }
 
     private void setUserItem(@NonNull ViewHolder holder, User user) {
@@ -158,8 +159,6 @@ public class UserSearchAdapter extends RecyclerView.Adapter<UserSearchAdapter.Vi
 //        }
 
 
-
-
 //        reference.addValueEventListener(new ValueEventListener() {
 //            @Override
 //            public void onDataChange(DataSnapshot dataSnapshot) {
@@ -185,28 +184,31 @@ public class UserSearchAdapter extends RecyclerView.Adapter<UserSearchAdapter.Vi
 
         //final FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference()
-                .child("Follow").child(firebaseUser.getUid()).child("following");
-        reference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.child(userid).exists()){
+       // DatabaseReference reference = userSearchAdapterViewModel.getReferenceMutableLiveData().getValue();
+          DatabaseReference reference = FirebaseDatabase.getInstance().getReference()
+                  .child("Follow").child(firebaseUser.getUid()).child("following");
 
-                    Log.d("logging","text currently reads: " + button.getText());
-                    button.setText("following");
-                    Log.d("logging","change text to following : " + userid);
-                } else{
-                    Log.d("logging","text currently reads: " + button.getText());
-                    button.setText("follow");
-                    Log.d("logging","change text to follow : " + userid);
+            reference.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    if (dataSnapshot.child(userid).exists()) {
+
+                        Log.d("logging", "text currently reads: " + button.getText());
+                        button.setText("following");
+                        Log.d("logging", "change text to following : " + userid);
+                    } else {
+                        Log.d("logging", "text currently reads: " + button.getText());
+                        button.setText("follow");
+                        Log.d("logging", "change text to follow : " + userid);
+                    }
                 }
-            }
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
 
-            }
-        });
+                }
+            });
+
     }
 
 }

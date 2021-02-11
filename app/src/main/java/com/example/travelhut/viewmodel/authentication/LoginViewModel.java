@@ -40,4 +40,8 @@ public class LoginViewModel extends AndroidViewModel {
         return userMutableLiveData;
     }
 
+    public void logout(){
+        authAppRepository.logout();
+    }
+
 }

@@ -3,7 +3,9 @@
 import android.util.Log;
 
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -19,12 +21,18 @@ public class UsersAppRepository extends LiveData<DataSnapshot> {
     private final Query query;
     private String s;
     private DatabaseReference reference;
+    private MutableLiveData<Boolean> loggedOutMutableLiveData;
+    private FirebaseAuth firebaseAuth;
+
 
     public UsersAppRepository(String s) {
         this.s = s;
         this.query = FirebaseDatabase.getInstance().getReference("Users").orderByChild("username")
                 .startAt(s)
                 .endAt(s+"\uf8ff");
+
+        firebaseAuth = FirebaseAuth.getInstance();
+        loggedOutMutableLiveData = new MutableLiveData<>();
         //reference = FirebaseDatabase.getInstance().getReference("Users");
 
     }
@@ -66,4 +74,14 @@ public class UsersAppRepository extends LiveData<DataSnapshot> {
             //Log.e(LOG_TAG, "Can't listen to query " + query, databaseError.toException());
         }
     }
+
+    public MutableLiveData<Boolean> getLoggedOutMutableLiveData() {
+        return loggedOutMutableLiveData;
+    }
+
+    public void logout(){
+        firebaseAuth.signOut();
+        loggedOutMutableLiveData.postValue(true);
+    }
+
 }

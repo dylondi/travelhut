@@ -10,6 +10,7 @@
         android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
 
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
@@ -34,6 +35,7 @@
             android:theme="@style/AppTheme" />
         <activity android:name=".views.main.planner.PlannerActivity"></activity>
         <activity android:name=".views.main.profile.ProfileActivity"></activity>
+        <activity android:name=".views.main.profile.AccountSettingsActivity"></activity>
         <activity android:name=".views.main.map_search.MapSearchActivity"></activity>
         <activity android:name=".views.main.trips.TripsActivity"></activity>
 

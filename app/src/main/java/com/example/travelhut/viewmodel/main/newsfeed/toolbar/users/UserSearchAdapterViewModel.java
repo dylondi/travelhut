@@ -1,14 +1,6 @@
-package com.example.travelhut.viewmodel.newsfeed.toolbar.users;
+package com.example.travelhut.viewmodel.main.newsfeed.toolbar.users;
 
-import android.app.Application;
-import android.widget.EditText;
-
-import androidx.annotation.NonNull;
-import androidx.lifecycle.AndroidViewModel;
-import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.OnLifecycleEvent;
 import androidx.lifecycle.ViewModel;
 
 import com.example.travelhut.model.UserSearchAppRepository;

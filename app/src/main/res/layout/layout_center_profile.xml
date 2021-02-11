@@ -1,0 +1,126 @@
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white">
+
+        <!--top toolbar -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:id="@+id/profile_rel_layout_1">
+
+            <include layout="@layout/snippet_top_profile_bar"/>
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/profile_rel_layout_1"
+            android:background="@drawable/white_light_blue_bottom_border">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:id="@+id/profile_linear_layout"
+                android:weightSum="100"
+                android:layout_marginTop="20dp">
+
+                <RelativeLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="25"
+                    android:layout_marginStart="25dp">
+
+                    <de.hdodenhof.circleimageview.CircleImageView
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
+                        android:id="@+id/profile_image"
+                        app:civ_border_color="@color/dark_blue"
+                        app:civ_border_width="2dp"
+                        android:layout_centerVertical="true"/>
+                    
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="75"
+                    android:layout_marginStart="30dp"
+                    android:layout_marginEnd="30dp">
+
+                    <include layout="@layout/snippet_top_profile"/>
+                </RelativeLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_below="@+id/profile_linear_layout"
+                android:padding="15dp"
+                android:id="@+id/profile_linear_layout_2">
+
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/display_name"
+                    android:textColor="@color/black"
+                    android:text="Dylon Di Ruscio"
+                    android:textSize="16sp"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/description"
+                    android:textColor="@color/black"
+                    android:text="Seasoned traveller"
+                    android:layout_marginTop="5dp"
+                    android:textSize="16sp"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/url"
+                    android:textColor="@color/dark_blue"
+                    android:text="dylon.diruscio@hotmail.com"
+                    android:textSize="16sp"
+                    android:layout_marginTop="5dp"/>
+
+
+            </LinearLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/profile_rel_layout_2"
+                android:layout_below="@id/profile_linear_layout_2"
+                android:layout_marginBottom="50dp">
+
+                <GridView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/grid_view_profile"
+                    android:verticalSpacing="1dp"
+                    android:horizontalSpacing="1dp"
+                    android:stretchMode="columnWidth"
+                    android:numColumns="3"
+                    android:gravity="center">
+
+
+                </GridView>
+
+
+            </RelativeLayout>
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+</merge>

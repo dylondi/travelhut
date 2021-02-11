@@ -1,0 +1,203 @@
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:padding="20dp">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:id="@+id/edit_profile_image"
+                android:layout_marginTop="20dp"
+                app:civ_border_color="@color/dark_blue"
+                app:civ_border_width="2dp"
+                android:layout_centerHorizontal="true"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Change Profile Image"
+                android:id="@+id/change_profile_image"
+                android:layout_below="@id/edit_profile_image"
+                android:layout_centerHorizontal="true"
+                android:textColor="@color/dark_blue"
+                android:textSize="16sp"/>
+
+
+            <!--display name section -->
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_below="@+id/change_profile_image"
+                android:layout_marginTop="80dp"
+                android:background="@drawable/light_blue_border_bottom"
+                android:id="@+id/relLayout1">
+
+                <ImageView
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:src="@drawable/ic_display_name"
+                    android:layout_centerVertical="true"/>
+
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/display_name"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="40dp"
+                    android:background="@null"
+                    android:inputType="textNoSuggestions"
+                    android:hint="Display Name"/>
+            </RelativeLayout>
+
+
+            <!--username section -->
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="15dp"
+                android:layout_below="@+id/relLayout1"
+                android:background="@drawable/light_blue_border_bottom"
+                android:id="@+id/relLayout2">
+
+                <ImageView
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:src="@drawable/ic_username"
+                    android:layout_centerVertical="true"/>
+
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/username"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="40dp"
+                    android:background="@null"
+                    android:inputType="textNoSuggestions"
+                    android:hint="Username"/>
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="15dp"
+                android:layout_below="@+id/relLayout2"
+                android:background="@drawable/light_blue_border_bottom"
+                android:id="@+id/relLayout3">
+
+                <ImageView
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:src="@drawable/ic_urls"
+                    android:layout_centerVertical="true"/>
+
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/urls"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="40dp"
+                    android:background="@null"
+                    android:hint="URLs"
+                    android:inputType="textNoSuggestions"/>
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_below="@+id/relLayout3"
+                android:background="@drawable/light_blue_border_bottom"
+                android:layout_marginTop="15dp"
+                android:id="@+id/relLayout4">
+
+                <ImageView
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:src="@drawable/ic_description"
+                    android:layout_centerVertical="true"/>
+
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/description"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="40dp"
+                    android:background="@null"
+                    android:inputType="textNoSuggestions"
+                    android:hint="Describe Yourself"/>
+            </RelativeLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="25sp"
+                android:id="@+id/private_info_text"
+                android:text="Private Information"
+                android:layout_below="@id/relLayout4"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="50dp"
+                android:textColor="@color/black"
+                android:background="@drawable/light_blue_border_bottom"/>
+
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="15dp"
+                android:layout_below="@+id/private_info_text"
+                android:background="@drawable/light_blue_border_bottom"
+                android:id="@+id/relLayout5">
+
+                <ImageView
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:src="@drawable/ic_email"
+                    android:layout_centerVertical="true"/>
+
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/email"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="40dp"
+                    android:background="@null"
+                    android:hint="Email"
+                    android:inputType="textNoSuggestions"/>
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="15dp"
+                android:layout_below="@+id/relLayout5"
+                android:background="@drawable/light_blue_border_bottom"
+                android:id="@+id/relLayout6">
+
+                <ImageView
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:src="@drawable/ic_phone_number"
+                    android:layout_centerVertical="true"/>
+
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/phone_number"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="40dp"
+                    android:background="@null"
+                    android:inputType="textNoSuggestions"
+                    android:hint="Phone Number"/>
+            </RelativeLayout>
+
+
+        </RelativeLayout>
+    </ScrollView>
+</merge>

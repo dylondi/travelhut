@@ -120,7 +120,11 @@ public class MapSearchActivity extends AppCompatActivity implements OnMapReadyCa
                 // TODO: Get info about the selected place.
                 Log.i(TAG, "Place: " + place.getName() + ", " + place.getId());
 
-                currentMarker.remove();
+                if(currentMarker!=null) {
+                    currentMarker.remove();
+                }
+
+
                  if(place.getName() != null || !place.getName().equals("")){
                     Geocoder geocoder = new Geocoder(MapSearchActivity.this);
 //                    try{
@@ -132,7 +136,7 @@ public class MapSearchActivity extends AppCompatActivity implements OnMapReadyCa
                     //Address address = addressList.get(0);
 
                     currentMarker = mMap.addMarker(new MarkerOptions().position(place.getLatLng()).title(place.getName()));
-                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(place.getLatLng(), 10));
+                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(place.getLatLng(), 8));
                 }
             }
 

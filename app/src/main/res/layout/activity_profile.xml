@@ -6,48 +6,57 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".views.main.profile.ProfileActivity">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <!--top toolbar -->
-        <RelativeLayout
-            android:id="@+id/rel_layout1"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+<!--    <androidx.constraintlayout.widget.ConstraintLayout-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent">-->
+<!--        &lt;!&ndash;top toolbar &ndash;&gt;-->
+<!--        <RelativeLayout-->
+<!--            android:id="@+id/rel_layout1"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            app:layout_constraintEnd_toEndOf="parent"-->
+<!--            app:layout_constraintStart_toStartOf="parent"-->
+<!--            app:layout_constraintTop_toTopOf="parent">-->
 
-            <include layout="@layout/layout_top_tabs" />
+<!--            <include layout="@layout/snippet_top_profile_bar" />-->
 
-        </RelativeLayout>
+<!--        </RelativeLayout>-->
 
 
-        <RelativeLayout
-            android:id="@+id/rel_layout2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/rel_layout1">
+<!--        <RelativeLayout-->
+<!--            android:id="@+id/rel_layout2"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            app:layout_constraintBottom_toBottomOf="parent"-->
+<!--            app:layout_constraintEnd_toEndOf="parent"-->
+<!--            app:layout_constraintStart_toStartOf="parent"-->
+<!--            app:layout_constraintTop_toBottomOf="@id/rel_layout1">-->
 
-            <TextView
-                android:id="@+id/username_profile"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/username"
-                android:textSize="30sp"
-                android:gravity="center"/>
+<!--            <TextView-->
+<!--                android:id="@+id/username_profile"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="@string/username"-->
+<!--                android:textSize="30sp"-->
+<!--                android:gravity="center"/>-->
 
-        </RelativeLayout>
+<!--        </RelativeLayout>-->
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+<!--    </androidx.constraintlayout.widget.ConstraintLayout>-->
     <RelativeLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent">
 
-        <include layout="@layout/layout_bottom_navigation_view" />
+        <include layout="@layout/layout_center_profile"/>
+        <include layout="@layout/layout_bottom_navigation_view"/>
+
+        <ProgressBar
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:id="@+id/profile_progress_bar"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="100dp"/>
+
     </RelativeLayout>
 
 
