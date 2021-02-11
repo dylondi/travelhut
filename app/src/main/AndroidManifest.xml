@@ -6,8 +6,8 @@
         android:glEsVersion="0x00020000"
         android:required="true"/>
 
-    <uses-permission
-        android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.INTERNET"/>
@@ -35,9 +35,14 @@
             android:theme="@style/AppTheme" />
         <activity android:name=".views.main.planner.PlannerActivity"></activity>
         <activity android:name=".views.main.profile.ProfileActivity"></activity>
+        <activity android:name=".views.main.profile.CreatePostActivity"></activity>
         <activity android:name=".views.main.profile.AccountSettingsActivity"></activity>
         <activity android:name=".views.main.map_search.MapSearchActivity"></activity>
         <activity android:name=".views.main.trips.TripsActivity"></activity>
+        <activity android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
+            android:theme="@style/Theme.Travelhut">
+
+        </activity>
 
         <meta-data
             android:name="preloaded_fonts"

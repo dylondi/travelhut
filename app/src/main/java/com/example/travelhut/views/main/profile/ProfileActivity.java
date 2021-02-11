@@ -127,6 +127,17 @@ public class ProfileActivity extends AppCompatActivity {
                  startActivity(new Intent(mContext, AccountSettingsActivity.class));
              }
          });
+
+
+         ImageView addPost = findViewById(R.id.add_post);
+         addPost.setOnClickListener(new View.OnClickListener() {
+             @Override
+             public void onClick(View v) {
+                 Log.i(TAG, "onClick called starting Intent for CreatePostActivity.");
+                // Intent intent = new Intent(mContext, AccountSettingsActivity.class);
+                 startActivity(new Intent(mContext, CreatePostActivity.class));
+             }
+         });
      }
 
 

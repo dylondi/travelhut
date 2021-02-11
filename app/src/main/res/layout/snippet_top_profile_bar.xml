@@ -33,6 +33,15 @@
                     android:layout_centerVertical="true"
                     android:id="@+id/overflow_menu"
                     android:src="@drawable/ic_profile_overflow"/>
+
+                <ImageView
+                    android:id="@+id/add_post"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginStart="286dp"
+                    android:layout_marginEnd="60dp"
+                    android:src="@drawable/ic_add_post" />
             </RelativeLayout>
 
         </androidx.appcompat.widget.Toolbar>

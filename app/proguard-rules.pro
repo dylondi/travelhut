@@ -21,3 +21,4 @@
 #-renamesourcefileattribute SourceFile
 
 -keep public class com.example.travelhut.views.main.newsfeed.NewsFeedActivity { *; }
+
