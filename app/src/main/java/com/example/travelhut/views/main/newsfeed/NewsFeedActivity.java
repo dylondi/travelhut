@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -11,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -25,6 +27,7 @@ import com.example.travelhut.model.UniversalImageLoader;
 import com.example.travelhut.model.User;
 import com.example.travelhut.utils.BottomNavigationViewHelper;
 import com.example.travelhut.viewmodel.main.newsfeed.NewsFeedActivityViewModel;
+import com.example.travelhut.views.ProfileFragment;
 import com.example.travelhut.views.main.newsfeed.newsfeed.PostAdapter;
 import com.example.travelhut.views.main.newsfeed.toolbar.user_search.UserSearchAdapter;
 import com.google.firebase.auth.FirebaseAuth;
@@ -82,6 +85,18 @@ public class NewsFeedActivity extends AppCompatActivity implements LifecycleOwne
         postAdapter = new PostAdapter(this, postList);
         newsFeedRecycler.setAdapter(postAdapter);
         checkFollowing();
+
+        Bundle intent = getIntent().getExtras();
+        if(intent != null){
+            String publisher = intent.getString("publisherid");
+
+            SharedPreferences.Editor editor = getSharedPreferences("PREFS", MODE_PRIVATE).edit();
+            editor.putString("profileid", publisher);
+            editor.apply();
+
+            ProfileFragment profileFragment = new ProfileFragment();
+            ((FragmentActivity) mContext).getSupportFragmentManager().beginTransaction().replace(R.id.frame_layout, profileFragment).commit();
+        }
 
         recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);
@@ -293,5 +308,10 @@ public class NewsFeedActivity extends AppCompatActivity implements LifecycleOwne
 
             }
         });
+    }
+
+    @Override
+    public void onBackPressed() {
+        
     }
 }

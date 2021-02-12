@@ -123,8 +123,6 @@ public class CreatePostActivity extends AppCompatActivity {
             StorageReference fileRef = storageReference.child(System.currentTimeMillis()
                     + "." + getFileExtension(this,imageUri));
 
-            Uri uri = imageUri;
-            String test = getFileExtension(this,imageUri);
 
 
 
