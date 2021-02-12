@@ -43,13 +43,18 @@
 
 <!--            <include layout="@layout/layout_center_viewpager"/>-->
 
-                <LinearLayout
+                <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
 
 
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/news_feed_recycler_view"/>
 
-                </LinearLayout>
+
+                </RelativeLayout>
 
 
                 <androidx.recyclerview.widget.RecyclerView

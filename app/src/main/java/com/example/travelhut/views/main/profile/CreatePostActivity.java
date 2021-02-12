@@ -2,9 +2,11 @@ package com.example.travelhut.views.main.profile;
 
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.webkit.MimeTypeMap;
 import android.widget.EditText;
@@ -29,10 +31,12 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
 import com.theartofdev.edmodo.cropper.CropImage;
 
+import java.io.File;
 import java.util.HashMap;
 
 public class CreatePostActivity extends AppCompatActivity {
 
+    private static final String TAG = "CreatePostActivity";
     Uri imageUri;
     String myUrl = "";
     StorageTask uploadTask;
@@ -77,20 +81,52 @@ public class CreatePostActivity extends AppCompatActivity {
 
     }
 
-    private String getFileExtension(Uri uri){
-        ContentResolver contentResolver = getContentResolver();
-        MimeTypeMap mime = MimeTypeMap.getSingleton();
-        return mime.getExtensionFromMimeType(contentResolver.getType(uri));
+
+    public static String getFileExtension(Context context, Uri uri) {
+        String extension;
+
+        //Check uri format to avoid null
+        if (uri.getScheme().equals(ContentResolver.SCHEME_CONTENT)) {
+            //If scheme is a content
+            final MimeTypeMap mime = MimeTypeMap.getSingleton();
+            extension = mime.getExtensionFromMimeType(context.getContentResolver().getType(uri));
+        } else {
+            //If scheme is a File
+            //This will replace white spaces with %20 and also other special characters. This will avoid returning null values on file name with spaces and special characters.
+            extension = MimeTypeMap.getFileExtensionFromUrl(Uri.fromFile(new File(uri.getPath())).toString());
+
+        }
+
+        return extension;
     }
+
+
+//    private String getFileExtension(Uri uri){
+//
+//        ContentResolver cR = getContentResolver();
+//        MimeTypeMap mime = MimeTypeMap.getSingleton();
+//        String type = mime.getExtensionFromMimeType(cR.getType(uri));
+//    }
 
     private void uploadImage(){
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Posting");
         progressDialog.show();
 
+
+        Log.d(TAG, "uploadImage: file extension: " + getFileExtension(this, imageUri));
         if(imageUri != null){
+            Log.d(TAG, "uploadImage: imageUri: " + imageUri.toString());
+//            StorageReference fileRef = storageReference.child(System.currentTimeMillis()
+//            + "." + getFileExtension(imageUri));
+
             StorageReference fileRef = storageReference.child(System.currentTimeMillis()
-            + "." + getFileExtension(imageUri));
+                    + "." + getFileExtension(this,imageUri));
+
+            Uri uri = imageUri;
+            String test = getFileExtension(this,imageUri);
+
+
 
             uploadTask = fileRef.putFile(imageUri);
             uploadTask.continueWithTask(new Continuation() {

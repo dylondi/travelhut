@@ -1,5 +1,6 @@
 package com.example.travelhut.views.main.newsfeed;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
@@ -19,12 +20,19 @@ import android.widget.TextView;
 import android.widget.ViewFlipper;
 
 import com.example.travelhut.R;
+import com.example.travelhut.model.Post;
 import com.example.travelhut.model.UniversalImageLoader;
 import com.example.travelhut.model.User;
 import com.example.travelhut.utils.BottomNavigationViewHelper;
 import com.example.travelhut.viewmodel.main.newsfeed.NewsFeedActivityViewModel;
+import com.example.travelhut.views.main.newsfeed.newsfeed.PostAdapter;
 import com.example.travelhut.views.main.newsfeed.toolbar.user_search.UserSearchAdapter;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
@@ -43,6 +51,11 @@ public class NewsFeedActivity extends AppCompatActivity implements LifecycleOwne
     private SearchView searchView;
     private ViewFlipper viewFlipper;
 
+    private RecyclerView newsFeedRecycler;
+    private PostAdapter postAdapter;
+    private List<Post> postList;
+
+    private List<String> followingList;
     private TextView loggedInUserTextView;
     private Button logoutButton;
 
@@ -59,7 +72,16 @@ public class NewsFeedActivity extends AppCompatActivity implements LifecycleOwne
         //toolbar.setTitle(null);
         getSupportActionBar().setTitle("");
         viewFlipper = findViewById(R.id.viewflipper);
-
+        newsFeedRecycler = findViewById(R.id.news_feed_recycler_view);
+        newsFeedRecycler.setHasFixedSize(true);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        linearLayoutManager.setReverseLayout(true);
+        linearLayoutManager.setStackFromEnd(true);
+        newsFeedRecycler.setLayoutManager(linearLayoutManager);
+        postList = new ArrayList<>();
+        postAdapter = new PostAdapter(this, postList);
+        newsFeedRecycler.setAdapter(postAdapter);
+        checkFollowing();
 
         recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);
@@ -67,6 +89,7 @@ public class NewsFeedActivity extends AppCompatActivity implements LifecycleOwne
 
         mUsers = new ArrayList<>();
         readUsers();
+
         userSearchAdapter = new UserSearchAdapter(this, mUsers);
         recyclerView.setAdapter(userSearchAdapter);
 //        getLifecycle().addObserver(userSearchAdapter);
@@ -214,5 +237,61 @@ public class NewsFeedActivity extends AppCompatActivity implements LifecycleOwne
     private void initImageLoader(){
         UniversalImageLoader universalImageLoader = new UniversalImageLoader(mContext);
         ImageLoader.getInstance().init(universalImageLoader.getConfig());
+    }
+
+
+    private void checkFollowing(){
+        followingList = new ArrayList<>();
+
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Follow")
+                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .child("following");
+
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                followingList.clear();
+                for(DataSnapshot snapshot : dataSnapshot.getChildren()){
+                    followingList.add(snapshot.getKey());
+                }
+
+                readPosts();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+
+    private void readPosts(){
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Posts");
+
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                postList.clear();
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+
+
+                    Post post = snapshot.getValue(Post.class);
+                    Log.d(TAG, "onDataChange: POST IMAGE: " + post.getPostimage());
+                    for (String id : followingList) {
+                        if (post.getPublisher().equals(id)) {
+                            postList.add(post);
+                        }
+                    }
+                }
+                postAdapter.notifyDataSetChanged();
+            }
+
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 }
