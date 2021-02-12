@@ -56,7 +56,7 @@ public class AuthAppRepository extends LiveData<DataSnapshot> {
                 hashMap.put("id", userId);
                 hashMap.put("username", username);
                 hashMap.put("email", email);
-                hashMap.put("imageurl", "https://firebasestorage.googleapis.com/v0/b/travelhut-a660a.appspot.com/o/placeholder.png?alt=media&token=af8ac3db-ebc3-479b-97f9-72b93a6a7e00");
+                hashMap.put("imageurl", "https://firebasestorage.googleapis.com/v0/b/travelhut-a660a.appspot.com/o/placeholder.png?alt=media&token=cf4b797a-3daf-43d6-b9a4-83383347bb0e");
 
                 databaseReference.setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override

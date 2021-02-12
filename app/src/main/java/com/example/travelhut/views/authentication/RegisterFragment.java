@@ -53,7 +53,7 @@ public class RegisterFragment extends Fragment {
         registerButton.setOnClickListener(view -> {
 
             boolean isEmailValid = registerViewModel.validateEmail(emailEditText);
-            boolean isUsernameValid = registerViewModel.validateEmail(usernameEditText);
+            boolean isUsernameValid = registerViewModel.validateUsername(usernameEditText);
             boolean isPasswordValid = registerViewModel.validatePasswordOne(passwordEditText);
             boolean isPasswordTwoValid = registerViewModel.validatePasswordTwo(passwordEditText, passwordTwoEditText);
 
