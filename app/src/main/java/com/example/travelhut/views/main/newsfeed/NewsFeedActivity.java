@@ -72,7 +72,6 @@ public class NewsFeedActivity extends AppCompatActivity implements LifecycleOwne
         initImageLoader();
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        //toolbar.setTitle(null);
         getSupportActionBar().setTitle("");
         viewFlipper = findViewById(R.id.viewflipper);
         newsFeedRecycler = findViewById(R.id.news_feed_recycler_view);
@@ -229,9 +228,6 @@ public class NewsFeedActivity extends AppCompatActivity implements LifecycleOwne
     }
 
     private void readUsers() {
-        //recyclerView.setAlpha(0);
-        //recyclerView.setClickable(false);
-        //DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Users");
         newsFeedActivityViewModel = new NewsFeedActivityViewModel();
         LiveData<DataSnapshot> liveData = newsFeedActivityViewModel.getDataSnapshotLiveData();
 
@@ -270,29 +266,6 @@ public class NewsFeedActivity extends AppCompatActivity implements LifecycleOwne
 
             readPosts();
         });
-
-
-
-//        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Follow")
-//                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-//                .child("following");
-//
-//        reference.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                followingList.clear();
-//                for(DataSnapshot snapshot : dataSnapshot.getChildren()){
-//                    followingList.add(snapshot.getKey());
-//                }
-//
-//                readPosts();
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//
-//            }
-//        });
     }
 
 
@@ -315,33 +288,6 @@ public class NewsFeedActivity extends AppCompatActivity implements LifecycleOwne
                 }
                 postAdapter.notifyDataSetChanged();
         });
-
-//        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Posts");
-//
-//        reference.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                postList.clear();
-//                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-//
-//
-//                    Post post = snapshot.getValue(Post.class);
-//                    Log.d(TAG, "onDataChange: POST IMAGE: " + post.getPostimage());
-//                    for (String id : followingList) {
-//                        if (post.getPublisher().equals(id)) {
-//                            postList.add(post);
-//                        }
-//                    }
-//                }
-//                postAdapter.notifyDataSetChanged();
-//            }
-//
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//
-//            }
-//        });
     }
 
     @Override
