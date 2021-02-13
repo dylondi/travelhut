@@ -49,11 +49,11 @@
                 <RelativeLayout
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:layout_weight="75"
                     android:layout_marginStart="30dp"
-                    android:layout_marginEnd="30dp">
+                    android:layout_marginEnd="30dp"
+                    android:layout_weight="75">
 
-                    <include layout="@layout/snippet_top_profile"/>
+                    <include layout="@layout/snippet_top_profile" />
                 </RelativeLayout>
             </LinearLayout>
 

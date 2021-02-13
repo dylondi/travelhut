@@ -2,6 +2,7 @@ package com.example.travelhut.views.main.profile;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -16,10 +17,16 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.lifecycle.LiveData;
 
+import com.bumptech.glide.Glide;
 import com.example.travelhut.R;
+import com.example.travelhut.model.FollowersAppRepository;
 import com.example.travelhut.model.UniversalImageLoader;
+import com.example.travelhut.model.User;
 import com.example.travelhut.utils.BottomNavigationViewHelper;
+import com.example.travelhut.viewmodel.main.newsfeed.NewsFeedActivityViewModel;
+import com.example.travelhut.viewmodel.main.profile.ProfileActivityViewModel;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -38,47 +45,62 @@ public class ProfileActivity extends AppCompatActivity {
     private static final int ACTIVITY_NUM = 4;
     private static final int NUM_OF_GRID_COLUMNS = 3;
     private TextView username;
+    String profileid;
     private FirebaseAuth firebaseAuth;
     private ProgressBar mProgressBar;
     private ImageView profileImage;
+    private TextView followers, following;
+    private ProfileActivityViewModel profileActivityViewModel;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
         Log.d(TAG, "onCreate: started.");
+        profileActivityViewModel = new ProfileActivityViewModel();
         username = findViewById(R.id.display_name);
+        followers = findViewById(R.id.numFollowers);
+        following = findViewById(R.id.numFollowing);
 
         String s = username.getText().toString();
 
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
-        username.setText(user.getDisplayName());
+        SharedPreferences prefs = getSharedPreferences("PREFS", Context.MODE_PRIVATE);
+        profileid = prefs.getString("profileid", "none");
+
+        username.setText(firebaseUser.getDisplayName());
+        //Glide.with(mContext).load(firebaseUser.getPhotoUrl()).into(profileImage);
+
 
         setupBottomNavigationView();
         setupToolbar();
         setupActivityWidgets();
 
-
+        userInfo();
+        getFollowers();
         tempGridSetup();
-        setProfileImage();
+        //setProfileImage();
+        //Glide.with(mContext).load(firebaseUser.getPhotoUrl()).into(profileImage);
 
 
 
 
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Users");
-        ref.child(user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                String name = dataSnapshot.child("username").getValue().toString();
-                username.setText(name);
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
+//        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Users");
+//        ref.child(firebaseUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot dataSnapshot) {
+//                String name = dataSnapshot.child("username").getValue().toString();
+//                username.setText(name);
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//
+//            }
+//        });
      }
 
      private void tempGridSetup(){
@@ -164,6 +186,43 @@ public class ProfileActivity extends AppCompatActivity {
         menuItem.setChecked(true);
     }
 
+
+    private void userInfo(){
+        
+        LiveData<DataSnapshot> liveData = profileActivityViewModel.getDataSnapshotLiveData();
+
+        liveData.observe(this, dataSnapshot -> {
+
+            if(dataSnapshot!=null) {
+                User user = dataSnapshot.getValue(User.class);
+                Log.d(TAG, "userInfo: imageuri: " + user.getImageurl());
+                Glide.with(mContext).load(user.getImageurl()).into(profileImage);
+                username.setText(user.getUsername());
+//                fullname.setText(user.getFullname());
+//                bio.setText(user.get());
+            }
+        });
+
+    }
+
+
+    private void getFollowers(){
+        LiveData<DataSnapshot> numOfFollowers = profileActivityViewModel.getFollowersSnapshot();
+
+        numOfFollowers.observe(this, dataSnapshot -> {
+            if(dataSnapshot!=null) {
+                followers.setText(""+dataSnapshot.getChildrenCount());
+            }
+        });
+
+        LiveData<DataSnapshot> numOfFollowing = profileActivityViewModel.getFollowingSnapshot();
+
+        numOfFollowing.observe(this, dataSnapshot -> {
+            if(dataSnapshot!=null) {
+                following.setText(""+dataSnapshot.getChildrenCount());
+            }
+        });
+    }
 
 
 
