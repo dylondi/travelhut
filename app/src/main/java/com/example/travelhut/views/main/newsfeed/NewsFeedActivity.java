@@ -258,36 +258,50 @@ public class NewsFeedActivity extends AppCompatActivity implements LifecycleOwne
     private void checkFollowing(){
         followingList = new ArrayList<>();
 
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Follow")
-                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                .child("following");
+        newsFeedActivityViewModel = new NewsFeedActivityViewModel();
 
-        reference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                followingList.clear();
-                for(DataSnapshot snapshot : dataSnapshot.getChildren()){
-                    followingList.add(snapshot.getKey());
-                }
+        LiveData<DataSnapshot> liveData = newsFeedActivityViewModel.getFollowingSnapshot();
 
-                readPosts();
+        liveData.observe(this, dataSnapshot -> {
+            followingList.clear();
+            for(DataSnapshot snapshot : dataSnapshot.getChildren()){
+                followingList.add(snapshot.getKey());
             }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
+            readPosts();
         });
+
+
+
+//        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Follow")
+//                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+//                .child("following");
+//
+//        reference.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                followingList.clear();
+//                for(DataSnapshot snapshot : dataSnapshot.getChildren()){
+//                    followingList.add(snapshot.getKey());
+//                }
+//
+//                readPosts();
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//
+//            }
+//        });
     }
 
 
     private void readPosts(){
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Posts");
 
-        reference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                postList.clear();
+        LiveData<DataSnapshot> liveData = newsFeedActivityViewModel.getPostsLiveData();
+
+        liveData.observe(this, dataSnapshot -> {
+                            postList.clear();
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
 
 
@@ -300,14 +314,34 @@ public class NewsFeedActivity extends AppCompatActivity implements LifecycleOwne
                     }
                 }
                 postAdapter.notifyDataSetChanged();
-            }
-
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
         });
+
+//        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Posts");
+//
+//        reference.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                postList.clear();
+//                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+//
+//
+//                    Post post = snapshot.getValue(Post.class);
+//                    Log.d(TAG, "onDataChange: POST IMAGE: " + post.getPostimage());
+//                    for (String id : followingList) {
+//                        if (post.getPublisher().equals(id)) {
+//                            postList.add(post);
+//                        }
+//                    }
+//                }
+//                postAdapter.notifyDataSetChanged();
+//            }
+//
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//
+//            }
+//        });
     }
 
     @Override

@@ -11,6 +11,10 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -124,7 +128,6 @@ public class UserSearchAdapter extends RecyclerView.Adapter<UserSearchAdapter.Vi
 
 
 
-
     public class ViewHolder extends RecyclerView.ViewHolder{
 
         public TextView username;
@@ -147,21 +150,14 @@ public class UserSearchAdapter extends RecyclerView.Adapter<UserSearchAdapter.Vi
 
     private void isFollowing(final String userid, final Button button) {
 
-        //final FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-
-        //DatabaseReference reference = userSearchAdapterViewModel.getReferenceMutableLiveData().getValue();
 
 
-//        if(userSearchAdapterViewModel.getIsFollowing().getValue()){
-//            button.setText("follow");
-//        }else{
-//            button.setText("unfollow");
-//        }
+//        LiveData<DataSnapshot> liveData = userSearchAdapterViewModel.getFollowing();
 
-
-//        reference.addValueEventListener(new ValueEventListener() {
+//
+//        liveData.observeForever(new Observer<DataSnapshot>() {
 //            @Override
-//            public void onDataChange(DataSnapshot dataSnapshot) {
+//            public void onChanged(DataSnapshot dataSnapshot) {
 //                if (dataSnapshot.child(userid).exists()) {
 //
 //                    Log.d("logging", "text currently reads: " + button.getText());
@@ -174,17 +170,8 @@ public class UserSearchAdapter extends RecyclerView.Adapter<UserSearchAdapter.Vi
 //                }
 //            }
 //
-//            @Override
-//            public void onCancelled(DatabaseError databaseError) {
-//
-//            }
 //        });
-//    }
-//     private void isFollowing(final String userid, final Button button){
-
-        //final FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-
-       // DatabaseReference reference = userSearchAdapterViewModel.getReferenceMutableLiveData().getValue();
+//
           DatabaseReference reference = FirebaseDatabase.getInstance().getReference()
                   .child("Follow").child(firebaseUser.getUid()).child("following");
 

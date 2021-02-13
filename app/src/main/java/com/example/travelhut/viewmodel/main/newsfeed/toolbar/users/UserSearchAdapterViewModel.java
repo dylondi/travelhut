@@ -1,10 +1,13 @@
 package com.example.travelhut.viewmodel.main.newsfeed.toolbar.users;
 
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.example.travelhut.model.FollowersAppRepository;
 import com.example.travelhut.model.UserSearchAppRepository;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 
 
@@ -14,6 +17,7 @@ public class UserSearchAdapterViewModel extends ViewModel{
     private MutableLiveData<FirebaseUser> userMutableLiveData;
     private MutableLiveData<DatabaseReference> referenceMutableLiveData;
     private MutableLiveData<Boolean> isFollowing;
+    private FollowersAppRepository followersAppRepository;
     //boolean userMutableLiveData;
 
     private String userId;
@@ -24,6 +28,7 @@ public class UserSearchAdapterViewModel extends ViewModel{
         referenceMutableLiveData = userSearchAppRepository.getReferenceMutableLiveData();
         this.userId = userId;
         isFollowing = userSearchAppRepository.getIsFollowing(userId);
+        followersAppRepository = new FollowersAppRepository();
 
         //userMutableLiveData = userSearchAppRepository.isFollowing();
     }
@@ -45,8 +50,8 @@ public class UserSearchAdapterViewModel extends ViewModel{
         return referenceMutableLiveData;
     }
 
-    public MutableLiveData<Boolean> getIsFollowing() {
-        return isFollowing;
+    public LiveData<DataSnapshot> getFollowing() {
+        return followersAppRepository;
     }
 
     public void unfollow(String userId) {
