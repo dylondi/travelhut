@@ -19,6 +19,7 @@ public class FollowingAppRepository extends LiveData<DataSnapshot> {
     private DatabaseReference following;
     private FirebaseUser firebaseUser;
 
+    //constructor
     public FollowingAppRepository() {
 
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -26,19 +27,24 @@ public class FollowingAppRepository extends LiveData<DataSnapshot> {
     }
 
 
+    //method called when an observer is active
     @Override
     protected void onActive() {
         Log.d(TAG, "onActive");
+        //assign event listener to find changes in number of following
         following.addValueEventListener(listenerFollowing);
 
     }
 
+    //method called when an observers lifecycle states has not started or resumed
     @Override
     protected void onInactive() {
         Log.d(TAG, "onInactive");
+        //remove event listener
         following.removeEventListener(listenerFollowing);
     }
 
+    //event listener to find changes in data
     private class FollowingValueEventListener implements ValueEventListener {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {

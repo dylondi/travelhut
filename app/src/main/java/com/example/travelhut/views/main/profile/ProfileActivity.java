@@ -13,7 +13,6 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -21,22 +20,15 @@ import androidx.lifecycle.LiveData;
 
 import com.bumptech.glide.Glide;
 import com.example.travelhut.R;
-import com.example.travelhut.model.FollowersAppRepository;
 import com.example.travelhut.model.UniversalImageLoader;
-import com.example.travelhut.model.User;
+import com.example.travelhut.views.authentication.utils.User;
 import com.example.travelhut.utils.BottomNavigationViewHelper;
-import com.example.travelhut.viewmodel.main.newsfeed.NewsFeedActivityViewModel;
 import com.example.travelhut.viewmodel.main.profile.ProfileActivityViewModel;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class ProfileActivity extends AppCompatActivity {

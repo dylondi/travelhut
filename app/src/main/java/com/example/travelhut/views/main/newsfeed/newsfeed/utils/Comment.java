@@ -1,4 +1,4 @@
-package com.example.travelhut.model;
+package com.example.travelhut.views.main.newsfeed.newsfeed.utils;
 
 public class Comment {
 

@@ -22,8 +22,7 @@ public class UserSearchAppRepository extends LiveData<DataSnapshot> {
     private MutableLiveData<DatabaseReference> referenceMutableLiveData;
     private FirebaseAuth firebaseAuth;
 
-
-
+    //constructor
     public UserSearchAppRepository() {
         isFollowing = new MutableLiveData<>();
         userMutableLiveData = new MutableLiveData<>();
@@ -39,18 +38,38 @@ public class UserSearchAppRepository extends LiveData<DataSnapshot> {
 
     }
 
+    //method is called when current user follows another user
     public void follow(String userId) {
-        FirebaseDatabase.getInstance().getReference().child("Follow").child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                .child("following").child(userId).setValue(true);
-        FirebaseDatabase.getInstance().getReference().child("Follow").child(userId)
-                .child("followers").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(true);
+        //updates db -> currentUser -> following -> otherUser -> true
+        FirebaseDatabase.getInstance().getReference()
+                .child("Follow")
+                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .child("following")
+                .child(userId).setValue(true);
+
+        //updates db -> otherUser -> followers -> currentUser -> true
+        FirebaseDatabase.getInstance().getReference()
+                .child("Follow")
+                .child(userId)
+                .child("followers")
+                .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(true);
     }
 
-    public void unfollow(String userId) {
-        FirebaseDatabase.getInstance().getReference().child("Follow").child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                .child("following").child(userId).removeValue();
-        FirebaseDatabase.getInstance().getReference().child("Follow").child(userId)
-                .child("followers").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).removeValue();
+    //method is called when current user unfollows another user
+    public void unFollow(String userId) {
+        //updates db -> currentUser -> following -> otherUser -> removes value
+        FirebaseDatabase.getInstance().getReference()
+                .child("Follow")
+                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .child("following")
+                .child(userId).removeValue();
+
+        //updates db -> otherUser -> followers -> currentUser -> removes value
+        FirebaseDatabase.getInstance().getReference()
+                .child("Follow")
+                .child(userId)
+                .child("followers")
+                .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).removeValue();
     }
 
     public MutableLiveData<FirebaseUser> getUserMutableLiveData() {
@@ -61,6 +80,9 @@ public class UserSearchAppRepository extends LiveData<DataSnapshot> {
     }
 
 
+
+
+//can remove method?
     public MutableLiveData<Boolean> getIsFollowing(String userid){
         final FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference()

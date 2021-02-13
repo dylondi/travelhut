@@ -19,25 +19,28 @@ public class PostsAppRepository extends LiveData<DataSnapshot> {
 
     DatabaseReference reference;
 
+    //constructor
     public PostsAppRepository() {
         reference = FirebaseDatabase.getInstance().getReference("Posts");
-
-
     }
 
-
+    //method called when an observer is active
     @Override
     protected void onActive() {
         Log.d(TAG, "onActive");
+        //assign event listener to find changes in posts data
         reference.addValueEventListener(listener);
     }
 
+    //method called when an observers lifecycle states has not started or resumed
     @Override
     protected void onInactive() {
         Log.d(TAG, "onInactive");
+        //remove event listener
         reference.removeEventListener(listener);
     }
 
+    //event listener to find changes in data
     private class PostsEventListener implements ValueEventListener {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {

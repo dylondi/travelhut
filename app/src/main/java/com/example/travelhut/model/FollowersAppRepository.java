@@ -15,30 +15,38 @@ import com.google.firebase.database.ValueEventListener;
 public class FollowersAppRepository extends LiveData<DataSnapshot> {
 
     private static final String TAG = "FollowersAppRepository";
-    private FollowersValueEventListener listenerFollowers = new FollowersValueEventListener();
+    private FollowersValueEventListener listenerFollowers;
     private DatabaseReference followers;
     private FirebaseUser firebaseUser;
 
+    //Constructor
     public FollowersAppRepository() {
-
+        listenerFollowers = new FollowersValueEventListener();
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         followers = FirebaseDatabase.getInstance().getReference("Follow").child(firebaseUser.getUid()).child("followers");
     }
 
 
+
+    //method called when an observer is active
     @Override
     protected void onActive() {
         Log.d(TAG, "onActive");
+        //assign event listener to find changes in number of followers
         followers.addValueEventListener(listenerFollowers);
 
     }
 
+    //method called when an observers lifecycle states has not started or resumed
     @Override
     protected void onInactive() {
         Log.d(TAG, "onInactive");
+        //remove event listener
         followers.removeEventListener(listenerFollowers);
     }
 
+
+    //event listener to find changes in data
     private class FollowersValueEventListener implements ValueEventListener {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {

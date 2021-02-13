@@ -54,7 +54,7 @@ public class UserSearchAdapterViewModel extends ViewModel{
         return followersAppRepository;
     }
 
-    public void unfollow(String userId) {
-        userSearchAppRepository.unfollow(userId);
+    public void unFollow(String userId) {
+        userSearchAppRepository.unFollow(userId);
     }
 }

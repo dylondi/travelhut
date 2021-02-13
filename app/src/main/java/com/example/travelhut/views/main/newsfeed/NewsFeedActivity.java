@@ -1,6 +1,5 @@
 package com.example.travelhut.views.main.newsfeed;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
@@ -22,20 +21,15 @@ import android.widget.TextView;
 import android.widget.ViewFlipper;
 
 import com.example.travelhut.R;
-import com.example.travelhut.model.Post;
+import com.example.travelhut.views.main.newsfeed.newsfeed.utils.Post;
 import com.example.travelhut.model.UniversalImageLoader;
-import com.example.travelhut.model.User;
+import com.example.travelhut.views.authentication.utils.User;
 import com.example.travelhut.utils.BottomNavigationViewHelper;
 import com.example.travelhut.viewmodel.main.newsfeed.NewsFeedActivityViewModel;
 import com.example.travelhut.views.ProfileFragment;
 import com.example.travelhut.views.main.newsfeed.newsfeed.PostAdapter;
 import com.example.travelhut.views.main.newsfeed.toolbar.user_search.UserSearchAdapter;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.nostra13.universalimageloader.core.ImageLoader;
 

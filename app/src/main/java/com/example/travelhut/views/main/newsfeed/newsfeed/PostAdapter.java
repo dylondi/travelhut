@@ -14,8 +14,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.travelhut.R;
-import com.example.travelhut.model.Post;
-import com.example.travelhut.model.User;
+import com.example.travelhut.views.main.newsfeed.newsfeed.utils.Post;
+import com.example.travelhut.views.authentication.utils.User;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;

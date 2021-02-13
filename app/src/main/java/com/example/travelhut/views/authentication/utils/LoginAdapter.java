@@ -1,4 +1,4 @@
-package com.example.travelhut.views.authentication;
+package com.example.travelhut.views.authentication.utils;
 
 import android.content.Context;
 

@@ -10,7 +10,7 @@ import android.os.Bundle;
 
 import com.example.travelhut.R;
 import com.example.travelhut.viewmodel.OnboardingScreensViewModel;
-import com.example.travelhut.views.authentication.SlideViewPagerAdapter;
+import com.example.travelhut.views.authentication.utils.SlideViewPagerAdapter;
 import com.example.travelhut.views.authentication.RegisterLoginActivity;
 import com.example.travelhut.views.main.newsfeed.NewsFeedActivity;
 

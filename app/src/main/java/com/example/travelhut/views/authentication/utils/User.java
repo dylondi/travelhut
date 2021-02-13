@@ -1,4 +1,4 @@
-package com.example.travelhut.model;
+package com.example.travelhut.views.authentication.utils;
 
 public class User {
     private String id;

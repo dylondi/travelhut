@@ -25,6 +25,7 @@ public class UsersAppRepository extends LiveData<DataSnapshot> {
     private FirebaseAuth firebaseAuth;
 
 
+    //constructor with search by user
     public UsersAppRepository(String s) {
         this.s = s;
         this.query = FirebaseDatabase.getInstance().getReference("Users").orderByChild("username")
@@ -36,6 +37,8 @@ public class UsersAppRepository extends LiveData<DataSnapshot> {
         //reference = FirebaseDatabase.getInstance().getReference("Users");
 
     }
+
+    //constructor without search by user
     public UsersAppRepository() {
 
         reference = FirebaseDatabase.getInstance().getReference("Users");
@@ -51,18 +54,21 @@ public class UsersAppRepository extends LiveData<DataSnapshot> {
         return reference;
     }
 
+    //method called when an observer is active
     @Override
     protected void onActive() {
         Log.d(LOG_TAG, "onActive");
         query.addValueEventListener(listener);
     }
 
+    //method called when an observers lifecycle states has not started or resumed
     @Override
     protected void onInactive() {
         Log.d(LOG_TAG, "onInactive");
         query.removeEventListener(listener);
     }
 
+    //event listener to find changes in data
     private class MyValueEventListener implements ValueEventListener {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {

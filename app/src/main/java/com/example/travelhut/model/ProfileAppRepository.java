@@ -21,29 +21,30 @@ public class ProfileAppRepository extends LiveData<DataSnapshot> {
     private FirebaseUser firebaseUser;
     private final MyValueEventListener listener = new MyValueEventListener();
 
-
-
+    //constructor
     public ProfileAppRepository() {
 
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         reference = FirebaseDatabase.getInstance().getReference("Users").child(firebaseUser.getUid());
     }
 
-
-
-
+    //method called when an observer is active
     @Override
     protected void onActive() {
         Log.d(LOG_TAG, "onActive");
+        //assign event listener to find changes in profile data
         reference.addValueEventListener(listener);
     }
 
+    //method called when an observers lifecycle states has not started or resumed
     @Override
     protected void onInactive() {
         Log.d(LOG_TAG, "onInactive");
+        //remove event listener
         reference.removeEventListener(listener);
     }
 
+    //event listener to find changes in data
     private class MyValueEventListener implements ValueEventListener {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {

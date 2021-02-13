@@ -1,4 +1,4 @@
-package com.example.travelhut.views.authentication;
+package com.example.travelhut.views.authentication.utils;
 
 import android.content.Context;
 import android.content.Intent;
@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.viewpager.widget.PagerAdapter;
 
 import com.example.travelhut.R;
+import com.example.travelhut.views.authentication.RegisterLoginActivity;
 import com.example.travelhut.views.onboarding.OnboardingScreensActivity;
 
 public class SlideViewPagerAdapter extends PagerAdapter {

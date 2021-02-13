@@ -11,15 +11,11 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
-import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.LifecycleOwner;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.travelhut.R;
-import com.example.travelhut.model.User;
+import com.example.travelhut.views.authentication.utils.User;
 import com.example.travelhut.viewmodel.main.newsfeed.toolbar.users.UserSearchAdapterViewModel;
 import com.example.travelhut.views.ProfileFragment;
 import com.google.firebase.auth.FirebaseAuth;
@@ -100,7 +96,7 @@ public class UserSearchAdapter extends RecyclerView.Adapter<UserSearchAdapter.Vi
             userSearchAdapterViewModel.follow(user.getId());
             Log.d("logging","follow " + user.getId());
         } else {
-            userSearchAdapterViewModel.unfollow(user.getId());
+            userSearchAdapterViewModel.unFollow(user.getId());
             Log.d("logging","unfollow" + user.getId());
         }
     }
