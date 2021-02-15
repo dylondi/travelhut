@@ -9,12 +9,14 @@ import androidx.fragment.app.FragmentPagerAdapter;
 import com.example.travelhut.views.authentication.LoginFragment;
 import com.example.travelhut.views.authentication.RegisterFragment;
 
-public class LoginAdapter extends FragmentPagerAdapter {
+
+//Adapter class to allow viewpager to switch between register and login fragments
+public class RegisterLoginAdapter extends FragmentPagerAdapter {
 
     private Context context;
     int totalTabs;
 
-    public LoginAdapter(FragmentManager fm, Context context, int totalTabs){
+    public RegisterLoginAdapter(FragmentManager fm, Context context, int totalTabs){
         super(fm);
         this.context = context;
         this.totalTabs = totalTabs;
@@ -25,6 +27,7 @@ public class LoginAdapter extends FragmentPagerAdapter {
         return totalTabs;
     }
 
+    //this method gets the fragment chosen by user on authentication... register|login
     public Fragment getItem(int position){
         switch(position){
             case 0:

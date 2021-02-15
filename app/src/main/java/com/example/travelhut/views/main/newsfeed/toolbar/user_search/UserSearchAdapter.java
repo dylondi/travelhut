@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.travelhut.R;
+import com.example.travelhut.model.StringsRepository;
 import com.example.travelhut.views.authentication.utils.User;
 import com.example.travelhut.viewmodel.main.newsfeed.toolbar.users.UserSearchAdapterViewModel;
 import com.example.travelhut.views.ProfileFragment;
@@ -92,7 +93,7 @@ public class UserSearchAdapter extends RecyclerView.Adapter<UserSearchAdapter.Vi
     }
 
     private void followOrUnfollowUser(@NonNull ViewHolder holder, User user) {
-        if(holder.btn_follow.getText().toString().equals("follow")){
+        if(holder.btn_follow.getText().toString().equals(StringsRepository.FOLLOW)){
             userSearchAdapterViewModel.follow(user.getId());
             Log.d("logging","follow " + user.getId());
         } else {
@@ -169,7 +170,7 @@ public class UserSearchAdapter extends RecyclerView.Adapter<UserSearchAdapter.Vi
 //        });
 //
           DatabaseReference reference = FirebaseDatabase.getInstance().getReference()
-                  .child("Follow").child(firebaseUser.getUid()).child("following");
+                  .child(StringsRepository.FOLLOW_CAP).child(firebaseUser.getUid()).child(StringsRepository.FOLLOWING);
 
             reference.addValueEventListener(new ValueEventListener() {
                 @Override
@@ -177,11 +178,11 @@ public class UserSearchAdapter extends RecyclerView.Adapter<UserSearchAdapter.Vi
                     if (dataSnapshot.child(userid).exists()) {
 
                         Log.d("logging", "text currently reads: " + button.getText());
-                        button.setText("following");
+                        button.setText(StringsRepository.FOLLOWING);
                         Log.d("logging", "change text to following : " + userid);
                     } else {
                         Log.d("logging", "text currently reads: " + button.getText());
-                        button.setText("follow");
+                        button.setText(StringsRepository.FOLLOW);
                         Log.d("logging", "change text to follow : " + userid);
                     }
                 }

@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.travelhut.R;
+import com.example.travelhut.views.main.newsfeed.NewsFeedStrings;
 import com.example.travelhut.views.main.newsfeed.newsfeed.utils.Comment;
 import com.example.travelhut.views.authentication.utils.User;
 import com.google.firebase.auth.FirebaseAuth;
@@ -85,7 +86,7 @@ public class CommentActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if (writeComment.getText().toString().equals("")) {
 
-                    Toast.makeText(CommentActivity.this, "You can't post an empty comment.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(CommentActivity.this, NewsFeedStrings.NO_EMPTY_COMMENT, Toast.LENGTH_SHORT).show();
                 }else{
                     createComment();
                 }

@@ -1,9 +1,11 @@
 package com.example.travelhut.viewmodel.authentication;
 
 import android.app.Application;
+import android.os.Build;
 import android.widget.EditText;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 
@@ -25,6 +27,7 @@ public class LoginViewModel extends AndroidViewModel {
 
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.P)
     public void login(String email, String password){
         authAppRepository.login(email, password);
     }

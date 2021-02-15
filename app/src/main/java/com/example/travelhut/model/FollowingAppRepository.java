@@ -23,14 +23,14 @@ public class FollowingAppRepository extends LiveData<DataSnapshot> {
     public FollowingAppRepository() {
 
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        following = FirebaseDatabase.getInstance().getReference("Follow").child(firebaseUser.getUid()).child("following");
+        following = FirebaseDatabase.getInstance().getReference(StringsRepository.FOLLOW_CAP).child(firebaseUser.getUid()).child(StringsRepository.FOLLOWING);
     }
 
 
     //method called when an observer is active
     @Override
     protected void onActive() {
-        Log.d(TAG, "onActive");
+        Log.d(TAG, StringsRepository.ON_ACTIVE);
         //assign event listener to find changes in number of following
         following.addValueEventListener(listenerFollowing);
 
@@ -39,7 +39,7 @@ public class FollowingAppRepository extends LiveData<DataSnapshot> {
     //method called when an observers lifecycle states has not started or resumed
     @Override
     protected void onInactive() {
-        Log.d(TAG, "onInactive");
+        Log.d(TAG, StringsRepository.ON_INACTIVE);
         //remove event listener
         following.removeEventListener(listenerFollowing);
     }

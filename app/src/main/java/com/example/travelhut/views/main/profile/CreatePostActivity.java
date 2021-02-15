@@ -19,6 +19,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.travelhut.R;
+import com.example.travelhut.model.StringsRepository;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -56,7 +57,7 @@ public class CreatePostActivity extends AppCompatActivity {
         post = findViewById(R.id.create_post_check);
         description = findViewById(R.id.description);
 
-        storageReference = FirebaseStorage.getInstance().getReference("posts");
+        storageReference = FirebaseStorage.getInstance().getReference(StringsRepository.POSTS);
 
         close.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -110,7 +111,7 @@ public class CreatePostActivity extends AppCompatActivity {
 
     private void uploadImage(){
         ProgressDialog progressDialog = new ProgressDialog(this);
-        progressDialog.setMessage("Posting");
+        progressDialog.setMessage(StringsRepository.POSTING_CAP);
         progressDialog.show();
 
 
@@ -142,15 +143,15 @@ public class CreatePostActivity extends AppCompatActivity {
                         Uri downloadUri = task.getResult();
                         myUrl = downloadUri.toString();
 
-                        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Posts");
+                        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(StringsRepository.POSTS_CAP);
 
                         String postId = reference.push().getKey();
 
                         HashMap<String, Object> hashMap = new HashMap<>();
-                        hashMap.put("postid", postId);
-                        hashMap.put("postimage", myUrl);
-                        hashMap.put("description", description.getText().toString());
-                        hashMap.put("publisher", FirebaseAuth.getInstance().getCurrentUser().getUid());
+                        hashMap.put(StringsRepository.POST_ID, postId);
+                        hashMap.put(StringsRepository.POST_IMAGE, myUrl);
+                        hashMap.put(StringsRepository.DESCRIPTION, description.getText().toString());
+                        hashMap.put(StringsRepository.PUBLISHER, FirebaseAuth.getInstance().getCurrentUser().getUid());
 
                         reference.child(postId).setValue(hashMap);
 
@@ -159,7 +160,7 @@ public class CreatePostActivity extends AppCompatActivity {
                         startActivity(new Intent(CreatePostActivity.this, ProfileActivity.class));
                         finish();
                     }else{
-                        Toast.makeText(CreatePostActivity.this, "Failed", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(CreatePostActivity.this, StringsRepository.FAILED_CAP, Toast.LENGTH_SHORT).show();
                     }
                 }
             }).addOnFailureListener(new OnFailureListener() {
@@ -169,7 +170,7 @@ public class CreatePostActivity extends AppCompatActivity {
                 }
             });
         }else{
-            Toast.makeText(CreatePostActivity.this, "No Image Selected", Toast.LENGTH_SHORT).show();
+            Toast.makeText(CreatePostActivity.this, StringsRepository.NO_IMAGE_SELECTED, Toast.LENGTH_SHORT).show();
 
         }
     }
@@ -184,7 +185,7 @@ public class CreatePostActivity extends AppCompatActivity {
 
             imageAdded.setImageURI(imageUri);
         }else{
-            Toast.makeText(this, "Something gone wrong", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, StringsRepository.SOMETHING_GONE_WRONG, Toast.LENGTH_SHORT).show();
             startActivity(new Intent(CreatePostActivity.this, ProfileActivity.class));
             finish();
         }

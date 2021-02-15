@@ -6,7 +6,7 @@ import androidx.viewpager.widget.ViewPager;
 import android.os.Bundle;
 
 import com.example.travelhut.R;
-import com.example.travelhut.views.authentication.utils.LoginAdapter;
+import com.example.travelhut.views.authentication.utils.RegisterLoginAdapter;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 
@@ -26,11 +26,11 @@ public class RegisterLoginActivity extends AppCompatActivity {
         viewPager = findViewById(R.id.view_pager);
         google = findViewById(R.id.fab_google);
 
-        tabLayout.addTab(tabLayout.newTab().setText("Login"));
-        tabLayout.addTab(tabLayout.newTab().setText("Register"));
+        tabLayout.addTab(tabLayout.newTab().setText(AuthViewStrings.LOGIN));
+        tabLayout.addTab(tabLayout.newTab().setText(AuthViewStrings.REGISTER));
         tabLayout.setTabGravity(tabLayout.GRAVITY_FILL);
 
-        final LoginAdapter adapter = new LoginAdapter(getSupportFragmentManager(), this, tabLayout.getTabCount());
+        final RegisterLoginAdapter adapter = new RegisterLoginAdapter(getSupportFragmentManager(), this, tabLayout.getTabCount());
         viewPager.setAdapter(adapter);
 
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));

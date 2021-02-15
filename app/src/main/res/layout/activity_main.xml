@@ -11,67 +11,69 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <!--top toolbar -->
-        <RelativeLayout
-            android:id="@+id/relLayout1"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+<!--        &lt;!&ndash;top toolbar &ndash;&gt;-->
+<!--        <RelativeLayout-->
+<!--            android:id="@+id/relLayout1"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content">-->
 
-            <include layout="@layout/layout_top_tabs"/>
+<!--            <include layout="@layout/layout_top_tabs"/>-->
 
-        </RelativeLayout>
+<!--        </RelativeLayout>-->
 
         <!--middle section-->
 
 
 <FrameLayout
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:layout_below="@+id/relLayout1"
+    android:layout_above="@id/nav_bar"
     android:id="@+id/frame_layout">
-        <RelativeLayout
-            android:id="@+id/relLayout2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+<!--        <RelativeLayout-->
+<!--            android:id="@+id/relLayout2"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content">-->
 
-            <ViewFlipper
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:id="@+id/viewflipper">
-
-
-
-<!--            <include layout="@layout/layout_center_viewpager"/>-->
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+<!--            <ViewFlipper-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="match_parent"-->
+<!--                android:id="@+id/viewflipper">-->
 
 
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/news_feed_recycler_view"/>
+
+<!--&lt;!&ndash;            <include layout="@layout/layout_center_viewpager"/>&ndash;&gt;-->
+
+<!--                <RelativeLayout-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="match_parent">-->
 
 
-                </RelativeLayout>
+<!--                    <androidx.recyclerview.widget.RecyclerView-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:id="@+id/news_feed_recycler_view"/>-->
 
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/recycler_view" />
-
-            </ViewFlipper>
+<!--                </RelativeLayout>-->
 
 
-        </RelativeLayout>
+<!--                <androidx.recyclerview.widget.RecyclerView-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:id="@+id/recycler_view" />-->
+
+<!--            </ViewFlipper>-->
+
+
+<!--        </RelativeLayout>-->
 </FrameLayout>
 
 
         <!--bottom navigation-->
         <include
-            layout="@layout/layout_bottom_navigation_view"/>
+            layout="@layout/layout_bottom_navigation_view"
+            android:id="@+id/nav_bar"/>
 
 
     </RelativeLayout>

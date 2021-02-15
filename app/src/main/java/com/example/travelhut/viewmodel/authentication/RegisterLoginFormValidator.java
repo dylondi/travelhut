@@ -1,6 +1,5 @@
 package com.example.travelhut.viewmodel.authentication;
 
-import android.util.Patterns;
 import android.widget.EditText;
 
 import java.util.regex.Pattern;
@@ -31,10 +30,10 @@ public class RegisterLoginFormValidator {
     public boolean validateEmail(EditText emailEditText) {
         String emailInput = emailEditText.getText().toString().trim();
         if (emailInput.isEmpty()) {
-            emailEditText.setError("Field can't be empty");
+            emailEditText.setError(AuthViewModelStrings.FIELD_CANNOT_BE_EMPTY);
             return false;
         } else if (!EMAIL_ADDRESS.matcher(emailInput).matches()) {
-            emailEditText.setError("Please enter a valid email address");
+            emailEditText.setError(AuthViewModelStrings.ENTER_VALID_EMAIL);
             return false;
         } else {
             emailEditText.setError(null);
@@ -45,10 +44,10 @@ public class RegisterLoginFormValidator {
     boolean validateUsername(EditText userNameEditText) {
         String fullNameInput = userNameEditText.getText().toString().trim();
         if (fullNameInput.isEmpty()) {
-            userNameEditText.setError("Field can't be empty");
+            userNameEditText.setError(AuthViewModelStrings.FIELD_CANNOT_BE_EMPTY);
             return false;
         } else if (fullNameInput.length() > 20) {
-            userNameEditText.setError("Username too long");
+            userNameEditText.setError(AuthViewModelStrings.USERNAME_TOO_LONG);
             return false;
         } else {
             userNameEditText.setError(null);
@@ -60,10 +59,10 @@ public class RegisterLoginFormValidator {
         String passwordInput = passwordForm.getText().toString().trim();
 
         if (passwordInput.isEmpty()) {
-            passwordForm.setError("Field can't be empty");
+            passwordForm.setError(AuthViewModelStrings.FIELD_CANNOT_BE_EMPTY);
             return false;
         } else if (!PASSWORD_PATTERN.matcher(passwordInput).matches()) {
-            passwordForm.setError("Password too weak");
+            passwordForm.setError(AuthViewModelStrings.PASSWORD_BAD_FORMAT);
             return false;
         } else{
             passwordForm.setError(null);
@@ -76,13 +75,13 @@ public class RegisterLoginFormValidator {
         String passwordInputTwo = passwordTwoForm.getText().toString().trim();
 
         if (passwordInput.isEmpty()) {
-            passwordTwoForm.setError("Field can't be empty");
+            passwordTwoForm.setError(AuthViewModelStrings.FIELD_CANNOT_BE_EMPTY);
             return false;
         } else if (!PASSWORD_PATTERN.matcher(passwordInput).matches()) {
-            passwordTwoForm.setError("Password too weak");
+            passwordTwoForm.setError(AuthViewModelStrings.PASSWORD_BAD_FORMAT);
             return false;
         } else if (!passwordInput.equals(passwordInputTwo)) {
-            passwordTwoForm.setError("You've entered two different passwords");
+            passwordTwoForm.setError(AuthViewModelStrings.PASSWORDS_DONT_MATCH);
             return false;
         } else {
             passwordTwoForm.setError(null);

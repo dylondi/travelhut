@@ -23,7 +23,7 @@ public class FollowersAppRepository extends LiveData<DataSnapshot> {
     public FollowersAppRepository() {
         listenerFollowers = new FollowersValueEventListener();
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        followers = FirebaseDatabase.getInstance().getReference("Follow").child(firebaseUser.getUid()).child("followers");
+        followers = FirebaseDatabase.getInstance().getReference(StringsRepository.FOLLOW_CAP).child(firebaseUser.getUid()).child(StringsRepository.FOLLOWERS);
     }
 
 
@@ -31,7 +31,7 @@ public class FollowersAppRepository extends LiveData<DataSnapshot> {
     //method called when an observer is active
     @Override
     protected void onActive() {
-        Log.d(TAG, "onActive");
+        Log.d(TAG, StringsRepository.ON_ACTIVE);
         //assign event listener to find changes in number of followers
         followers.addValueEventListener(listenerFollowers);
 
@@ -40,7 +40,7 @@ public class FollowersAppRepository extends LiveData<DataSnapshot> {
     //method called when an observers lifecycle states has not started or resumed
     @Override
     protected void onInactive() {
-        Log.d(TAG, "onInactive");
+        Log.d(TAG, StringsRepository.ON_INACTIVE);
         //remove event listener
         followers.removeEventListener(listenerFollowers);
     }

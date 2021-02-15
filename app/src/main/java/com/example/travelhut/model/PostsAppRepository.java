@@ -21,13 +21,13 @@ public class PostsAppRepository extends LiveData<DataSnapshot> {
 
     //constructor
     public PostsAppRepository() {
-        reference = FirebaseDatabase.getInstance().getReference("Posts");
+        reference = FirebaseDatabase.getInstance().getReference(StringsRepository.POSTS_CAP);
     }
 
     //method called when an observer is active
     @Override
     protected void onActive() {
-        Log.d(TAG, "onActive");
+        Log.d(TAG, StringsRepository.ON_ACTIVE);
         //assign event listener to find changes in posts data
         reference.addValueEventListener(listener);
     }
@@ -35,7 +35,7 @@ public class PostsAppRepository extends LiveData<DataSnapshot> {
     //method called when an observers lifecycle states has not started or resumed
     @Override
     protected void onInactive() {
-        Log.d(TAG, "onInactive");
+        Log.d(TAG, StringsRepository.ON_INACTIVE);
         //remove event listener
         reference.removeEventListener(listener);
     }

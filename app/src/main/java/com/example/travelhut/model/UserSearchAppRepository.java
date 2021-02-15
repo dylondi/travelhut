@@ -32,7 +32,7 @@ public class UserSearchAppRepository extends LiveData<DataSnapshot> {
         if(firebaseAuth.getCurrentUser() != null){
             userMutableLiveData.postValue(firebaseAuth.getCurrentUser());
             referenceMutableLiveData.postValue(FirebaseDatabase.getInstance().getReference()
-                    .child("Follow").child(firebaseAuth.getCurrentUser().getUid()).child("following"));
+                    .child(StringsRepository.FOLLOW_CAP).child(firebaseAuth.getCurrentUser().getUid()).child(StringsRepository.FOLLOWING));
         }
 
 
@@ -42,16 +42,16 @@ public class UserSearchAppRepository extends LiveData<DataSnapshot> {
     public void follow(String userId) {
         //updates db -> currentUser -> following -> otherUser -> true
         FirebaseDatabase.getInstance().getReference()
-                .child("Follow")
+                .child(StringsRepository.FOLLOW_CAP)
                 .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                .child("following")
+                .child(StringsRepository.FOLLOWING)
                 .child(userId).setValue(true);
 
         //updates db -> otherUser -> followers -> currentUser -> true
         FirebaseDatabase.getInstance().getReference()
-                .child("Follow")
+                .child(StringsRepository.FOLLOW_CAP)
                 .child(userId)
-                .child("followers")
+                .child(StringsRepository.FOLLOWERS)
                 .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(true);
     }
 
@@ -59,16 +59,16 @@ public class UserSearchAppRepository extends LiveData<DataSnapshot> {
     public void unFollow(String userId) {
         //updates db -> currentUser -> following -> otherUser -> removes value
         FirebaseDatabase.getInstance().getReference()
-                .child("Follow")
+                .child(StringsRepository.FOLLOW_CAP)
                 .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                .child("following")
+                .child(StringsRepository.FOLLOWING)
                 .child(userId).removeValue();
 
         //updates db -> otherUser -> followers -> currentUser -> removes value
         FirebaseDatabase.getInstance().getReference()
-                .child("Follow")
+                .child(StringsRepository.FOLLOW_CAP)
                 .child(userId)
-                .child("followers")
+                .child(StringsRepository.FOLLOWERS)
                 .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).removeValue();
     }
 

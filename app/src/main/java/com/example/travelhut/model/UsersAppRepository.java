@@ -28,7 +28,7 @@ public class UsersAppRepository extends LiveData<DataSnapshot> {
     //constructor with search by user
     public UsersAppRepository(String s) {
         this.s = s;
-        this.query = FirebaseDatabase.getInstance().getReference("Users").orderByChild("username")
+        this.query = FirebaseDatabase.getInstance().getReference(StringsRepository.USERS_CAP).orderByChild(StringsRepository.USERNAME)
                 .startAt(s)
                 .endAt(s+"\uf8ff");
 
@@ -41,7 +41,7 @@ public class UsersAppRepository extends LiveData<DataSnapshot> {
     //constructor without search by user
     public UsersAppRepository() {
 
-        reference = FirebaseDatabase.getInstance().getReference("Users");
+        reference = FirebaseDatabase.getInstance().getReference(StringsRepository.USERS_CAP);
         query = (Query) reference;
 
     }
@@ -57,14 +57,14 @@ public class UsersAppRepository extends LiveData<DataSnapshot> {
     //method called when an observer is active
     @Override
     protected void onActive() {
-        Log.d(LOG_TAG, "onActive");
+        Log.d(LOG_TAG, StringsRepository.ON_ACTIVE);
         query.addValueEventListener(listener);
     }
 
     //method called when an observers lifecycle states has not started or resumed
     @Override
     protected void onInactive() {
-        Log.d(LOG_TAG, "onInactive");
+        Log.d(LOG_TAG, StringsRepository.ON_INACTIVE);
         query.removeEventListener(listener);
     }
 

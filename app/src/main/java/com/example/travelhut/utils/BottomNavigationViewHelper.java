@@ -30,6 +30,8 @@ public class BottomNavigationViewHelper {
         bottomNavigationViewEx.setTextVisibility(false);
     }
 
+
+    //this method assigns intents to each item in a menu by iterating with a switch statement
     public static void enableNavigation(final Context context, BottomNavigationViewEx view){
         view.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override

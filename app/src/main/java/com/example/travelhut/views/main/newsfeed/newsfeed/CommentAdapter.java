@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.travelhut.R;
+import com.example.travelhut.model.StringsRepository;
 import com.example.travelhut.views.main.newsfeed.newsfeed.utils.Comment;
 import com.example.travelhut.views.authentication.utils.User;
 import com.example.travelhut.views.main.newsfeed.NewsFeedActivity;
@@ -96,7 +97,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
     }
 
     private void getUserInfo(ImageView imageView, TextView username, String publisherid){
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("Users").child(publisherid);
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child(StringsRepository.USERS_CAP).child(publisherid);
 
         reference.addValueEventListener(new ValueEventListener() {
             @Override

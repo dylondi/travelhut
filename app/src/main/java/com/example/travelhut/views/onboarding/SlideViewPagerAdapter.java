@@ -1,4 +1,4 @@
-package com.example.travelhut.views.authentication.utils;
+package com.example.travelhut.views.onboarding;
 
 import android.content.Context;
 import android.content.Intent;

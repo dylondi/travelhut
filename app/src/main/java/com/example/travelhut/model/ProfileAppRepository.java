@@ -25,13 +25,13 @@ public class ProfileAppRepository extends LiveData<DataSnapshot> {
     public ProfileAppRepository() {
 
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        reference = FirebaseDatabase.getInstance().getReference("Users").child(firebaseUser.getUid());
+        reference = FirebaseDatabase.getInstance().getReference(StringsRepository.USERS_CAP).child(firebaseUser.getUid());
     }
 
     //method called when an observer is active
     @Override
     protected void onActive() {
-        Log.d(LOG_TAG, "onActive");
+        Log.d(LOG_TAG, StringsRepository.ON_ACTIVE);
         //assign event listener to find changes in profile data
         reference.addValueEventListener(listener);
     }
@@ -39,7 +39,7 @@ public class ProfileAppRepository extends LiveData<DataSnapshot> {
     //method called when an observers lifecycle states has not started or resumed
     @Override
     protected void onInactive() {
-        Log.d(LOG_TAG, "onInactive");
+        Log.d(LOG_TAG, StringsRepository.ON_INACTIVE);
         //remove event listener
         reference.removeEventListener(listener);
     }

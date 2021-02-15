@@ -14,6 +14,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.travelhut.R;
+import com.example.travelhut.model.StringsRepository;
+import com.example.travelhut.views.main.newsfeed.NewsFeedStrings;
 import com.example.travelhut.views.main.newsfeed.newsfeed.utils.Post;
 import com.example.travelhut.views.authentication.utils.User;
 import com.google.firebase.auth.FirebaseAuth;
@@ -80,12 +82,12 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder>{
         holder.like.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (holder.like.getTag().equals("like")) {
-                    FirebaseDatabase.getInstance().getReference().child("Likes").child(post.getPostid())
+                if (holder.like.getTag().equals(NewsFeedStrings.LIKE)) {
+                    FirebaseDatabase.getInstance().getReference().child(NewsFeedStrings.LIKES_CAP).child(post.getPostid())
                             .child(firebaseUser.getUid()).setValue(true);
                     //addNotification(post.getPublisher(), post.getPostid());
                 } else {
-                    FirebaseDatabase.getInstance().getReference().child("Likes").child(post.getPostid())
+                    FirebaseDatabase.getInstance().getReference().child(NewsFeedStrings.LIKES_CAP).child(post.getPostid())
                             .child(firebaseUser.getUid()).removeValue();
                 }
             }
@@ -140,13 +142,19 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder>{
     }
 
     private void getComments(String postid, TextView comments){
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("Comments").child(postid);
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child(NewsFeedStrings.COMMENTS_CAP).child(postid);
 
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                comments.setText("View all " + snapshot.getChildrenCount() + " comments");
+                if(snapshot.getChildrenCount()<1){
+                    comments.setText("");
+
+                }else {
+                    comments.setText("View all " + snapshot.getChildrenCount() + " comments");
+                }
             }
+
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
@@ -159,7 +167,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder>{
     private void checkIfLiked(String postId, ImageView imageView){
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference()
-                .child("Likes")
+                .child(NewsFeedStrings.LIKES_CAP)
                 .child(postId);
 
         reference.addValueEventListener(new ValueEventListener() {
@@ -167,10 +175,10 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder>{
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.child(firebaseUser.getUid()).exists()){
                     imageView.setImageResource(R.drawable.ic_liked);
-                    imageView.setTag("liked");
+                    imageView.setTag(NewsFeedStrings.LIKED);
                 }else{
                     imageView.setImageResource(R.drawable.ic_like);
-                    imageView.setTag("like");
+                    imageView.setTag(NewsFeedStrings.LIKE);
                 }
             }
 
@@ -184,7 +192,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder>{
 
 
     private void getNumOfLikes(final TextView likes_text, String postId){
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("Likes")
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child(NewsFeedStrings.LIKES_CAP)
                 .child(postId);
 
         reference.addValueEventListener(new ValueEventListener() {
@@ -200,7 +208,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder>{
         });
     }
     private void publisherInfo(ImageView image_profile, TextView username, TextView publisher, String userid){
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Users").child(userid);
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(StringsRepository.USERS_CAP).child(userid);
 
         reference.addValueEventListener(new ValueEventListener() {
             @Override
