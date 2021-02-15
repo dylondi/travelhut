@@ -264,6 +264,7 @@ public class NewsFeedFragment extends Fragment {
 
     }
 
+
     public ViewFlipper getViewFlipper() {
         return viewFlipper;
     }

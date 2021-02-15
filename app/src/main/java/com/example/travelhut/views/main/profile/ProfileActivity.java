@@ -17,6 +17,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.LiveData;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.travelhut.R;
@@ -24,12 +26,19 @@ import com.example.travelhut.model.UniversalImageLoader;
 import com.example.travelhut.views.authentication.utils.User;
 import com.example.travelhut.utils.BottomNavigationViewHelper;
 import com.example.travelhut.viewmodel.main.profile.ProfileActivityViewModel;
+import com.example.travelhut.views.main.newsfeed.newsfeed.PostAdapter;
+import com.example.travelhut.views.main.newsfeed.newsfeed.utils.Post;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class ProfileActivity extends AppCompatActivity {
     private static final String TAG = "ProfileActivity";
@@ -43,7 +52,9 @@ public class ProfileActivity extends AppCompatActivity {
     private ImageView profileImage;
     private TextView followers, following;
     private ProfileActivityViewModel profileActivityViewModel;
-
+    private PostAdapter postAdapter;
+    private List<Post> postList;
+    public RecyclerView recyclerView;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -54,7 +65,15 @@ public class ProfileActivity extends AppCompatActivity {
         username = findViewById(R.id.display_name);
         followers = findViewById(R.id.numFollowers);
         following = findViewById(R.id.numFollowing);
+        recyclerView = findViewById(R.id.profile_activity_recycler_view);
 
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(mContext);
+        linearLayoutManager.setReverseLayout(true);
+        linearLayoutManager.setStackFromEnd(true);
+        recyclerView.setLayoutManager(linearLayoutManager);
+        postList = new ArrayList<>();
+        postAdapter = new PostAdapter(mContext, postList);
+        recyclerView.setAdapter(postAdapter);
         String s = username.getText().toString();
 
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -72,7 +91,8 @@ public class ProfileActivity extends AppCompatActivity {
 
         userInfo();
         getFollowers();
-        tempGridSetup();
+        getProfileFeed();
+//        tempGridSetup();
         //setProfileImage();
         //Glide.with(mContext).load(firebaseUser.getPhotoUrl()).into(profileImage);
 
@@ -95,27 +115,27 @@ public class ProfileActivity extends AppCompatActivity {
 //        });
      }
 
-     private void tempGridSetup(){
-        ArrayList<String> imgURLs = new ArrayList<>();
-        imgURLs.add("https://picsum.photos/id/237/200/300");
-        imgURLs.add("https://picsum.photos/seed/picsum/200/300");
-        imgURLs.add("https://picsum.photos/200/300?grayscale");
-        imgURLs.add("https://picsum.photos/200/300/?blur");
-        imgURLs.add("https://picsum.photos/id/870/200/300?grayscale&blur=2");
-         imgURLs.add("https://picsum.photos/seed/picsum/200/300");
-         imgURLs.add("https://picsum.photos/200/300?grayscale");
-         imgURLs.add("https://picsum.photos/200/300/?blur");
-         imgURLs.add("https://picsum.photos/id/870/200/300?grayscale&blur=2");
-        imgURLs.add("https://i.picsum.photos/id/1003/1181/1772.jpg?hmac=oN9fHMXiqe9Zq2RM6XT-RVZkojgPnECWwyEF1RvvTZk");
-        imgURLs.add("https://i.picsum.photos/id/1010/5184/3456.jpg?hmac=7SE0MNAloXpJXDxio2nvoshUx9roGIJ_5pZej6qdxXs");
-        imgURLs.add("https://i.picsum.photos/id/1015/6000/4000.jpg?hmac=aHjb0fRa1t14DTIEBcoC12c5rAXOSwnVlaA5ujxPQ0I");
-        imgURLs.add("https://i.picsum.photos/id/102/4320/3240.jpg?hmac=ico2KysoswVG8E8r550V_afIWN963F6ygTVrqHeHeRc");
-        imgURLs.add("https://i.picsum.photos/id/102/4320/3240.jpg?hmac=ico2KysoswVG8E8r550V_afIWN963F6ygTVrqHeHeRc");
-        imgURLs.add("https://i.picsum.photos/id/102/4320/3240.jpg?hmac=ico2KysoswVG8E8r550V_afIWN963F6ygTVrqHeHeRc");
-        imgURLs.add("https://i.picsum.photos/id/102/4320/3240.jpg?hmac=ico2KysoswVG8E8r550V_afIWN963F6ygTVrqHeHeRc");
-
-        setupImageGridView(imgURLs);
-     }
+//     private void tempGridSetup(){
+//        ArrayList<String> imgURLs = new ArrayList<>();
+//        imgURLs.add("https://picsum.photos/id/237/200/300");
+//        imgURLs.add("https://picsum.photos/seed/picsum/200/300");
+//        imgURLs.add("https://picsum.photos/200/300?grayscale");
+//        imgURLs.add("https://picsum.photos/200/300/?blur");
+//        imgURLs.add("https://picsum.photos/id/870/200/300?grayscale&blur=2");
+//         imgURLs.add("https://picsum.photos/seed/picsum/200/300");
+//         imgURLs.add("https://picsum.photos/200/300?grayscale");
+//         imgURLs.add("https://picsum.photos/200/300/?blur");
+//         imgURLs.add("https://picsum.photos/id/870/200/300?grayscale&blur=2");
+//        imgURLs.add("https://i.picsum.photos/id/1003/1181/1772.jpg?hmac=oN9fHMXiqe9Zq2RM6XT-RVZkojgPnECWwyEF1RvvTZk");
+//        imgURLs.add("https://i.picsum.photos/id/1010/5184/3456.jpg?hmac=7SE0MNAloXpJXDxio2nvoshUx9roGIJ_5pZej6qdxXs");
+//        imgURLs.add("https://i.picsum.photos/id/1015/6000/4000.jpg?hmac=aHjb0fRa1t14DTIEBcoC12c5rAXOSwnVlaA5ujxPQ0I");
+//        imgURLs.add("https://i.picsum.photos/id/102/4320/3240.jpg?hmac=ico2KysoswVG8E8r550V_afIWN963F6ygTVrqHeHeRc");
+//        imgURLs.add("https://i.picsum.photos/id/102/4320/3240.jpg?hmac=ico2KysoswVG8E8r550V_afIWN963F6ygTVrqHeHeRc");
+//        imgURLs.add("https://i.picsum.photos/id/102/4320/3240.jpg?hmac=ico2KysoswVG8E8r550V_afIWN963F6ygTVrqHeHeRc");
+//        imgURLs.add("https://i.picsum.photos/id/102/4320/3240.jpg?hmac=ico2KysoswVG8E8r550V_afIWN963F6ygTVrqHeHeRc");
+//
+//        setupImageGridView(imgURLs);
+//     }
 
      private void setProfileImage(){
         String imgURL = "https://www.sportsfile.com/winshare/w540/Library/SF722/523374.jpg";
@@ -156,14 +176,14 @@ public class ProfileActivity extends AppCompatActivity {
 
 
 
-     private void setupImageGridView(ArrayList<String> imgURLs){
-         GridView gridView = findViewById(R.id.grid_view_profile);
-        int gridWidth = getResources().getDisplayMetrics().widthPixels;
-        int imagewidth = gridWidth/NUM_OF_GRID_COLUMNS;
-        gridView.setColumnWidth(imagewidth);
-         GridImageAdapter adapter = new GridImageAdapter(mContext, R.layout.layout_grid_imageview, "", imgURLs);
-         gridView.setAdapter(adapter);
-     }
+//     private void setupImageGridView(ArrayList<String> imgURLs){
+//         GridView gridView = findViewById(R.id.grid_view_profile);
+//        int gridWidth = getResources().getDisplayMetrics().widthPixels;
+//        int imagewidth = gridWidth/NUM_OF_GRID_COLUMNS;
+//        gridView.setColumnWidth(imagewidth);
+//         GridImageAdapter adapter = new GridImageAdapter(mContext, R.layout.layout_grid_imageview, "", imgURLs);
+//         gridView.setAdapter(adapter);
+//     }
 
 
 
@@ -216,6 +236,27 @@ public class ProfileActivity extends AppCompatActivity {
         });
     }
 
+    private void getProfileFeed(){
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Posts");
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                postList.clear();
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()){
+                    Post post = snapshot.getValue(Post.class);
+                    if (post.getPublisher().equals(profileid)){
+                        postList.add(post);
+                    }
+                }
+                //Collections.reverse(postList);
+                postAdapter.notifyDataSetChanged();
+            }
 
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
 
 }

@@ -103,18 +103,10 @@
                 android:layout_below="@id/profile_linear_layout_2"
                 android:layout_marginBottom="50dp">
 
-                <GridView
+                <androidx.recyclerview.widget.RecyclerView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:id="@+id/grid_view_profile"
-                    android:verticalSpacing="1dp"
-                    android:horizontalSpacing="1dp"
-                    android:stretchMode="columnWidth"
-                    android:numColumns="3"
-                    android:gravity="center">
-
-
-                </GridView>
+                    android:id="@+id/profile_activity_recycler_view" />
 
 
             </RelativeLayout>

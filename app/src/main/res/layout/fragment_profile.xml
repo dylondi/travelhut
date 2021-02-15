@@ -8,6 +8,18 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/profile_fragment_rel_layout_1">
+
+        <include layout="@layout/snippet_profile_fragment_toolbar"/>
+
+    </RelativeLayout>
+    <RelativeLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/profile_fragment_rel_layout_1"
         android:background="@drawable/white_light_blue_bottom_border">
@@ -99,6 +111,7 @@
 
         </RelativeLayout>
 
+    </RelativeLayout>
     </RelativeLayout>
 
 </FrameLayout>

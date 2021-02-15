@@ -33,7 +33,7 @@
                     android:textSize="20sp"
                     android:textColor="@color/white"
                     android:layout_marginStart="5dp"
-                    android:id="@+id/profileName"/>
+                    android:id="@+id/comment_text"/>
 
 
             </RelativeLayout>

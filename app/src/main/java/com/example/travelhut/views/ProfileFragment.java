@@ -6,6 +6,8 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +20,8 @@ import com.bumptech.glide.Glide;
 import com.example.travelhut.R;
 import com.example.travelhut.model.StringsRepository;
 import com.example.travelhut.views.authentication.utils.User;
+import com.example.travelhut.views.main.newsfeed.NewsFeedFragment;
+import com.example.travelhut.views.main.newsfeed.newsfeed.PostAdapter;
 import com.example.travelhut.views.main.newsfeed.newsfeed.utils.Post;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -27,15 +31,25 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 
 public class ProfileFragment extends Fragment {
 
-    ImageView profileImage;
-    TextView followers, following, username, bio, url;
+    ImageView profileImage, backArrow;
+    TextView followers, following, username, bio, url, headerName;
     Button followButton;
 
     FirebaseUser firebaseUser;
     String profileid;
+
+    private PostAdapter postAdapter;
+    private List<Post> postList;
+    public RecyclerView recyclerView;
+    private NewsFeedFragment newsFeedFragment;
+
 
 
 
@@ -58,10 +72,22 @@ public class ProfileFragment extends Fragment {
         bio = view.findViewById(R.id.bio_profile_fragment);
         url = view.findViewById(R.id.url_profile_fragment);
         followButton = view.findViewById(R.id.follow_button_profile_fragment);
+        recyclerView = view.findViewById(R.id.profile_fragment_recycler_view);
+        headerName = view.findViewById(R.id.profile_fragment_name);
+        backArrow = view.findViewById(R.id.profile_fragment_back_arrow);
+//        recyclerView.setHasFixedSize(true);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+        linearLayoutManager.setReverseLayout(true);
+        linearLayoutManager.setStackFromEnd(true);
+        recyclerView.setLayoutManager(linearLayoutManager);
+        postList = new ArrayList<>();
+        postAdapter = new PostAdapter(getContext(), postList);
+        recyclerView.setAdapter(postAdapter);
 
         userInfo();
         getFollowers();
 
+        getProfileFeed();
         if(profileid.equals(firebaseUser.getUid())){
             followButton.setText("edit profile");
         }else{
@@ -100,6 +126,16 @@ public class ProfileFragment extends Fragment {
                 }
             }
         });
+
+        backArrow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                newsFeedFragment = new NewsFeedFragment();
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.frame_layout, (Fragment) newsFeedFragment).commit();
+            }
+        });
+
+
         return view;
     }
 
@@ -114,6 +150,7 @@ public class ProfileFragment extends Fragment {
                 }
 
                 User user = snapshot.getValue(User.class);
+                headerName.setText(user.getUsername());
                 Glide.with(getContext()).load(user.getImageurl()).into(profileImage);
                 username.setText(user.getUsername());
                 url.setText(user.getEmail());
@@ -200,6 +237,29 @@ public class ProfileFragment extends Fragment {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void getProfileFeed(){
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Posts");
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                postList.clear();
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()){
+                    Post post = snapshot.getValue(Post.class);
+                    if (post.getPublisher().equals(profileid)){
+                        postList.add(post);
+                    }
+                }
+                //Collections.reverse(postList);
+                postAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
 
             }
         });

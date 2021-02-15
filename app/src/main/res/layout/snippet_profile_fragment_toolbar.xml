@@ -9,7 +9,7 @@
         <androidx.appcompat.widget.Toolbar
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/profile_toolbar">
+            android:id="@+id/comment_toolbar">
 
 
             <RelativeLayout
@@ -22,18 +22,17 @@
                     android:layout_marginStart="10dp"
                     android:layout_marginEnd="20dp"
                     android:layout_centerVertical="true"
-                    android:id="@+id/back_arrow"
+                    android:id="@+id/profile_fragment_back_arrow"
                     android:src="@drawable/ic_back_arrow"/>
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
-                    android:layout_toRightOf="@id/back_arrow"
-                    android:text="Options"
+                    android:layout_toRightOf="@id/profile_fragment_back_arrow"
                     android:textSize="20sp"
                     android:textColor="@color/white"
                     android:layout_marginStart="5dp"
-                    android:id="@+id/options_account_settings_text"/>
+                    android:id="@+id/profile_fragment_name"/>
 
 
             </RelativeLayout>
