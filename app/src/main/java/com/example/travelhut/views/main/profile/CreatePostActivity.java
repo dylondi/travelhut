@@ -17,9 +17,12 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProviders;
 
 import com.example.travelhut.R;
 import com.example.travelhut.model.StringsRepository;
+import com.example.travelhut.viewmodel.main.profile.CreatePostActivityViewModel;
+import com.example.travelhut.viewmodel.main.profile.EditProfileActivityViewModel;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -39,9 +42,7 @@ public class CreatePostActivity extends AppCompatActivity {
 
     private static final String TAG = "CreatePostActivity";
     Uri imageUri;
-    String myUrl = "";
-    StorageTask uploadTask;
-    StorageReference storageReference;
+    CreatePostActivityViewModel createPostActivityViewModel;
 
     ImageView close, imageAdded, post;
 
@@ -56,8 +57,7 @@ public class CreatePostActivity extends AppCompatActivity {
         imageAdded = findViewById(R.id.image_posted);
         post = findViewById(R.id.create_post_check);
         description = findViewById(R.id.description);
-
-        storageReference = FirebaseStorage.getInstance().getReference(StringsRepository.POSTS);
+        createPostActivityViewModel = ViewModelProviders.of(this).get(CreatePostActivityViewModel.class);
 
         close.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -101,78 +101,13 @@ public class CreatePostActivity extends AppCompatActivity {
         return extension;
     }
 
-
-//    private String getFileExtension(Uri uri){
-//
-//        ContentResolver cR = getContentResolver();
-//        MimeTypeMap mime = MimeTypeMap.getSingleton();
-//        String type = mime.getExtensionFromMimeType(cR.getType(uri));
-//    }
-
     private void uploadImage(){
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setMessage(StringsRepository.POSTING_CAP);
         progressDialog.show();
 
+        createPostActivityViewModel.uploadImage(imageUri, getFileExtension(this,imageUri), progressDialog, description.getText().toString());
 
-        Log.d(TAG, "uploadImage: file extension: " + getFileExtension(this, imageUri));
-        if(imageUri != null){
-            Log.d(TAG, "uploadImage: imageUri: " + imageUri.toString());
-//            StorageReference fileRef = storageReference.child(System.currentTimeMillis()
-//            + "." + getFileExtension(imageUri));
-
-            StorageReference fileRef = storageReference.child(System.currentTimeMillis()
-                    + "." + getFileExtension(this,imageUri));
-
-
-
-
-            uploadTask = fileRef.putFile(imageUri);
-            uploadTask.continueWithTask(new Continuation() {
-                @Override
-                public Object then(@NonNull Task task) throws Exception {
-                    if(!task.isComplete()){
-                        throw task.getException();
-                    }
-                    return fileRef.getDownloadUrl();
-                }
-            }).addOnCompleteListener(new OnCompleteListener<Uri>() {
-                @Override
-                public void onComplete(@NonNull Task<Uri> task) {
-                    if(task.isSuccessful()){
-                        Uri downloadUri = task.getResult();
-                        myUrl = downloadUri.toString();
-
-                        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(StringsRepository.POSTS_CAP);
-
-                        String postId = reference.push().getKey();
-
-                        HashMap<String, Object> hashMap = new HashMap<>();
-                        hashMap.put(StringsRepository.POST_ID, postId);
-                        hashMap.put(StringsRepository.POST_IMAGE, myUrl);
-                        hashMap.put(StringsRepository.DESCRIPTION, description.getText().toString());
-                        hashMap.put(StringsRepository.PUBLISHER, FirebaseAuth.getInstance().getCurrentUser().getUid());
-
-                        reference.child(postId).setValue(hashMap);
-
-                        progressDialog.dismiss();
-
-                        startActivity(new Intent(CreatePostActivity.this, ProfileActivity.class));
-                        finish();
-                    }else{
-                        Toast.makeText(CreatePostActivity.this, StringsRepository.FAILED_CAP, Toast.LENGTH_SHORT).show();
-                    }
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    Toast.makeText(CreatePostActivity.this, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
-                }
-            });
-        }else{
-            Toast.makeText(CreatePostActivity.this, StringsRepository.NO_IMAGE_SELECTED, Toast.LENGTH_SHORT).show();
-
-        }
     }
 
     @Override
