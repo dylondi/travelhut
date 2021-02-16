@@ -46,7 +46,7 @@
                     android:src="@drawable/ic_display_name"
                     android:layout_centerVertical="true"/>
 
-                <EditText
+                <com.rengwuxian.materialedittext.MaterialEditText
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/display_name"
@@ -73,10 +73,10 @@
                     android:src="@drawable/ic_username"
                     android:layout_centerVertical="true"/>
 
-                <EditText
+                <com.rengwuxian.materialedittext.MaterialEditText
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:id="@+id/username"
+                    android:id="@+id/username_edit_profile"
                     android:layout_centerVertical="true"
                     android:layout_marginStart="40dp"
                     android:background="@null"
@@ -98,10 +98,10 @@
                     android:src="@drawable/ic_urls"
                     android:layout_centerVertical="true"/>
 
-                <EditText
+                <com.rengwuxian.materialedittext.MaterialEditText
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:id="@+id/urls"
+                    android:id="@+id/url_edit_profile"
                     android:layout_centerVertical="true"
                     android:layout_marginStart="40dp"
                     android:background="@null"
@@ -123,10 +123,10 @@
                     android:src="@drawable/ic_description"
                     android:layout_centerVertical="true"/>
 
-                <EditText
+                <com.rengwuxian.materialedittext.MaterialEditText
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:id="@+id/description"
+                    android:id="@+id/bio_edit_profile"
                     android:layout_centerVertical="true"
                     android:layout_marginStart="40dp"
                     android:background="@null"
@@ -161,7 +161,7 @@
                     android:src="@drawable/ic_email"
                     android:layout_centerVertical="true"/>
 
-                <EditText
+                <com.rengwuxian.materialedittext.MaterialEditText
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/email"
@@ -186,7 +186,7 @@
                     android:src="@drawable/ic_phone_number"
                     android:layout_centerVertical="true"/>
 
-                <EditText
+                <com.rengwuxian.materialedittext.MaterialEditText
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/phone_number"

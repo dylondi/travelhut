@@ -71,25 +71,22 @@
                     android:layout_height="wrap_content"
                     android:id="@+id/display_name"
                     android:textColor="@color/black"
-                    android:text="Dylon Di Ruscio"
                     android:textSize="16sp"
                     android:textStyle="bold"/>
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:id="@+id/description"
+                    android:id="@+id/bio_profile_activity"
                     android:textColor="@color/black"
-                    android:text="Seasoned traveller"
                     android:layout_marginTop="5dp"
                     android:textSize="16sp"/>
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:id="@+id/url"
+                    android:id="@+id/url_profile_activity"
                     android:textColor="@color/dark_blue"
-                    android:text="dylon.diruscio@hotmail.com"
                     android:textSize="16sp"
                     android:layout_marginTop="5dp"/>
 

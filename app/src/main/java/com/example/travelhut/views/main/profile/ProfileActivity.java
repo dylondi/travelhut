@@ -8,7 +8,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -45,7 +44,7 @@ public class ProfileActivity extends AppCompatActivity {
     private Context mContext = ProfileActivity.this;
     private static final int ACTIVITY_NUM = 4;
     private static final int NUM_OF_GRID_COLUMNS = 3;
-    private TextView username;
+    private TextView displayName, username, bio, url;
     String profileid;
     private FirebaseAuth firebaseAuth;
     private ProgressBar mProgressBar;
@@ -62,9 +61,12 @@ public class ProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_profile);
         Log.d(TAG, "onCreate: started.");
         profileActivityViewModel = new ProfileActivityViewModel();
-        username = findViewById(R.id.display_name);
+        displayName = findViewById(R.id.display_name);
         followers = findViewById(R.id.numFollowers);
         following = findViewById(R.id.numFollowing);
+        username = findViewById(R.id.profileName);
+        bio = findViewById(R.id.bio_profile_activity);
+        url = findViewById(R.id.url_profile_activity);
         recyclerView = findViewById(R.id.profile_activity_recycler_view);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(mContext);
@@ -74,15 +76,14 @@ public class ProfileActivity extends AppCompatActivity {
         postList = new ArrayList<>();
         postAdapter = new PostAdapter(mContext, postList);
         recyclerView.setAdapter(postAdapter);
-        String s = username.getText().toString();
+       // String s = displayName.getText().toString();
 
-        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        //FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
         SharedPreferences prefs = getSharedPreferences("PREFS", Context.MODE_PRIVATE);
         profileid = prefs.getString("profileid", "none");
 
-        username.setText(firebaseUser.getDisplayName());
-        //Glide.with(mContext).load(firebaseUser.getPhotoUrl()).into(profileImage);
+        //displayName.setText(firebaseUser.getDisplayName());
 
 
         setupBottomNavigationView();
@@ -92,50 +93,9 @@ public class ProfileActivity extends AppCompatActivity {
         userInfo();
         getFollowers();
         getProfileFeed();
-//        tempGridSetup();
-        //setProfileImage();
-        //Glide.with(mContext).load(firebaseUser.getPhotoUrl()).into(profileImage);
 
-
-
-
-
-//        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Users");
-//        ref.child(firebaseUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(DataSnapshot dataSnapshot) {
-//                String name = dataSnapshot.child("username").getValue().toString();
-//                username.setText(name);
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//
-//            }
-//        });
      }
 
-//     private void tempGridSetup(){
-//        ArrayList<String> imgURLs = new ArrayList<>();
-//        imgURLs.add("https://picsum.photos/id/237/200/300");
-//        imgURLs.add("https://picsum.photos/seed/picsum/200/300");
-//        imgURLs.add("https://picsum.photos/200/300?grayscale");
-//        imgURLs.add("https://picsum.photos/200/300/?blur");
-//        imgURLs.add("https://picsum.photos/id/870/200/300?grayscale&blur=2");
-//         imgURLs.add("https://picsum.photos/seed/picsum/200/300");
-//         imgURLs.add("https://picsum.photos/200/300?grayscale");
-//         imgURLs.add("https://picsum.photos/200/300/?blur");
-//         imgURLs.add("https://picsum.photos/id/870/200/300?grayscale&blur=2");
-//        imgURLs.add("https://i.picsum.photos/id/1003/1181/1772.jpg?hmac=oN9fHMXiqe9Zq2RM6XT-RVZkojgPnECWwyEF1RvvTZk");
-//        imgURLs.add("https://i.picsum.photos/id/1010/5184/3456.jpg?hmac=7SE0MNAloXpJXDxio2nvoshUx9roGIJ_5pZej6qdxXs");
-//        imgURLs.add("https://i.picsum.photos/id/1015/6000/4000.jpg?hmac=aHjb0fRa1t14DTIEBcoC12c5rAXOSwnVlaA5ujxPQ0I");
-//        imgURLs.add("https://i.picsum.photos/id/102/4320/3240.jpg?hmac=ico2KysoswVG8E8r550V_afIWN963F6ygTVrqHeHeRc");
-//        imgURLs.add("https://i.picsum.photos/id/102/4320/3240.jpg?hmac=ico2KysoswVG8E8r550V_afIWN963F6ygTVrqHeHeRc");
-//        imgURLs.add("https://i.picsum.photos/id/102/4320/3240.jpg?hmac=ico2KysoswVG8E8r550V_afIWN963F6ygTVrqHeHeRc");
-//        imgURLs.add("https://i.picsum.photos/id/102/4320/3240.jpg?hmac=ico2KysoswVG8E8r550V_afIWN963F6ygTVrqHeHeRc");
-//
-//        setupImageGridView(imgURLs);
-//     }
 
      private void setProfileImage(){
         String imgURL = "https://www.sportsfile.com/winshare/w540/Library/SF722/523374.jpg";
@@ -158,7 +118,7 @@ public class ProfileActivity extends AppCompatActivity {
              public void onClick(View v) {
                  Log.i(TAG, "onClick called starting Intent for AccountSettingsActivity.");
                 // Intent intent = new Intent(mContext, AccountSettingsActivity.class);
-                 startActivity(new Intent(mContext, AccountSettingsActivity.class));
+                 startActivity(new Intent(mContext, EditProfileActivity.class));
              }
          });
 
@@ -209,9 +169,11 @@ public class ProfileActivity extends AppCompatActivity {
                 User user = dataSnapshot.getValue(User.class);
                 Log.d(TAG, "userInfo: imageuri: " + user.getImageurl());
                 Glide.with(mContext).load(user.getImageurl()).into(profileImage);
+                displayName.setText(user.getDisplayname());
                 username.setText(user.getUsername());
-//                fullname.setText(user.getFullname());
-//                bio.setText(user.get());
+                bio.setText(user.getBio());
+                url.setText(user.getUrl());
+
             }
         });
 

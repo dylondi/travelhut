@@ -95,6 +95,9 @@ public class AuthAppRepository extends LiveData<DataSnapshot> {
         HashMap<String, Object> hashMap = new HashMap<>();
         hashMap.put(StringsRepository.ID, userId);
         hashMap.put(StringsRepository.USERNAME, username);
+        hashMap.put("displayname", "");
+        hashMap.put("bio", "");
+        hashMap.put("url", "");
         hashMap.put(StringsRepository.EMAIL, email);
         hashMap.put(StringsRepository.IMAGE_URL, StringsRepository.PLACEHOLDER_PROFILE_IMAGE_URL);
         return hashMap;

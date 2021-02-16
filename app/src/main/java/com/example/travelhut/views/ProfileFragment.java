@@ -152,7 +152,7 @@ public class ProfileFragment extends Fragment {
                 User user = snapshot.getValue(User.class);
                 headerName.setText(user.getUsername());
                 Glide.with(getContext()).load(user.getImageurl()).into(profileImage);
-                username.setText(user.getUsername());
+                username.setText(user.getDisplayname());
                 url.setText(user.getEmail());
             }
 
