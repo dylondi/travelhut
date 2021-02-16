@@ -9,7 +9,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".views.main.profile.EditProfileActivity"></activity>
+        <activity android:name=".views.main.profile.toolbar.NotificationsActivity"></activity>
+        <activity android:name=".views.main.profile.toolbar.EditProfileActivity" />
         <activity android:name=".views.main.newsfeed.newsfeed.CommentActivity" />
         <activity android:name=".views.authentication.RegisterLoginActivity" />
         <activity android:name=".views.onboarding.OnboardingScreensActivity" />
@@ -25,7 +26,7 @@
             android:theme="@style/AppTheme" />
         <activity android:name=".views.main.planner.PlannerActivity" />
         <activity android:name=".views.main.profile.ProfileActivity" />
-        <activity android:name=".views.main.profile.CreatePostActivity" />
+        <activity android:name=".views.main.profile.toolbar.CreatePostActivity" />
         <activity android:name=".views.main.profile.AccountSettingsActivity" />
         <activity android:name=".views.main.map_search.MapSearchActivity" />
         <activity android:name=".views.main.trips.TripsActivity" />
@@ -51,11 +52,11 @@
     <uses-feature
         android:glEsVersion="0x00020000"
         android:required="true" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
 </manifest>

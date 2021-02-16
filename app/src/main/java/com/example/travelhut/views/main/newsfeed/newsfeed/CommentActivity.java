@@ -79,7 +79,7 @@ public class CommentActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         postId = intent.getStringExtra("postid");
-        publisherId = intent.getStringExtra("publisherid");
+        publisherId = intent.getStringExtra("publisher");
 
         commentPost.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -108,7 +108,20 @@ public class CommentActivity extends AppCompatActivity {
         hashMap.put("publisher", firebaseUser.getUid());
 
         reference.push().setValue(hashMap);
+        addNotification();
         writeComment.setText("");
+    }
+
+    private void addNotification(){
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Notifications").child(publisherId);
+
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put("userid", firebaseUser.getUid());
+        hashMap.put("text", "commented: " + writeComment.getText().toString());
+        hashMap.put("postid", postId);
+        hashMap.put("ispost", true);
+
+        reference.push().setValue(hashMap);
     }
 
 
