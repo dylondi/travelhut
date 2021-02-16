@@ -33,6 +33,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -110,6 +111,8 @@ public class ProfileFragment extends Fragment {
                             .child(profileid)
                             .child(StringsRepository.FOLLOWERS)
                             .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(true);
+
+                    addNotification();
                 }else if(followButton.getText().toString().equals("following")){
                     FirebaseDatabase.getInstance().getReference()
                             .child(StringsRepository.FOLLOW_CAP)
@@ -137,6 +140,19 @@ public class ProfileFragment extends Fragment {
 
 
         return view;
+    }
+
+
+    private void addNotification(){
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Notifications").child(profileid);
+
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put("userid", firebaseUser.getUid());
+        hashMap.put("text", "started following you");
+        hashMap.put("postid", "");
+        hashMap.put("ispost", false);
+
+        reference.push().setValue(hashMap);
     }
 
 

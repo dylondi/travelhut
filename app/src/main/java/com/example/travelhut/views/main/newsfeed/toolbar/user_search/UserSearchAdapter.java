@@ -27,6 +27,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.HashMap;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -92,9 +93,22 @@ public class UserSearchAdapter extends RecyclerView.Adapter<UserSearchAdapter.Vi
 
     }
 
+    private void addNotification(String userid){
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Notifications").child(userid);
+
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put("userid", firebaseUser.getUid());
+        hashMap.put("text", "started following you");
+        hashMap.put("postid", "");
+        hashMap.put("ispost", false);
+
+        reference.push().setValue(hashMap);
+    }
+
     private void followOrUnfollowUser(@NonNull ViewHolder holder, User user) {
         if(holder.btn_follow.getText().toString().equals(StringsRepository.FOLLOW)){
             userSearchAdapterViewModel.follow(user.getId());
+            addNotification(user.getId());
             Log.d("logging","follow " + user.getId());
         } else {
             userSearchAdapterViewModel.unFollow(user.getId());

@@ -27,8 +27,10 @@ import com.example.travelhut.utils.BottomNavigationViewHelper;
 import com.example.travelhut.viewmodel.main.profile.ProfileActivityViewModel;
 import com.example.travelhut.views.main.newsfeed.newsfeed.PostAdapter;
 import com.example.travelhut.views.main.newsfeed.newsfeed.utils.Post;
+import com.example.travelhut.views.main.profile.toolbar.CreatePostActivity;
+import com.example.travelhut.views.main.profile.toolbar.EditProfileActivity;
+import com.example.travelhut.views.main.profile.toolbar.NotificationsActivity;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -130,6 +132,16 @@ public class ProfileActivity extends AppCompatActivity {
                  Log.i(TAG, "onClick called starting Intent for CreatePostActivity.");
                 // Intent intent = new Intent(mContext, AccountSettingsActivity.class);
                  startActivity(new Intent(mContext, CreatePostActivity.class));
+             }
+         });
+
+         ImageView notifications = findViewById(R.id.notifications);
+         notifications.setOnClickListener(new View.OnClickListener() {
+             @Override
+             public void onClick(View v) {
+                 Log.i(TAG, "onClick called starting Intent for CreatePostActivity.");
+                // Intent intent = new Intent(mContext, AccountSettingsActivity.class);
+                 startActivity(new Intent(mContext, NotificationsActivity.class));
              }
          });
      }
