@@ -10,6 +10,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".views.main.profile.toolbar.NotificationsActivity"></activity>
+        <activity android:name=".views.authentication.TestActivity" />
         <activity android:name=".views.main.profile.toolbar.EditProfileActivity" />
         <activity android:name=".views.main.newsfeed.newsfeed.CommentActivity" />
         <activity android:name=".views.authentication.RegisterLoginActivity" />
@@ -30,6 +31,7 @@
         <activity android:name=".views.main.profile.AccountSettingsActivity" />
         <activity android:name=".views.main.map_search.MapSearchActivity" />
         <activity android:name=".views.main.trips.TripsActivity" />
+
         <activity
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
             android:theme="@style/Theme.Travelhut" />
