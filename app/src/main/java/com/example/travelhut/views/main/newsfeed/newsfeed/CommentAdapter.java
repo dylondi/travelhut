@@ -52,12 +52,19 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 
+        //gets current firebase user
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+
+        //create comment object of current comment
         Comment comment = mComment.get(position);
 
+        //sets text of comment
         holder.comment.setText(comment.getComment());
+
+        //sets the user data for user who commented
         getUserInfo(holder.profileImage, holder.username, comment.getPublisher());
 
+        //OnClickListener for comment
         holder.comment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -67,6 +74,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
             }
         });
 
+        //OnClickListener for user profile image
         holder.profileImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -96,13 +104,20 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
         }
     }
 
+
+    //this method retrieves user info of use current comment
     private void getUserInfo(ImageView imageView, TextView username, String publisherid){
+
+        //db ref
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child(StringsRepository.USERS_CAP).child(publisherid);
 
+        //ValueEventListener for ref
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 User user = snapshot.getValue(User.class);
+
+                //two lines set profile image and username of user comment
                 Glide.with(mContext).load(user.getImageurl()).into(imageView);
                 username.setText(user.getUsername());
             }

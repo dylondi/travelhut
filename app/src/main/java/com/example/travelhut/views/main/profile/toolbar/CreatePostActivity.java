@@ -1,4 +1,4 @@
-package com.example.travelhut.views.main.profile;
+package com.example.travelhut.views.main.profile.toolbar;
 
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
@@ -23,6 +23,7 @@ import com.example.travelhut.R;
 import com.example.travelhut.model.StringsRepository;
 import com.example.travelhut.viewmodel.main.profile.CreatePostActivityViewModel;
 import com.example.travelhut.viewmodel.main.profile.EditProfileActivityViewModel;
+import com.example.travelhut.views.main.profile.ProfileActivity;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -53,27 +54,33 @@ public class CreatePostActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_post);
 
+        //assigning views
         close = findViewById(R.id.create_post_back_arrow);
         imageAdded = findViewById(R.id.image_posted);
         post = findViewById(R.id.create_post_check);
         description = findViewById(R.id.description);
         createPostActivityViewModel = ViewModelProviders.of(this).get(CreatePostActivityViewModel.class);
 
+        //discard post
         close.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //go to profile page
                 startActivity(new Intent(CreatePostActivity.this, ProfileActivity.class));
             }
         });
 
 
+        //confirm post
         post.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //upload post
                 uploadImage();
             }
         });
 
+        //sets aspect ratio of post to make sure it is square image
         CropImage.activity()
                 .setAspectRatio(1, 1)
                 .start(CreatePostActivity.this);
@@ -83,6 +90,7 @@ public class CreatePostActivity extends AppCompatActivity {
     }
 
 
+    //gets file extension of Uri
     public static String getFileExtension(Context context, Uri uri) {
         String extension;
 
@@ -101,6 +109,7 @@ public class CreatePostActivity extends AppCompatActivity {
         return extension;
     }
 
+    //this method calls the upload image in the ViewModel to upload the post
     private void uploadImage(){
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setMessage(StringsRepository.POSTING_CAP);

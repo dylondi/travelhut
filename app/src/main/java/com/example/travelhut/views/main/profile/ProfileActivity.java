@@ -27,7 +27,6 @@ import com.example.travelhut.utils.BottomNavigationViewHelper;
 import com.example.travelhut.viewmodel.main.profile.ProfileActivityViewModel;
 import com.example.travelhut.views.main.newsfeed.newsfeed.PostAdapter;
 import com.example.travelhut.views.main.newsfeed.newsfeed.utils.Post;
-import com.example.travelhut.views.main.profile.toolbar.CreatePostActivity;
 import com.example.travelhut.views.main.profile.toolbar.EditProfileActivity;
 import com.example.travelhut.views.main.profile.toolbar.NotificationsActivity;
 import com.google.firebase.auth.FirebaseAuth;
@@ -37,6 +36,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
+import com.example.travelhut.views.main.profile.toolbar.CreatePostActivity;
 
 import java.util.ArrayList;
 import java.util.List;

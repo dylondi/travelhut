@@ -44,12 +44,15 @@ public class RegisterFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         ViewGroup root = (ViewGroup) inflater.inflate(R.layout.fragment_register, container, false);
 
+        //assigning views
         emailEditText = root.findViewById(R.id.emailRegister);
         usernameEditText = root.findViewById(R.id.usernameRegister);
         passwordEditText = root.findViewById(R.id.passwordRegister);
         passwordTwoEditText = root.findViewById(R.id.passwordTwoRegister);
         registerButton = root.findViewById(R.id.registerBtn);
 
+
+        //onClickListener for register button which calls the register method in the RegisterViewModel
         registerButton.setOnClickListener(view -> {
 
             boolean isEmailValid = registerViewModel.validateEmail(emailEditText);
@@ -57,6 +60,7 @@ public class RegisterFragment extends Fragment {
             boolean isPasswordValid = registerViewModel.validatePasswordOne(passwordEditText);
             boolean isPasswordTwoValid = registerViewModel.validatePasswordTwo(passwordEditText, passwordTwoEditText);
 
+            //if all inputs are valid
             if(isEmailValid && isUsernameValid && isPasswordValid && isPasswordTwoValid)
             {
                 registerViewModel.register(emailEditText.getText().toString(), usernameEditText.getText().toString(), passwordEditText.getText().toString());

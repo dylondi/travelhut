@@ -44,6 +44,7 @@ public class EditProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_profile);
 
+        //assigning views
         editProfileActivityViewModel = ViewModelProviders.of(this).get(EditProfileActivityViewModel.class);
         editProfileImage = findViewById(R.id.edit_profile_image);
         save = findViewById(R.id.check);
@@ -56,6 +57,7 @@ public class EditProfileActivity extends AppCompatActivity {
         userInfo();
 
 
+        //OnClickListener for change profile text
         changeProfilePic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -66,6 +68,7 @@ public class EditProfileActivity extends AppCompatActivity {
             }
         });
 
+        //save profile changes OnClickListener
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -78,6 +81,7 @@ public class EditProfileActivity extends AppCompatActivity {
             }
         });
 
+        //edit profile image OnClickListener
         editProfileImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -91,6 +95,7 @@ public class EditProfileActivity extends AppCompatActivity {
 
 
 
+        //assign back arrow view and set OnClickListener
         ImageView backArrow = findViewById(R.id.edit_profile_back_arrow);
         backArrow.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -101,10 +106,12 @@ public class EditProfileActivity extends AppCompatActivity {
         });
     }
 
+    //updates profile
     private void updateProfile(String displayName, String username, String bio, String url){
         editProfileActivityViewModel.updateProfile(displayName, username, bio, url);
     }
 
+    //gets file extension from Uri
     public String getFileExtension(Context context, Uri uri) {
         String extension;
 
@@ -126,7 +133,7 @@ public class EditProfileActivity extends AppCompatActivity {
 
 
 
-
+//uploads image to ViewModel
     private void uploadImage(){
         final ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Uploading");
@@ -147,6 +154,7 @@ public class EditProfileActivity extends AppCompatActivity {
         }
     }
 
+    //retrieves current user info and sets all views to display current data
     private void userInfo(){
         LiveData<DataSnapshot> liveData = editProfileActivityViewModel.getDataSnapshotLiveData();
 

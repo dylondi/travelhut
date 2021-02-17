@@ -10,7 +10,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 
-import com.example.travelhut.views.main.profile.CreatePostActivity;
 import com.example.travelhut.views.main.profile.ProfileActivity;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;

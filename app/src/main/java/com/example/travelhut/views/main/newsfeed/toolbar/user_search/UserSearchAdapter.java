@@ -69,30 +69,45 @@ public class UserSearchAdapter extends RecyclerView.Adapter<UserSearchAdapter.Vi
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 
         Log.i(TAG, "onBindViewHolder called, position: " + position);
+
+        //gets current user in recyclerView
         final User user = mUsers.get(position);
 
+        //initialize userSearchAdapterViewModel
         userSearchAdapterViewModel = new UserSearchAdapterViewModel(user.getId());
+
+        //current firebase user
         //firebaseUser = userSearchAdapterViewModel.getUserMutableLiveData().getValue();
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+
+
         setUserItem(holder, user);
         isFollowing(user.getId(),holder.btn_follow);
 
+        //if this user is current user then remove option to follow/unfollow
         if(user.getId().equals(firebaseUser.getUid())){
             holder.btn_follow.setVisibility(View.GONE);
         }
 
+        //OnClickListener for current user in search
         holder.itemView.setOnClickListener(v -> {
             Log.i(TAG, "itemView clicked in RecyclerView");
+
+            //go to user profile
             showProfileFragment(user);
         });
 
+        //OnClickListener for follow button in search
         holder.btn_follow.setOnClickListener(v -> {
             Log.i(TAG, "itemView clicked in RecyclerView");
+
+            //follow or unfollow user
             followOrUnfollowUser(holder, user);
         });
 
     }
 
+    //add notification ****NOT FINISHED****
     private void addNotification(String userid){
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Notifications").child(userid);
 
@@ -105,7 +120,11 @@ public class UserSearchAdapter extends RecyclerView.Adapter<UserSearchAdapter.Vi
         reference.push().setValue(hashMap);
     }
 
+
+    //follow or unfollow user based on if already following or not
     private void followOrUnfollowUser(@NonNull ViewHolder holder, User user) {
+
+        //checks if already following
         if(holder.btn_follow.getText().toString().equals(StringsRepository.FOLLOW)){
             userSearchAdapterViewModel.follow(user.getId());
             addNotification(user.getId());
@@ -116,6 +135,7 @@ public class UserSearchAdapter extends RecyclerView.Adapter<UserSearchAdapter.Vi
         }
     }
 
+    //go to user profile
     private void showProfileFragment(User user) {
         SharedPreferences.Editor editor = mContext.getSharedPreferences("PREFS", Context.MODE_PRIVATE).edit();
         editor.putString("profileid", user.getId());
@@ -124,6 +144,7 @@ public class UserSearchAdapter extends RecyclerView.Adapter<UserSearchAdapter.Vi
         ((FragmentActivity) mContext).getSupportFragmentManager().beginTransaction().replace(R.id.frame_layout, profileFragment).commit();
     }
 
+    //this method sets the data for the current item in recyclerView
     private void setUserItem(@NonNull ViewHolder holder, User user) {
         holder.btn_follow.setVisibility(View.VISIBLE);
         holder.username.setText(user.getUsername());
@@ -158,7 +179,7 @@ public class UserSearchAdapter extends RecyclerView.Adapter<UserSearchAdapter.Vi
     }
 
 
-
+    //this method checks if you are following each user
     private void isFollowing(final String userid, final Button button) {
 
 

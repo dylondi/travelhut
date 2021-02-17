@@ -22,15 +22,20 @@ public class RegisterLoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        //assigning views
         tabLayout = findViewById(R.id.tab_layout);
         viewPager = findViewById(R.id.view_pager);
         google = findViewById(R.id.fab_google);
 
+        //add login and register tabs to tabLayout
         tabLayout.addTab(tabLayout.newTab().setText(AuthViewStrings.LOGIN));
         tabLayout.addTab(tabLayout.newTab().setText(AuthViewStrings.REGISTER));
+
         tabLayout.setTabGravity(tabLayout.GRAVITY_FILL);
 
+        //declaring and initializing the adapter which will adapt the login and register fragment to this viewpager
         final RegisterLoginAdapter adapter = new RegisterLoginAdapter(getSupportFragmentManager(), this, tabLayout.getTabCount());
+
         viewPager.setAdapter(adapter);
 
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
@@ -42,6 +47,7 @@ public class RegisterLoginActivity extends AppCompatActivity {
         google.animate().translationY(0).alpha(1).setDuration(1000).setStartDelay(400);
         tabLayout.animate().translationY(0).alpha(1).setDuration(1000).setStartDelay(400);
 
+        //onTabSelectedListener to switch between login and register tabs when either one is clicked by user
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener(){
             @Override
             public void onTabSelected(TabLayout.Tab tab) {

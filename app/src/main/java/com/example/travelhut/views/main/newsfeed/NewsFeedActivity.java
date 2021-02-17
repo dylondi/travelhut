@@ -59,6 +59,7 @@ public class NewsFeedActivity extends AppCompatActivity implements LifecycleOwne
         getSupportFragmentManager().beginTransaction().add(R.id.frame_layout, (Fragment) newsFeedFragment).commit();
     }
 
+    //sets up botttom navigation view
     private void setupBottomNavigationView() {
         Log.d(TAG, "setupBottomNavigationView: setting up BottomNavigationView");
         BottomNavigationViewEx bottomNavigationViewEx = findViewById(R.id.bottomNavViewBar);

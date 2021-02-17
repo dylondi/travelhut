@@ -12,10 +12,15 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.travelhut.R;
+import com.example.travelhut.model.NotificationsAdapterAppRepository;
+import com.example.travelhut.viewmodel.main.profile.toolbar.NotificationAdapterViewModel;
+import com.example.travelhut.viewmodel.main.profile.toolbar.NotificationsActivityViewModel;
 import com.example.travelhut.views.authentication.utils.User;
 import com.example.travelhut.views.main.newsfeed.newsfeed.utils.Post;
 import com.google.firebase.database.DataSnapshot;
@@ -31,6 +36,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
     private Context mContext;
     private List<Notification> mNotifications;
+    private NotificationAdapterViewModel notificationAdapterViewModel;
 
     public NotificationAdapter(Context mContext, List<Notification> mNotifications) {
         this.mContext = mContext;
@@ -96,6 +102,12 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
     }
 
     private void getUserInfo(ImageView imageView, TextView username, String publisherid){
+
+//        notificationAdapterViewModel = new NotificationAdapterViewModel(publisherid);
+//
+//        LiveData<DataSnapshot> liveData = notificationAdapterViewModel.getFollowingSnapshot();
+//
+//        liveData.observe(, dataSnapshot -> {});
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Users").child(publisherid);
         reference.addValueEventListener(new ValueEventListener() {
             @Override

@@ -39,6 +39,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder>{
 
     private FirebaseUser firebaseUser;
 
+
+    //constructor
     public PostAdapter(Context mContext, List<Post> mPost) {
         this.mContext = mContext;
         this.mPost = mPost;
@@ -56,17 +58,16 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder>{
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 
+        //current firebase user
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+
+        //get current post from mPost list
         Post post = mPost.get(position);
-        Log.d(TAG, "onBindViewHolder: postImgURL: " + post.getPostimage());
-        Log.d(TAG, "onBindViewHolder: postPublisher: " + post.getPublisher());
-        Log.d(TAG, "onBindViewHolder: postId: " + post.getPostid());
-        Log.d(TAG, "onBindViewHolder: postDescription: " + post.getDescription());
 
-        //Glide.with(mContext).load(post.getPostImage()).into(holder.post_image);
+        //set image for post
         Glide.with(mContext).load(post.getPostimage()).into(holder.post_image);
-        //holder.post_image.setVisibility(View.VISIBLE);
 
+        //checks if post description is empty or not -> makes visible or not based on string
         if(post.getDescription().equals("")){
             holder.description.setVisibility(View.GONE);
         }else{
@@ -74,26 +75,39 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder>{
             holder.description.setText(post.getDescription());
         }
 
+        //get data of user that published current post
         publisherInfo(holder.profile_image, holder.username, holder.publisher, post.getPublisher());
 
+        //check if current user already liked current post
         checkIfLiked(post.getPostid(), holder.like);
+
+        //get number of likes on current post
         getNumOfLikes(holder.likes, post.getPostid());
+
+        //get comments for current post
         getComments(post.getPostid(), holder.comments);
 
+
+        //OnClickListener for like button
         holder.like.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                //if not liked then like
                 if (holder.like.getTag().equals(NewsFeedStrings.LIKE)) {
                     FirebaseDatabase.getInstance().getReference().child(NewsFeedStrings.LIKES_CAP).child(post.getPostid())
                             .child(firebaseUser.getUid()).setValue(true);
                     addNotification(post.getPublisher(), post.getPostid());
-                } else {
+                }
+                //if already liked then unlike
+                else {
                     FirebaseDatabase.getInstance().getReference().child(NewsFeedStrings.LIKES_CAP).child(post.getPostid())
                             .child(firebaseUser.getUid()).removeValue();
                 }
             }
         });
 
+        //comment OnClickListener
         holder.comment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -103,6 +117,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder>{
                 mContext.startActivity(intent);
             }
         });
+
+        //comments OnClickListener
         holder.comments.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -130,6 +146,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder>{
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
+            //assigning views
             profile_image = itemView.findViewById(R.id.post_profile_image);
             post_image = itemView.findViewById(R.id.image_post);
             like = itemView.findViewById(R.id.like_button);
@@ -142,6 +159,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder>{
         }
     }
 
+    //this method retrieved all comments on current post
     private void getComments(String postid, TextView comments){
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child(NewsFeedStrings.COMMENTS_CAP).child(postid);
 
@@ -165,12 +183,18 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder>{
     }
 
 
+    //this method checks if current user has already liked the current post
     private void checkIfLiked(String postId, ImageView imageView){
+
+        //current firebase user
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+
+        //db ref
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference()
                 .child(NewsFeedStrings.LIKES_CAP)
                 .child(postId);
 
+        //ref OnClickListener
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -191,6 +215,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder>{
         });
     }
 
+    //add notification *****NOT FINISHED*****
     private void addNotification(String userid, String postid){
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Notifications").child(userid);
 
@@ -203,10 +228,15 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder>{
         reference.push().setValue(hashMap);
     }
 
+
+    //this method gets number of likes on current post
     private void getNumOfLikes(final TextView likes_text, String postId){
+
+        //db ref
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child(NewsFeedStrings.LIKES_CAP)
                 .child(postId);
 
+        //ref ValueEventListener
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -219,9 +249,15 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder>{
             }
         });
     }
+
+    //this method retrieves the publisher information of the current post
     private void publisherInfo(ImageView image_profile, TextView username, TextView publisher, String userid){
+
+        //db ref
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(StringsRepository.USERS_CAP).child(userid);
 
+
+        //ref ValueEventListener
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {

@@ -49,11 +49,6 @@ public class NewsFeedFragment extends Fragment {
     private SearchView searchView;
 
 
-//        public Fragment newInstance() {
-//            Fragment mFrgment = new NewsFeedFragment();
-//            return mFrgment;
-//        }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
@@ -62,20 +57,32 @@ public class NewsFeedFragment extends Fragment {
 
         Toolbar toolbar = view.findViewById(R.id.toolbar);
 
+        //get toolbar and set title to empty string
         ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
         ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle("");
+
+        //assign views
         viewFlipper = view.findViewById(R.id.viewflipper);
         recyclerView = view.findViewById(R.id.news_feed_recycler_view);
-        recyclerView.setHasFixedSize(true);
         newsFeedActivityViewModel = new NewsFeedActivityViewModel();
 
+        //create linearLayoutManager
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         linearLayoutManager.setReverseLayout(true);
         linearLayoutManager.setStackFromEnd(true);
+
+        //fix recyclerView size and setLayoutManager to linearLayoutManager already initialized
+        recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(linearLayoutManager);
+
+
         postList = new ArrayList<>();
         postAdapter = new PostAdapter(getContext(), postList);
+
+        //set adapter for recyclerView
         recyclerView.setAdapter(postAdapter);
+
+
         checkFollowing();
 
         Bundle intent = getActivity().getIntent().getExtras();
@@ -90,6 +97,7 @@ public class NewsFeedFragment extends Fragment {
             ((FragmentActivity) getContext()).getSupportFragmentManager().beginTransaction().replace(R.id.frame_layout, profileFragment).commit();
         }
 
+        //assigning recyclerView Search
         recyclerViewSearch = view.findViewById(R.id.recycler_view);
         recyclerViewSearch.setHasFixedSize(true);
         recyclerViewSearch.setLayoutManager(new LinearLayoutManager(getActivity().getApplicationContext()));
@@ -105,6 +113,8 @@ public class NewsFeedFragment extends Fragment {
 
     }
 
+
+    //create options menu in toolbar
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.news_feed_action_bar_menu, menu);
@@ -123,20 +133,28 @@ public class NewsFeedFragment extends Fragment {
 //                return false;
 //            }
 //        });
+
+
+        //setOnActionExpandListener for user search item
         menuItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
 
 
+            //if search is opened
             @Override
             public boolean onMenuItemActionExpand(MenuItem menuItem) {
                 readUsers();
+                //show next view in viewflipper
                 viewFlipper.showNext();
                 return true;
             }
 
+            //if search is closed
             @Override
             public boolean onMenuItemActionCollapse(MenuItem menuItem) {
                 searchView.setQuery("", true);
+                //show previous view in viewflipper
                 viewFlipper.showPrevious();
+                //notify userSearchAdapter of data changes
                 userSearchAdapter.notifyDataSetChanged();
                 return true;
             }
@@ -147,6 +165,7 @@ public class NewsFeedFragment extends Fragment {
         //return super.onCreateOptionsMenu(menu);
     }
 
+    //if search is selected
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -172,16 +191,21 @@ public class NewsFeedFragment extends Fragment {
     }
 
 
+    //search for user with string s
     void searchUsers(String s) {
 
-        Log.v("Your Filter", "CLICKED ROW CLICKED ROW CLICKED ROW CLICKED ROW CLICKED ROW CLICKED ROW CLICKED ROW CLICKED ROW CLICKED ROW " + s);
+        //get LiveData object from viewmodel for search result
         newsFeedActivityViewModel = new NewsFeedActivityViewModel(s);
         LiveData<DataSnapshot> liveData = newsFeedActivityViewModel.getDataSnapshotLiveData();
 
+
+        //observe the LiveData object which returns a DataSnapshot object
         liveData.observe(this, dataSnapshot -> {
             mUsers.clear();
             for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                 User user = snapshot.getValue(User.class);
+
+                //add each user found in search to list of found users
                 mUsers.add(user);
             }
 
@@ -190,6 +214,7 @@ public class NewsFeedFragment extends Fragment {
 
     }
 
+    //this method gets all possible user in db
     void readUsers() {
         newsFeedActivityViewModel = new NewsFeedActivityViewModel();
         LiveData<DataSnapshot> liveData = newsFeedActivityViewModel.getDataSnapshotLiveData();
@@ -210,6 +235,7 @@ public class NewsFeedFragment extends Fragment {
 
 
 
+    //checks if your following each user from ViewModel
     private void checkFollowing() {
         followingList = new ArrayList<>();
 
@@ -233,6 +259,7 @@ public class NewsFeedFragment extends Fragment {
     }
 
 
+    //retrieves posts from ViewModel
     private void readPosts() {
 
         LiveData<DataSnapshot> liveData = newsFeedActivityViewModel.getPostsLiveData();
