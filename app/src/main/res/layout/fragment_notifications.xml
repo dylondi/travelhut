@@ -5,24 +5,23 @@
     android:layout_height="match_parent"
     tools:context=".views.main.profile.toolbar.NotificationsActivity">
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/toolbar_rel_layout_notifications">
+
+        <include layout="@layout/snippet_top_notifications"/>
+    </RelativeLayout>
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-    <FrameLayout
-        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/nav_bar"
-        android:id="@+id/notifications_frame_layout">
-    <!--        </RelativeLayout>-->
-    </FrameLayout>
+        android:layout_below="@id/toolbar_rel_layout_notifications">
 
-
-    <!--bottom navigation-->
-    <include
-        layout="@layout/layout_bottom_navigation_view"
-        android:id="@+id/nav_bar"/>
+        <androidx.recyclerview.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/notifications_recycler_view"/>
 
     </RelativeLayout>
 

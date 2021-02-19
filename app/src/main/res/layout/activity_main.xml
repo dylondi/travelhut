@@ -75,7 +75,6 @@
             layout="@layout/layout_bottom_navigation_view"
             android:id="@+id/nav_bar"/>
 
-
     </RelativeLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

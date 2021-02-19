@@ -54,7 +54,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 
         final Notification notification = mNotifications.get(position);
-        holder.text.setText("testttt " + notification.getText());
+        holder.text.setText(notification.getText());
 
         getUserInfo(holder.profileImage, holder.username, notification.getUserid());
 
@@ -64,6 +64,17 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         }else{
             holder.postImage.setVisibility(View.GONE);
         }
+
+        holder.postImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SharedPreferences.Editor editor = mContext.getSharedPreferences("PREFS", Context.MODE_PRIVATE).edit();
+                editor.putString("postid", notification.getPostid());
+                editor.apply();
+
+                ((FragmentActivity)mContext).getSupportFragmentManager().beginTransaction().replace(R.id.notifications_frame_layout, new SinglePostFragment()).commit();
+            }
+        });
 
 //        holder.itemView.setOnClickListener(new View.OnClickListener() {
 //            @Override
