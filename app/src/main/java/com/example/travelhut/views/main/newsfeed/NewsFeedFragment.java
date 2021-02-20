@@ -9,6 +9,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.ViewFlipper;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -47,6 +48,7 @@ public class NewsFeedFragment extends Fragment {
     private List<String> followingList;
     private static final String TAG = "NewsFeedFragment";
     private SearchView searchView;
+    ProgressBar progressBar;
 
 
     @Override
@@ -64,6 +66,7 @@ public class NewsFeedFragment extends Fragment {
         //assign views
         viewFlipper = view.findViewById(R.id.viewflipper);
         recyclerView = view.findViewById(R.id.news_feed_recycler_view);
+        progressBar = view.findViewById(R.id.newsfeed_progress_bar);
         newsFeedActivityViewModel = new NewsFeedActivityViewModel();
 
         //create linearLayoutManager
@@ -228,6 +231,7 @@ public class NewsFeedFragment extends Fragment {
                 }
 
                 userSearchAdapter.notifyDataSetChanged();
+                progressBar.setVisibility(View.GONE);
             }
         });
     }

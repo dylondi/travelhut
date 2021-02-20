@@ -120,7 +120,7 @@ public class ProfileActivity extends AppCompatActivity {
              public void onClick(View v) {
                  Log.i(TAG, "onClick called starting Intent for AccountSettingsActivity.");
                 // Intent intent = new Intent(mContext, AccountSettingsActivity.class);
-                 startActivity(new Intent(mContext, EditProfileActivity.class));
+                 startActivity(new Intent(mContext, AccountSettingsActivity.class));
              }
          });
 

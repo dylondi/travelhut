@@ -28,7 +28,39 @@
         android:layout_below="@+id/acc_settings_rel_layout_2"
         android:layout_marginBottom="50dp">
 
-        <include layout="@layout/layout_center_account_settings"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/acc_settings_settings_btn"
+            android:text="Settings"
+            android:textColor="@color/grey"
+            android:textSize="24sp"
+            android:layout_margin="10dp"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/light_blue"
+            android:id="@+id/acc_Settings_bar_1"
+            android:layout_below="@id/acc_settings_settings_btn"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/acc_settings_logout_btn"
+            android:text="Sign Out"
+            android:textColor="@color/grey"
+            android:textSize="24sp"
+            android:layout_below="@+id/acc_Settings_bar_1"
+            android:layout_margin="10dp"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/light_blue"
+            android:layout_below="@id/acc_settings_logout_btn"/>
+
+<!--        <include layout="@layout/layout_center_account_settings"/>-->
 
     </RelativeLayout>
 
