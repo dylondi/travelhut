@@ -1,5 +1,6 @@
 package com.example.travelhut.views.main.newsfeed;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
@@ -12,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.ViewFlipper;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
@@ -25,10 +27,18 @@ import com.example.travelhut.R;
 import com.example.travelhut.viewmodel.main.newsfeed.NewsFeedActivityViewModel;
 import com.example.travelhut.views.ProfileFragment;
 import com.example.travelhut.views.authentication.utils.User;
+import com.example.travelhut.views.main.newsfeed.newsfeed.AddStoryActivity;
 import com.example.travelhut.views.main.newsfeed.newsfeed.PostAdapter;
+import com.example.travelhut.views.main.newsfeed.newsfeed.StoryAdapter;
 import com.example.travelhut.views.main.newsfeed.newsfeed.utils.Post;
+import com.example.travelhut.views.main.newsfeed.newsfeed.utils.Story;
 import com.example.travelhut.views.main.newsfeed.toolbar.user_search.UserSearchAdapter;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,6 +60,11 @@ public class NewsFeedFragment extends Fragment {
     private SearchView searchView;
     ProgressBar progressBar;
 
+    private RecyclerView storyRecyclerView;
+    private StoryAdapter storyAdapter;
+    private List<Story> storyList;
+
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -63,20 +78,30 @@ public class NewsFeedFragment extends Fragment {
         ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
         ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle("");
 
+        storyList = new ArrayList<>();
+
+        storyAdapter = new StoryAdapter(getContext(), storyList);
         //assign views
         viewFlipper = view.findViewById(R.id.viewflipper);
         recyclerView = view.findViewById(R.id.news_feed_recycler_view);
+        storyRecyclerView = view.findViewById(R.id.story_recycler_view);
         progressBar = view.findViewById(R.id.newsfeed_progress_bar);
         newsFeedActivityViewModel = new NewsFeedActivityViewModel();
 
         //create linearLayoutManager
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+        LinearLayoutManager linearLayoutManager2 = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
+
         linearLayoutManager.setReverseLayout(true);
         linearLayoutManager.setStackFromEnd(true);
 
         //fix recyclerView size and setLayoutManager to linearLayoutManager already initialized
         recyclerView.setHasFixedSize(true);
+        storyRecyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(linearLayoutManager);
+        storyRecyclerView.setLayoutManager(linearLayoutManager2);
+
+        storyRecyclerView.setAdapter(storyAdapter);
 
 
         postList = new ArrayList<>();
@@ -107,6 +132,7 @@ public class NewsFeedFragment extends Fragment {
 
         mUsers = new ArrayList<>();
         readUsers();
+
 
         userSearchAdapter = new UserSearchAdapter(getContext(), mUsers);
         recyclerViewSearch.setAdapter(userSearchAdapter);
@@ -188,6 +214,11 @@ public class NewsFeedFragment extends Fragment {
                     }
                 });
                 return true;
+
+            case R.id.camera_icon:
+                 Intent intent = new Intent(getContext(), AddStoryActivity.class);
+                 getContext().startActivity(intent);
+                 return true;
         }
 
         return false;
@@ -253,12 +284,13 @@ public class NewsFeedFragment extends Fragment {
                 followingList.add(snapshot.getKey());
             }
             //followingList.add(newsFeedActivityViewModel.getUserMutableLiveData());
-
+            readStory();
             newsFeedActivityViewModel.getUserMutableLiveData().observe(getViewLifecycleOwner(), firebaseUser -> {
                 followingList.add(firebaseUser.getUid());
             });
 
             readPosts();
+
         });
     }
 
@@ -285,6 +317,51 @@ public class NewsFeedFragment extends Fragment {
         });
     }
 
+
+    private void readStory(){
+
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Story");
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                long timecurrent = System.currentTimeMillis();
+                storyList.clear();
+                storyList.add(new Story("", 0, 0, "",
+                        FirebaseAuth.getInstance().getCurrentUser().getUid()));
+
+                //final String myUid="";
+
+                //newsFeedActivityViewModel = new NewsFeedActivityViewModel();
+
+
+                for (String id : followingList) {
+                    int countStory = 0;
+                    Story story = null;
+                    for (DataSnapshot snapshot : dataSnapshot.child(id).getChildren()) {
+
+                        //String myId = newsFeedActivityViewModel.getUserMutableLiveData().getValue().getUid();
+
+                        if(id!=FirebaseAuth.getInstance().getCurrentUser().getUid()) {
+                            story = snapshot.getValue(Story.class);
+                            if (timecurrent > story.getTimestart() && timecurrent < story.getTimeend()) {
+                                countStory++;
+                            }
+                        }
+                    }
+                    if (countStory > 0){
+                        storyList.add(story);
+                    }
+                }
+
+                storyAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
 
     public void nextView(){
         viewFlipper.showNext();

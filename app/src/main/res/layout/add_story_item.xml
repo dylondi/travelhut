@@ -17,8 +17,7 @@
             android:layout_height="55dp"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
-            android:src="@color/light_blue"
-            android:id="@+id/add_story_image"/>
+            android:id="@+id/profile_image_story"/>
 
 
         <de.hdodenhof.circleimageview.CircleImageView

@@ -9,7 +9,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".views.main.profile.toolbar.NotificationsActivity"></activity>
+        <activity android:name=".views.main.newsfeed.newsfeed.StoryActivity"></activity>
+        <activity android:name=".views.main.newsfeed.newsfeed.AddStoryActivity" />
+        <activity android:name=".views.main.profile.toolbar.NotificationsActivity" />
         <activity android:name=".views.main.profile.toolbar.EditProfileActivity" />
         <activity android:name=".views.main.newsfeed.newsfeed.CommentActivity" />
         <activity android:name=".views.authentication.RegisterLoginActivity" />
@@ -52,11 +54,11 @@
     <uses-feature
         android:glEsVersion="0x00020000"
         android:required="true" />
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
 </manifest>
