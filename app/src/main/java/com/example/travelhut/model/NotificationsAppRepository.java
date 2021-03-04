@@ -17,13 +17,13 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.Collections;
 
 
-public class NotifcationsAppRepository extends LiveData<DataSnapshot> {
+public class NotificationsAppRepository extends LiveData<DataSnapshot> {
 
-    FirebaseUser firebaseUser;
-    DatabaseReference reference;
+    private FirebaseUser firebaseUser;
+    private DatabaseReference reference;
     private final MyValueEventListener listener = new MyValueEventListener();
 
-    public NotifcationsAppRepository() {
+    public NotificationsAppRepository() {
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         reference = FirebaseDatabase.getInstance().getReference("Notifications").child(firebaseUser.getUid());
     }

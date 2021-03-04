@@ -1,4 +1,4 @@
-package com.example.travelhut.views.main.profile;
+package com.example.travelhut.views.main.trips.trip_fragments;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -11,14 +11,11 @@ import androidx.fragment.app.Fragment;
 
 import com.example.travelhut.R;
 
-public class SignOutFragment extends Fragment {
-
-    private static final String TAG = "SignOutFragment";
+public class CurrentTripsFragment extends Fragment {
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_sign_out, container, false);
-        return view;
+        return inflater.inflate(R.layout.fragment_current_trips, container,false);
     }
 }

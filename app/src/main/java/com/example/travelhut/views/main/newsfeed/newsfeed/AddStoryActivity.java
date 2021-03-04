@@ -3,6 +3,7 @@ package com.example.travelhut.views.main.newsfeed.newsfeed;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProviders;
 
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
@@ -14,6 +15,8 @@ import android.webkit.MimeTypeMap;
 import android.widget.Toast;
 
 import com.example.travelhut.R;
+import com.example.travelhut.viewmodel.main.newsfeed.newsfeed.AddStoryActivityViewModel;
+import com.example.travelhut.viewmodel.main.profile.CreatePostActivityViewModel;
 import com.example.travelhut.views.main.newsfeed.NewsFeedActivity;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -34,11 +37,9 @@ import java.util.HashMap;
 public class AddStoryActivity extends AppCompatActivity {
 
 
+    //Variables
     private Uri imageUri;
-    String myUrl = "";
-    private StorageTask storageTask;
-    StorageReference storageReference;
-
+    private AddStoryActivityViewModel addStoryActivityViewModel;
 
 
     @Override
@@ -46,16 +47,12 @@ public class AddStoryActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_story);
 
-        storageReference = FirebaseStorage.getInstance().getReference("story");
-
-        CropImage.activity()
-                .setAspectRatio(9, 16)
-                .start(AddStoryActivity.this);
+        addStoryActivityViewModel = ViewModelProviders.of(this).get(AddStoryActivityViewModel.class);
+        CropImage.activity().setAspectRatio(11, 16).start(AddStoryActivity.this);
     }
 
     public String getFileExtension(Context context, Uri uri) {
         String extension;
-
         //Check uri format to avoid null
         if (uri.getScheme().equals(ContentResolver.SCHEME_CONTENT)) {
             //If scheme is a content
@@ -65,70 +62,18 @@ public class AddStoryActivity extends AppCompatActivity {
             //If scheme is a File
             //This will replace white spaces with %20 and also other special characters. This will avoid returning null values on file name with spaces and special characters.
             extension = MimeTypeMap.getFileExtensionFromUrl(Uri.fromFile(new File(uri.getPath())).toString());
-
         }
-
         return extension;
     }
 
 
+    //calls ViewModel's publishStory method
     private void publishStory(){
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Posting");
         progressDialog.show();
 
-        if(imageUri != null){
-            StorageReference imgRef = storageReference.child(System.currentTimeMillis() + "." + getFileExtension(this, imageUri));
-
-            storageTask = imgRef.putFile(imageUri);
-            storageTask.continueWithTask(new Continuation() {
-                @Override
-                public Object then(@NonNull Task task) throws Exception {
-                    if(!task.isSuccessful()){
-                        throw task.getException();
-                    }
-                    return imgRef.getDownloadUrl();
-                }
-            }).addOnCompleteListener(new OnCompleteListener<Uri>() {
-                @Override
-                public void onComplete(@NonNull Task<Uri> task) {
-                    if(task.isSuccessful()){
-                        Uri downloadUri = task.getResult();
-                        myUrl = downloadUri.toString();
-
-                        String myid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-
-                        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Story")
-                                .child(myid);
-
-                        String storyid = reference.push().getKey();
-                        long timeend = System.currentTimeMillis()+86400000;
-
-                        HashMap<String, Object> hashMap = new HashMap<>();
-                        hashMap.put("imageurl", myUrl);
-                        hashMap.put("timestart", ServerValue.TIMESTAMP);
-                        hashMap.put("timeend", timeend);
-                        hashMap.put("storyid", storyid);
-                        hashMap.put("userid", myid);
-
-                        reference.child(storyid).setValue(hashMap);
-                        progressDialog.dismiss();
-
-                        finish();
-                    }
-                    else{
-                        Toast.makeText(AddStoryActivity.this, "Failed", Toast.LENGTH_SHORT).show();
-                    }
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    Toast.makeText(AddStoryActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
-                }
-            });
-        }else{
-            Toast.makeText(this, "No image selected", Toast.LENGTH_SHORT).show();
-        }
+        addStoryActivityViewModel.publishStory(imageUri, getFileExtension(this,imageUri), progressDialog);
     }
 
     @Override

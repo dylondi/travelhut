@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModel;
 import com.example.travelhut.model.AuthAppRepository;
 import com.example.travelhut.model.FollowingAppRepository;
 import com.example.travelhut.model.PostsAppRepository;
+import com.example.travelhut.model.StoriesAppRepository;
 import com.example.travelhut.model.UsersAppRepository;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -23,6 +24,7 @@ public class NewsFeedActivityViewModel extends ViewModel {
     private PostsAppRepository postsAppRepository;
     private FollowingAppRepository followingAppRepository;
     private AuthAppRepository authAppRepository;
+    private StoriesAppRepository storiesAppRepository;
 
 
 
@@ -34,6 +36,7 @@ public class NewsFeedActivityViewModel extends ViewModel {
         postsAppRepository = new PostsAppRepository();
         this.userSearchQuery = liveData.getUserSearchQuery();
         authAppRepository = new AuthAppRepository();
+        storiesAppRepository = new StoriesAppRepository();
 
     }
 
@@ -42,7 +45,9 @@ public class NewsFeedActivityViewModel extends ViewModel {
         postsAppRepository = new PostsAppRepository();
         followingAppRepository = new FollowingAppRepository();
         this.userSearchQuery = liveData.getReference();
-        authAppRepository = new AuthAppRepository();    }
+        authAppRepository = new AuthAppRepository();
+        storiesAppRepository = new StoriesAppRepository();
+    }
 
     @NonNull
     public LiveData<DataSnapshot> getDataSnapshotLiveData() {
@@ -62,6 +67,11 @@ public class NewsFeedActivityViewModel extends ViewModel {
     public LiveData<DataSnapshot> getFollowingSnapshot() {
 
         return followingAppRepository;
+    }
+    @NonNull
+    public LiveData<DataSnapshot> getStoriesLiveData() {
+
+        return storiesAppRepository;
     }
 
     @NonNull

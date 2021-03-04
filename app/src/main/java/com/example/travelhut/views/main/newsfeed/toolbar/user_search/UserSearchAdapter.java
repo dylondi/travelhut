@@ -18,7 +18,6 @@ import com.example.travelhut.R;
 import com.example.travelhut.model.StringsRepository;
 import com.example.travelhut.views.authentication.utils.User;
 import com.example.travelhut.viewmodel.main.newsfeed.toolbar.users.UserSearchAdapterViewModel;
-import com.example.travelhut.views.ProfileFragment;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;

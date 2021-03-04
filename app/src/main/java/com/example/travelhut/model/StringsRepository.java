@@ -27,4 +27,20 @@ public class StringsRepository {
     public final static String FAILED_CAP = "Failed";
     public final static String NO_IMAGE_SELECTED = "No Image Selected";
     public final static String SOMETHING_GONE_WRONG = "Something Gone Wrong";
+    public final static String STORY_CAP = "Story";
+    public final static String STORY = "story";
+    public final static String STORY_START_TIME = "timestart";
+    public final static String STORY_END_TIME = "timeend";
+    public final static String STORY_ID = "storyid";
+    public final static String USER_ID = "userid";
+    public final static String FULL_STOP = ".";
+    public final static String DISPLAY_NAME = "displayname";
+    public final static String BIO = "bio";
+    public final static String URL = "url";
+    public final static String TEXT = "text";
+    public final static String IS_POST = "ispost";
+    public final static String NOTIFICATIONS_CAP = "Notifications";
+    public final static String STARTED_FOLLOWING_YOU = "started following you";
+    public final static String UPLOADS = "uploads";
+
 }

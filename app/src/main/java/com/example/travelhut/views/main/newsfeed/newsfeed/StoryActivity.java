@@ -210,20 +210,17 @@ public class StoryActivity extends AppCompatActivity implements StoriesProgressV
                     }
                 }
 
+                storiesProgressView.setStoriesCount(images.size());
+                storiesProgressView.setStoryDuration(5000L);
+                storiesProgressView.setStoriesListener(StoryActivity.this);
+                storiesProgressView.startStories(counter);
 
-                //if(images.size()>0) {
-                    storiesProgressView.setStoriesCount(images.size());
-                    storiesProgressView.setStoryDuration(5000L);
-                    storiesProgressView.setStoriesListener(StoryActivity.this);
-                    storiesProgressView.startStories(counter);
-
-                    Glide.with(getApplicationContext()).load(images.get(counter)).into(image);
-                }
+                Glide.with(getApplicationContext()).load(images.get(counter)).into(image);
                 //
-//                addView(storyids.get(counter));
-//                seenNumber(storyids.get(counter));
+                addView(storyids.get(counter));
+                seenNumber(storyids.get(counter));
                 //
-           // }
+            }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {

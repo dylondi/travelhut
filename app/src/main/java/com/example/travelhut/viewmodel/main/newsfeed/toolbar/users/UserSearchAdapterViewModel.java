@@ -28,7 +28,7 @@ public class UserSearchAdapterViewModel extends ViewModel{
         referenceMutableLiveData = userSearchAppRepository.getReferenceMutableLiveData();
         this.userId = userId;
         isFollowing = userSearchAppRepository.getIsFollowing(userId);
-        followersAppRepository = new FollowersAppRepository();
+        followersAppRepository = new FollowersAppRepository(userId);
 
         //userMutableLiveData = userSearchAppRepository.isFollowing();
     }

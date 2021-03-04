@@ -11,9 +11,11 @@ import com.google.firebase.database.ValueEventListener;
 
 public class NotificationsAdapterAppRepository extends LiveData<DataSnapshot> {
 
+    //Variables
     private final MyValueEventListener listener = new MyValueEventListener();
+    private DatabaseReference userInfo;
 
-    DatabaseReference userInfo;
+    //Constructor
     public NotificationsAdapterAppRepository(String publisherid) {
         userInfo = FirebaseDatabase.getInstance().getReference("Users").child(publisherid);
     }

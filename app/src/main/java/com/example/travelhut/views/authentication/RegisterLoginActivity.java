@@ -23,15 +23,10 @@ public class RegisterLoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         //assigning views
-        tabLayout = findViewById(R.id.tab_layout);
-        viewPager = findViewById(R.id.view_pager);
-        google = findViewById(R.id.fab_google);
+        assignViews();
 
         //add login and register tabs to tabLayout
-        tabLayout.addTab(tabLayout.newTab().setText(AuthViewStrings.LOGIN));
-        tabLayout.addTab(tabLayout.newTab().setText(AuthViewStrings.REGISTER));
-
-        tabLayout.setTabGravity(tabLayout.GRAVITY_FILL);
+        configTabLayout();
 
         //declaring and initializing the adapter which will adapt the login and register fragment to this viewpager
         final RegisterLoginAdapter adapter = new RegisterLoginAdapter(getSupportFragmentManager(), this, tabLayout.getTabCount());
@@ -40,12 +35,7 @@ public class RegisterLoginActivity extends AppCompatActivity {
 
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
 
-        google.setTranslationY(300);
-        tabLayout.setTranslationY(300);
-        google.setAlpha(v);
-        tabLayout.setAlpha(v);
-        google.animate().translationY(0).alpha(1).setDuration(1000).setStartDelay(400);
-        tabLayout.animate().translationY(0).alpha(1).setDuration(1000).setStartDelay(400);
+        animateViews();
 
         //onTabSelectedListener to switch between login and register tabs when either one is clicked by user
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener(){
@@ -65,6 +55,28 @@ public class RegisterLoginActivity extends AppCompatActivity {
             }
         });
     }
+
+    private void animateViews() {
+        google.setTranslationY(300);
+        tabLayout.setTranslationY(300);
+        google.setAlpha(v);
+        tabLayout.setAlpha(v);
+        google.animate().translationY(0).alpha(1).setDuration(1000).setStartDelay(400);
+        tabLayout.animate().translationY(0).alpha(1).setDuration(1000).setStartDelay(400);
+    }
+
+    private void configTabLayout() {
+        tabLayout.addTab(tabLayout.newTab().setText(AuthViewStrings.LOGIN));
+        tabLayout.addTab(tabLayout.newTab().setText(AuthViewStrings.REGISTER));
+        tabLayout.setTabGravity(tabLayout.GRAVITY_FILL);
+    }
+
+    private void assignViews() {
+        tabLayout = findViewById(R.id.tab_layout);
+        viewPager = findViewById(R.id.view_pager);
+        google = findViewById(R.id.fab_google);
+    }
+
     @Override
     public void onBackPressed() {
         // Simply Do noting!

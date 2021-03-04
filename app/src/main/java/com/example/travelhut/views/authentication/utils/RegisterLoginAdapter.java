@@ -31,7 +31,6 @@ public class RegisterLoginAdapter extends FragmentPagerAdapter {
     public Fragment getItem(int position){
         switch(position){
             case 0:
-
                 //create and return LoginFragment
                 LoginFragment loginFragment = new LoginFragment();
                 return loginFragment;

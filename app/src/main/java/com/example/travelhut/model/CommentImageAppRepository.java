@@ -12,30 +12,26 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-public class FollowersAppRepository extends LiveData<DataSnapshot> {
+public class CommentImageAppRepository extends LiveData<DataSnapshot> {
 
     //Variables
-    private static final String TAG = "FollowersAppRepository";
-    private FollowersValueEventListener listenerFollowers;
-    private DatabaseReference followers;
+    private static final String TAG = "CommentImageAppReposito";
+    private CommentImageEventListener listener = new CommentImageEventListener();
+    private DatabaseReference reference;
     private FirebaseUser firebaseUser;
 
     //Constructor
-    public FollowersAppRepository(String profileId) {
-        listenerFollowers = new FollowersValueEventListener();
+    public CommentImageAppRepository() {
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        followers = FirebaseDatabase.getInstance().getReference(StringsRepository.FOLLOW_CAP).child(profileId).child(StringsRepository.FOLLOWERS);
+        reference = FirebaseDatabase.getInstance().getReference("Users").child(firebaseUser.getUid());
     }
-
-
 
     //method called when an observer is active
     @Override
     protected void onActive() {
         Log.d(TAG, StringsRepository.ON_ACTIVE);
-        //assign event listener to find changes in number of followers
-        followers.addValueEventListener(listenerFollowers);
-
+        //assign event listener to find changes in posts data
+        reference.addValueEventListener(listener);
     }
 
     //method called when an observers lifecycle states has not started or resumed
@@ -43,16 +39,14 @@ public class FollowersAppRepository extends LiveData<DataSnapshot> {
     protected void onInactive() {
         Log.d(TAG, StringsRepository.ON_INACTIVE);
         //remove event listener
-        followers.removeEventListener(listenerFollowers);
+        reference.removeEventListener(listener);
     }
 
-
     //event listener to find changes in data
-    private class FollowersValueEventListener implements ValueEventListener {
+    private class CommentImageEventListener implements ValueEventListener {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
             setValue(dataSnapshot);
-
         }
 
         @Override

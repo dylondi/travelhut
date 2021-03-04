@@ -27,29 +27,26 @@ import java.util.HashMap;
 
 public class CreatePostAppRepository extends LiveData<DataSnapshot> {
 
+    //Variables
+    private StorageReference storageReference;
+    private StorageTask uploadTask;
+
+    //Constructor
     public CreatePostAppRepository() {
+        storageReference = FirebaseStorage.getInstance().getReference(StringsRepository.POSTS);
     }
 
-
+    //This method will upload the post to firebase
     public void uploadImage(Uri imageUri, String fileExtension, Application application, ProgressDialog progressDialog, String description){
 
-
-
-        //Log.d(TAG, "uploadImage: file extension: " + getFileExtension(this, imageUri));
         if(imageUri != null){
-           //Log.d(TAG, "uploadImage: imageUri: " + imageUri.toString());
-//            StorageReference fileRef = storageReference.child(System.currentTimeMillis()
-//            + "." + getFileExtension(imageUri));
 
-            StorageReference storageReference = FirebaseStorage.getInstance().getReference(StringsRepository.POSTS);
+            StorageReference fileRef = storageReference.child(System.currentTimeMillis() + StringsRepository.FULL_STOP + fileExtension);
 
-            StorageReference fileRef = storageReference.child(System.currentTimeMillis()
-                    + "." + fileExtension);
+            uploadTask = fileRef.putFile(imageUri);
 
-
-
-
-            StorageTask uploadTask = fileRef.putFile(imageUri);
+            //Returns a new Task that will be completed with the result of applying the specified Continuation to this Task
+            //If task completion fails -> display toast
             uploadTask.continueWithTask(new Continuation() {
                 @Override
                 public Object then(@NonNull Task task) throws Exception {
@@ -58,42 +55,53 @@ public class CreatePostAppRepository extends LiveData<DataSnapshot> {
                     }
                     return fileRef.getDownloadUrl();
                 }
-            }).addOnCompleteListener(new OnCompleteListener<Uri>() {
-                @Override
-                public void onComplete(@NonNull Task<Uri> task) {
-                    if(task.isSuccessful()){
-                        Uri downloadUri = task.getResult();
-                        String myUrl = downloadUri.toString();
+            }).addOnCompleteListener((OnCompleteListener<Uri>) task -> {
 
-                        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(StringsRepository.POSTS_CAP);
+                //If Image is uploaded to Firebase Storage successfully
+                if(task.isSuccessful()){
 
-                        String postId = reference.push().getKey();
+                    //Get image uri and assign to String variable
+                    Uri downloadUri = task.getResult();
+                    String myUrl = downloadUri.toString();
 
-                        HashMap<String, Object> hashMap = new HashMap<>();
-                        hashMap.put(StringsRepository.POST_ID, postId);
-                        hashMap.put(StringsRepository.POST_IMAGE, myUrl);
-                        hashMap.put(StringsRepository.DESCRIPTION, description);
-                        hashMap.put(StringsRepository.PUBLISHER, FirebaseAuth.getInstance().getCurrentUser().getUid());
+                    //Retrieve the database reference to all users posts
+                    DatabaseReference reference = FirebaseDatabase.getInstance().getReference(StringsRepository.POSTS_CAP);
 
-                        reference.child(postId).setValue(hashMap);
+                    //Retrieve post key for post to be uploaded
+                    String postId = reference.push().getKey();
 
-                        progressDialog.dismiss();
+                    //Calling uploadPostToDatabase with our current post values
+                    uploadPostToDatabase(myUrl, reference, postId, description);
 
-                        application.startActivity(new Intent(application, ProfileActivity.class));
-                        //application.finish();
-                    }else{
-                        Toast.makeText(application, StringsRepository.FAILED_CAP, Toast.LENGTH_SHORT).show();
-                    }
+                    progressDialog.dismiss();
+
+                    //Create and start intent to navigate to the ProfileActivity upon successful task completion
+                    Intent profileIntent = new Intent(application, ProfileActivity.class);
+                    profileIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    application.startActivity(profileIntent);
+                    //application.finish();
                 }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    Toast.makeText(application, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
+                //If task is unsuccessful -> display toast
+                else{
+                    Toast.makeText(application, StringsRepository.FAILED_CAP, Toast.LENGTH_SHORT).show();
                 }
-            });
-        }else{
+            }).addOnFailureListener(e -> Toast.makeText(application, ""+e.getMessage(), Toast.LENGTH_SHORT).show());
+        }
+        //Else -> display toast informing no image was selected
+        else{
             Toast.makeText(application, StringsRepository.NO_IMAGE_SELECTED, Toast.LENGTH_SHORT).show();
 
         }
+    }
+
+    //This method uploads a HashMap object containing a post's details for Firebase Database
+    private void uploadPostToDatabase(String myUrl, DatabaseReference reference, String postId, String description) {
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put(StringsRepository.POST_ID, postId);
+        hashMap.put(StringsRepository.POST_IMAGE, myUrl);
+        hashMap.put(StringsRepository.DESCRIPTION, description);
+        hashMap.put(StringsRepository.PUBLISHER, FirebaseAuth.getInstance().getCurrentUser().getUid());
+
+        reference.child(postId).setValue(hashMap);
     }
 }

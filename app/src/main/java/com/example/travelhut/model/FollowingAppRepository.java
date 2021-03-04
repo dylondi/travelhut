@@ -14,16 +14,21 @@ import com.google.firebase.database.ValueEventListener;
 
 public class FollowingAppRepository extends LiveData<DataSnapshot> {
 
+    //Variables
     private static final String TAG = "FollowingAppRepository";
     private FollowingValueEventListener listenerFollowing = new FollowingValueEventListener();
     private DatabaseReference following;
     private FirebaseUser firebaseUser;
 
-    //constructor
+    //Constructors
     public FollowingAppRepository() {
 
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         following = FirebaseDatabase.getInstance().getReference(StringsRepository.FOLLOW_CAP).child(firebaseUser.getUid()).child(StringsRepository.FOLLOWING);
+    }
+    public FollowingAppRepository(String profileId) {
+        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        following = FirebaseDatabase.getInstance().getReference(StringsRepository.FOLLOW_CAP).child(profileId).child(StringsRepository.FOLLOWING);
     }
 
 

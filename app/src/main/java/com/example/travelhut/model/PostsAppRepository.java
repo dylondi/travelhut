@@ -3,6 +3,7 @@ package com.example.travelhut.model;
 import android.util.Log;
 
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -16,12 +17,14 @@ public class PostsAppRepository extends LiveData<DataSnapshot> {
     private static final String TAG = "PostsAppRepository";
 
     private PostsEventListener listener = new PostsEventListener();
+    private MutableLiveData<DatabaseReference> postMutableLiveData;
 
     DatabaseReference reference;
 
     //constructor
     public PostsAppRepository() {
         reference = FirebaseDatabase.getInstance().getReference(StringsRepository.POSTS_CAP);
+
     }
 
     //method called when an observer is active
@@ -52,4 +55,12 @@ public class PostsAppRepository extends LiveData<DataSnapshot> {
             //Log.e(LOG_TAG, "Can't listen to query " + query, databaseError.toException());
         }
     }
+
+
+//    public MutableLiveData<DataSnapshot> getPostMutableLiveData(String postid) {
+//        postMutableLiveData.postValue(FirebaseDatabase.getInstance().getReference("Posts").child(postid));
+//
+//
+//        return postMutableLiveData;
+//    }
 }

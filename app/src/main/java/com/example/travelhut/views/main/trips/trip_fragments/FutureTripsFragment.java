@@ -1,4 +1,4 @@
-package com.example.travelhut.views.main.planner.trip_fragments;
+package com.example.travelhut.views.main.trips.trip_fragments;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -11,11 +11,10 @@ import androidx.fragment.app.Fragment;
 
 import com.example.travelhut.R;
 
-public class CurrentTripsFragment extends Fragment {
-
+public class FutureTripsFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_current_trips, container,false);
+        return inflater.inflate(R.layout.fragment_future_trips, container,false);
     }
 }

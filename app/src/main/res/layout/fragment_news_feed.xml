@@ -8,83 +8,81 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-    <RelativeLayout
-        android:id="@+id/relLayout1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
 
-        <include layout="@layout/layout_top_tabs"/>
-
-    </RelativeLayout>
-
-
-
-    <RelativeLayout
-        android:id="@+id/relLayout2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/relLayout1">
-
-        <ViewFlipper
+        <RelativeLayout
+            android:id="@+id/relLayout1"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/viewflipper">
+            android:layout_height="wrap_content">
+
+            <include layout="@layout/layout_top_tabs" />
+
+        </RelativeLayout>
 
 
+        <RelativeLayout
+            android:id="@+id/relLayout2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/relLayout1">
 
-            <!--            <include layout="@layout/layout_center_viewpager"/>-->
+            <ProgressBar
+                android:id="@+id/newsfeed_progress_bar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true" />
 
-            <RelativeLayout
+            <ViewFlipper
+                android:id="@+id/viewflipper"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-                <androidx.core.widget.NestedScrollView
+
+                <!--            <include layout="@layout/layout_center_viewpager"/>-->
+
+                <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/newsfeed_bar">
+                    android:layout_height="match_parent">
 
-                    <LinearLayout
+                    <androidx.core.widget.NestedScrollView
+                        android:id="@+id/newsfeed_bar"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical">
+                        android:layout_height="wrap_content">
 
-
-                        <androidx.recyclerview.widget.RecyclerView
+                        <LinearLayout
+                            android:id="@+id/news_feed_lin_layout"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_below="@id/newsfeed_bar"
-                            android:id="@+id/story_recycler_view"
-                            android:layout_margin="5dp"/>
+                            android:orientation="vertical">
+
+
+                            <androidx.recyclerview.widget.RecyclerView
+                                android:id="@+id/story_recycler_view"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@id/newsfeed_bar"
+                                android:layout_margin="5dp" />
+
+
+                            <androidx.recyclerview.widget.RecyclerView
+                                android:id="@+id/news_feed_recycler_view"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content" />
+
+
+                        </LinearLayout>
+                    </androidx.core.widget.NestedScrollView>
+                </RelativeLayout>
 
 
                 <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recycler_view"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/news_feed_recycler_view"/>
+                    android:layout_height="wrap_content" />
+
+            </ViewFlipper>
 
 
-
-                    </LinearLayout>
-                </androidx.core.widget.NestedScrollView>
-            </RelativeLayout>
-
-
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/recycler_view" />
-
-        </ViewFlipper>
-
-        <ProgressBar
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/newsfeed_progress_bar"
-            android:layout_centerInParent="true"/>
-
-
-    </RelativeLayout>
+        </RelativeLayout>
     </RelativeLayout>
 
 </FrameLayout>

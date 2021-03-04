@@ -15,6 +15,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.HashMap;
+
 public class UserSearchAppRepository extends LiveData<DataSnapshot> {
 
     private MutableLiveData<Boolean> isFollowing;
@@ -34,6 +36,7 @@ public class UserSearchAppRepository extends LiveData<DataSnapshot> {
             referenceMutableLiveData.postValue(FirebaseDatabase.getInstance().getReference()
                     .child(StringsRepository.FOLLOW_CAP).child(firebaseAuth.getCurrentUser().getUid()).child(StringsRepository.FOLLOWING));
         }
+        //if(FirebaseDatabase.getInstance().getReference().child("Follow").child(firebaseAuth.getCurrentUser().getUid()).child("following").child())
 
 
     }
@@ -78,6 +81,7 @@ public class UserSearchAppRepository extends LiveData<DataSnapshot> {
     public MutableLiveData<DatabaseReference> getReferenceMutableLiveData() {
         return referenceMutableLiveData;
     }
+
 
 
 

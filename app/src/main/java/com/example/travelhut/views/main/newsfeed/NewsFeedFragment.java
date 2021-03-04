@@ -10,13 +10,14 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.ViewFlipper;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.ViewCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.LiveData;
@@ -25,20 +26,16 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.travelhut.R;
 import com.example.travelhut.viewmodel.main.newsfeed.NewsFeedActivityViewModel;
-import com.example.travelhut.views.ProfileFragment;
+import com.example.travelhut.views.main.newsfeed.toolbar.user_search.ProfileFragment;
 import com.example.travelhut.views.authentication.utils.User;
 import com.example.travelhut.views.main.newsfeed.newsfeed.AddStoryActivity;
-import com.example.travelhut.views.main.newsfeed.newsfeed.PostAdapter;
+import com.example.travelhut.views.main.newsfeed.newsfeed.PostsAdapter;
 import com.example.travelhut.views.main.newsfeed.newsfeed.StoryAdapter;
 import com.example.travelhut.views.main.newsfeed.newsfeed.utils.Post;
 import com.example.travelhut.views.main.newsfeed.newsfeed.utils.Story;
 import com.example.travelhut.views.main.newsfeed.toolbar.user_search.UserSearchAdapter;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,7 +49,7 @@ public class NewsFeedFragment extends Fragment {
     private List<User> mUsers;
     public ViewFlipper viewFlipper;
     public RecyclerView recyclerView;
-    private PostAdapter postAdapter;
+    private PostsAdapter postsAdapter;
     private List<Post> postList;
     private NewsFeedActivityViewModel newsFeedActivityViewModel;
     private List<String> followingList;
@@ -63,6 +60,7 @@ public class NewsFeedFragment extends Fragment {
     private RecyclerView storyRecyclerView;
     private StoryAdapter storyAdapter;
     private List<Story> storyList;
+    private LinearLayout linearLayout;
 
 
 
@@ -85,6 +83,9 @@ public class NewsFeedFragment extends Fragment {
         viewFlipper = view.findViewById(R.id.viewflipper);
         recyclerView = view.findViewById(R.id.news_feed_recycler_view);
         storyRecyclerView = view.findViewById(R.id.story_recycler_view);
+        linearLayout = view.findViewById(R.id.news_feed_lin_layout);
+
+
         progressBar = view.findViewById(R.id.newsfeed_progress_bar);
         newsFeedActivityViewModel = new NewsFeedActivityViewModel();
 
@@ -105,10 +106,11 @@ public class NewsFeedFragment extends Fragment {
 
 
         postList = new ArrayList<>();
-        postAdapter = new PostAdapter(getContext(), postList);
+        postsAdapter = new PostsAdapter(getContext(), postList);
+        postsAdapter.setHasStableIds(true);
 
         //set adapter for recyclerView
-        recyclerView.setAdapter(postAdapter);
+        recyclerView.setAdapter(postsAdapter);
 
 
         checkFollowing();
@@ -137,7 +139,16 @@ public class NewsFeedFragment extends Fragment {
         userSearchAdapter = new UserSearchAdapter(getContext(), mUsers);
         recyclerViewSearch.setAdapter(userSearchAdapter);
 
+//        recyclerView.setNestedScrollingEnabled(false);
+//        storyRecyclerView.setNestedScrollingEnabled(false);
+//        linearLayout.setNestedScrollingEnabled(false);
+//        ViewCompat.setNestedScrollingEnabled(recyclerView, false);
+//        ViewCompat.setNestedScrollingEnabled(storyRecyclerView, false);
+        RecyclerView.RecycledViewPool pool= new RecyclerView.RecycledViewPool();
 
+        pool.setMaxRecycledViews(0, 10);
+        recyclerView.setRecycledViewPool(pool);
+        ViewCompat.setNestedScrollingEnabled(linearLayout, false);
         return view;
 
     }
@@ -313,55 +324,85 @@ public class NewsFeedFragment extends Fragment {
                     }
                 }
             }
-            postAdapter.notifyDataSetChanged();
+            postsAdapter.notifyDataSetChanged();
         });
     }
 
 
-    private void readStory(){
+    private void readStory() {
 
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Story");
-        reference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                long timecurrent = System.currentTimeMillis();
-                storyList.clear();
-                storyList.add(new Story("", 0, 0, "",
-                        FirebaseAuth.getInstance().getCurrentUser().getUid()));
+        LiveData<DataSnapshot> liveData = newsFeedActivityViewModel.getStoriesLiveData();
 
-                //final String myUid="";
-
-                //newsFeedActivityViewModel = new NewsFeedActivityViewModel();
+        liveData.observe(getViewLifecycleOwner(), dataSnapshot -> {
+            long timecurrent = System.currentTimeMillis();
+            storyList.clear();
+            storyList.add(new Story("", 0, 0, "",
+                    FirebaseAuth.getInstance().getCurrentUser().getUid()));
 
 
-                for (String id : followingList) {
-                    int countStory = 0;
-                    Story story = null;
-                    for (DataSnapshot snapshot : dataSnapshot.child(id).getChildren()) {
+            for (String id : followingList) {
+                int countStory = 0;
+                Story story = null;
+                for (DataSnapshot snapshot : dataSnapshot.child(id).getChildren()) {
 
-                        //String myId = newsFeedActivityViewModel.getUserMutableLiveData().getValue().getUid();
+                    //String myId = newsFeedActivityViewModel.getUserMutableLiveData().getValue().getUid();
 
-                        if(id!=FirebaseAuth.getInstance().getCurrentUser().getUid()) {
-                            story = snapshot.getValue(Story.class);
-                            if (timecurrent > story.getTimestart() && timecurrent < story.getTimeend()) {
-                                countStory++;
-                            }
+                    if (id != FirebaseAuth.getInstance().getCurrentUser().getUid()) {
+                        story = snapshot.getValue(Story.class);
+                        if (timecurrent > story.getTimestart() && timecurrent < story.getTimeend()) {
+                            countStory++;
                         }
                     }
-                    if (countStory > 0){
-                        storyList.add(story);
-                    }
                 }
-
-                storyAdapter.notifyDataSetChanged();
+                if (countStory > 0) {
+                    storyList.add(story);
+                }
             }
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
+            storyAdapter.notifyDataSetChanged();
         });
+
     }
+
+//        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Story");
+//        reference.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot dataSnapshot) {
+//                long timecurrent = System.currentTimeMillis();
+//                storyList.clear();
+//                storyList.add(new Story("", 0, 0, "",
+//                        FirebaseAuth.getInstance().getCurrentUser().getUid()));
+//
+//
+//
+//                for (String id : followingList) {
+//                    int countStory = 0;
+//                    Story story = null;
+//                    for (DataSnapshot snapshot : dataSnapshot.child(id).getChildren()) {
+//
+//                        //String myId = newsFeedActivityViewModel.getUserMutableLiveData().getValue().getUid();
+//
+//                        if(id!=FirebaseAuth.getInstance().getCurrentUser().getUid()) {
+//                            story = snapshot.getValue(Story.class);
+//                            if (timecurrent > story.getTimestart() && timecurrent < story.getTimeend()) {
+//                                countStory++;
+//                            }
+//                        }
+//                    }
+//                    if (countStory > 0){
+//                        storyList.add(story);
+//                    }
+//                }
+//
+//                storyAdapter.notifyDataSetChanged();
+ //           }
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//
+//            }
+//});
+//    }
 
     public void nextView(){
         viewFlipper.showNext();

@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -86,6 +87,7 @@ public class StoryAdapter extends RecyclerView.Adapter<StoryAdapter.ViewHolder>{
     public class ViewHolder extends RecyclerView.ViewHolder{
         public ImageView storyImage, storyPlus, storyImageViewed;
         public TextView username, postStoryText;
+        public FrameLayout storyFrame, storySeenFrame;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -95,6 +97,8 @@ public class StoryAdapter extends RecyclerView.Adapter<StoryAdapter.ViewHolder>{
             storyImageViewed = itemView.findViewById(R.id.profile_image_story_viewed);
             username = itemView.findViewById(R.id.story_username);
             postStoryText = itemView.findViewById(R.id.add_story_text);
+            storyFrame = itemView.findViewById(R.id.story_frame);
+            storySeenFrame = itemView.findViewById(R.id.story_frame_seen);
 
         }
     }
@@ -212,11 +216,11 @@ public class StoryAdapter extends RecyclerView.Adapter<StoryAdapter.ViewHolder>{
                 }
 
                 if(i > 0){
-                    viewHolder.storyImage.setVisibility(View.VISIBLE);
-                    viewHolder.storyImageViewed.setVisibility(View.GONE);
+                    viewHolder.storyFrame.setVisibility(View.VISIBLE);
+                    viewHolder.storySeenFrame.setVisibility(View.GONE);
                 }else{
-                    viewHolder.storyImage.setVisibility(View.GONE);
-                    viewHolder.storyImageViewed.setVisibility(View.VISIBLE);
+                    viewHolder.storyFrame.setVisibility(View.GONE);
+                    viewHolder.storySeenFrame.setVisibility(View.VISIBLE);
                 }
             }
 

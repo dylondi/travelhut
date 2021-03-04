@@ -45,11 +45,7 @@ public class RegisterFragment extends Fragment {
         ViewGroup root = (ViewGroup) inflater.inflate(R.layout.fragment_register, container, false);
 
         //assigning views
-        emailEditText = root.findViewById(R.id.emailRegister);
-        usernameEditText = root.findViewById(R.id.usernameRegister);
-        passwordEditText = root.findViewById(R.id.passwordRegister);
-        passwordTwoEditText = root.findViewById(R.id.passwordTwoRegister);
-        registerButton = root.findViewById(R.id.registerBtn);
+        assignViews(root);
 
 
         //onClickListener for register button which calls the register method in the RegisterViewModel
@@ -68,5 +64,13 @@ public class RegisterFragment extends Fragment {
         });
 
         return root;
+    }
+
+    private void assignViews(ViewGroup root) {
+        emailEditText = root.findViewById(R.id.emailRegister);
+        usernameEditText = root.findViewById(R.id.usernameRegister);
+        passwordEditText = root.findViewById(R.id.passwordRegister);
+        passwordTwoEditText = root.findViewById(R.id.passwordTwoRegister);
+        registerButton = root.findViewById(R.id.registerBtn);
     }
 }

@@ -6,22 +6,22 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
-import com.example.travelhut.model.NotifcationsAppRepository;
+import com.example.travelhut.model.NotificationsAppRepository;
 import com.google.firebase.database.DataSnapshot;
 
 public class NotificationsActivityViewModel extends AndroidViewModel {
 
     Application application;
-    private NotifcationsAppRepository notifcationsAppRepository;
+    private NotificationsAppRepository notificationsAppRepository;
     public NotificationsActivityViewModel(@NonNull Application application) {
         super(application);
-        notifcationsAppRepository = new NotifcationsAppRepository();
+        notificationsAppRepository = new NotificationsAppRepository();
         this.application = application;
     }
 
     @NonNull
     public LiveData<DataSnapshot> getFollowingSnapshot() {
 
-        return notifcationsAppRepository;
+        return notificationsAppRepository;
     }
 }

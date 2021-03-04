@@ -25,16 +25,11 @@ import com.example.travelhut.model.UniversalImageLoader;
 import com.example.travelhut.views.authentication.utils.User;
 import com.example.travelhut.utils.BottomNavigationViewHelper;
 import com.example.travelhut.viewmodel.main.profile.ProfileActivityViewModel;
-import com.example.travelhut.views.main.newsfeed.newsfeed.PostAdapter;
+import com.example.travelhut.views.main.newsfeed.newsfeed.PostsAdapter;
 import com.example.travelhut.views.main.newsfeed.newsfeed.utils.Post;
-import com.example.travelhut.views.main.profile.toolbar.EditProfileActivity;
 import com.example.travelhut.views.main.profile.toolbar.NotificationsActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.example.travelhut.views.main.profile.toolbar.CreatePostActivity;
 
@@ -53,7 +48,7 @@ public class ProfileActivity extends AppCompatActivity {
     private ImageView profileImage;
     private TextView followers, following;
     private ProfileActivityViewModel profileActivityViewModel;
-    private PostAdapter postAdapter;
+    private PostsAdapter postsAdapter;
     private List<Post> postList;
     public RecyclerView recyclerView;
 
@@ -62,7 +57,10 @@ public class ProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
         Log.d(TAG, "onCreate: started.");
-        profileActivityViewModel = new ProfileActivityViewModel();
+
+        SharedPreferences prefs = getSharedPreferences("PREFS", Context.MODE_PRIVATE);
+        profileid = prefs.getString("profileid", "none");
+        profileActivityViewModel = new ProfileActivityViewModel(profileid);
         displayName = findViewById(R.id.display_name);
         followers = findViewById(R.id.numFollowers);
         following = findViewById(R.id.numFollowing);
@@ -76,14 +74,12 @@ public class ProfileActivity extends AppCompatActivity {
         linearLayoutManager.setStackFromEnd(true);
         recyclerView.setLayoutManager(linearLayoutManager);
         postList = new ArrayList<>();
-        postAdapter = new PostAdapter(mContext, postList);
-        recyclerView.setAdapter(postAdapter);
+        postsAdapter = new PostsAdapter(mContext, postList);
+        recyclerView.setAdapter(postsAdapter);
        // String s = displayName.getText().toString();
 
         //FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
-        SharedPreferences prefs = getSharedPreferences("PREFS", Context.MODE_PRIVATE);
-        profileid = prefs.getString("profileid", "none");
 
         //displayName.setText(firebaseUser.getDisplayName());
 
@@ -211,25 +207,17 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void getProfileFeed(){
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Posts");
-        reference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                postList.clear();
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()){
-                    Post post = snapshot.getValue(Post.class);
-                    if (post.getPublisher().equals(profileid)){
-                        postList.add(post);
-                    }
+        LiveData<DataSnapshot> liveData = profileActivityViewModel.getPostsLiveData();
+        liveData.observe(this,  dataSnapshot -> {
+            postList.clear();
+            for (DataSnapshot snapshot : dataSnapshot.getChildren()){
+                Post post = snapshot.getValue(Post.class);
+                if (post.getPublisher().equals(profileid)){
+                    postList.add(post);
                 }
-                //Collections.reverse(postList);
-                postAdapter.notifyDataSetChanged();
             }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
+            //Collections.reverse(postList);
+            postsAdapter.notifyDataSetChanged();
         });
     }
 

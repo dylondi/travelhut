@@ -17,6 +17,7 @@
             android:layout_height="55dp"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
+            android:layout_marginTop="4dp"
             android:id="@+id/profile_image_story"/>
 
 
@@ -36,7 +37,8 @@
         android:id="@+id/add_story_text"
         android:textColor="@color/grey"
         android:layout_gravity="center"
-        android:maxLines="1"/>
+        android:maxLines="1"
+        android:layout_marginTop="4dp"/>
 
 
 </LinearLayout>

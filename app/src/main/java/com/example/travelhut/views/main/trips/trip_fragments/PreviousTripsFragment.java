@@ -1,4 +1,4 @@
-package com.example.travelhut.views.main.planner.trip_fragments;
+package com.example.travelhut.views.main.trips.trip_fragments;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;

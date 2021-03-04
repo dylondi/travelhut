@@ -2,7 +2,6 @@ package com.example.travelhut.views.main.newsfeed.newsfeed;
 
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,29 +29,29 @@ import java.util.HashMap;
 import java.util.List;
 
 
-public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder>{
+public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder>{
 
     private static final String TAG = "PostAdapter";
 
-    public Context mContext;
-    public List<Post> mPost;
+    public Context context;
+    public List<Post> posts;
 
     private FirebaseUser firebaseUser;
 
 
     //constructor
-    public PostAdapter(Context mContext, List<Post> mPost) {
-        this.mContext = mContext;
-        this.mPost = mPost;
+    public PostsAdapter(Context context, List<Post> posts) {
+        this.context = context;
+        this.posts = posts;
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 
-        View view = LayoutInflater.from(mContext).inflate(R.layout.post_item, parent, false);
+        View view = LayoutInflater.from(context).inflate(R.layout.post_item, parent, false);
 
-        return new PostAdapter.ViewHolder(view);
+        return new PostsAdapter.ViewHolder(view);
     }
 
     @Override
@@ -62,10 +61,10 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder>{
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
         //get current post from mPost list
-        Post post = mPost.get(position);
+        Post post = posts.get(position);
 
         //set image for post
-        Glide.with(mContext).load(post.getPostimage()).into(holder.post_image);
+        Glide.with(context).load(post.getPostimage()).into(holder.post_image);
 
         //checks if post description is empty or not -> makes visible or not based on string
         if(post.getDescription().equals("")){
@@ -111,10 +110,10 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder>{
         holder.comment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(mContext, CommentActivity.class);
+                Intent intent = new Intent(context, CommentActivity.class);
                 intent.putExtra("postid", post.getPostid());
                 intent.putExtra("publisher", post.getPublisher());
-                mContext.startActivity(intent);
+                context.startActivity(intent);
             }
         });
 
@@ -122,10 +121,10 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder>{
         holder.comments.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(mContext, CommentActivity.class);
+                Intent intent = new Intent(context, CommentActivity.class);
                 intent.putExtra("postid", post.getPostid());
                 intent.putExtra("publisher", post.getPublisher());
-                mContext.startActivity(intent);
+                context.startActivity(intent);
             }
         });
 
@@ -135,7 +134,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder>{
 
     @Override
     public int getItemCount() {
-        return mPost.size();
+        return posts.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder{
@@ -262,7 +261,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder>{
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 User user = snapshot.getValue(User.class);
-                Glide.with(mContext).load(user.getImageurl()).into(image_profile);
+                Glide.with(context).load(user.getImageurl()).into(image_profile);
                 username.setText(user.getUsername());
                 publisher.setText(user.getUsername());
 

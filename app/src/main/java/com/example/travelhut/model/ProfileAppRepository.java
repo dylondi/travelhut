@@ -8,6 +8,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -27,17 +28,50 @@ import com.google.firebase.storage.UploadTask;
 
 import java.util.HashMap;
 
+import static com.example.travelhut.model.StringsRepository.USERS_CAP;
+
 public class ProfileAppRepository extends LiveData<DataSnapshot> {
+
+    //Variables
     private static final String LOG_TAG = "ProfileAppRepository";
     private DatabaseReference reference;
     private FirebaseUser firebaseUser;
     private final MyValueEventListener listener = new MyValueEventListener();
+    private MutableLiveData<Boolean> isFollowing;
+
 
     //constructor
     public ProfileAppRepository() {
 
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        reference = FirebaseDatabase.getInstance().getReference(StringsRepository.USERS_CAP).child(firebaseUser.getUid());
+        reference = FirebaseDatabase.getInstance().getReference(USERS_CAP).child(firebaseUser.getUid());
+    }
+    public ProfileAppRepository(String profileId) {
+
+        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        reference = FirebaseDatabase.getInstance().getReference(USERS_CAP).child(profileId);
+        isFollowing = new MutableLiveData<>();
+        checkIfFollows(profileId);
+    }
+
+    private void checkIfFollows(String profileId){
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child(StringsRepository.FOLLOW_CAP).child(firebaseUser.getUid()).child(StringsRepository.FOLLOWING);
+
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.child(profileId).exists()){
+                    isFollowing.setValue(true);
+                }else{
+                    isFollowing.setValue(false);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
     //method called when an observer is active
@@ -74,21 +108,75 @@ public class ProfileAppRepository extends LiveData<DataSnapshot> {
 
 
     public void updateProfile(String displayName, String username, String bio, String url){
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Users").child(firebaseUser.getUid());
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(USERS_CAP).child(firebaseUser.getUid());
 
         HashMap<String, Object> hashMap = new HashMap<>();
-        hashMap.put("displayname", displayName);
-        hashMap.put("username", username);
-        hashMap.put("bio", bio);
-        hashMap.put("url", url);
+        hashMap.put(StringsRepository.DISPLAY_NAME, displayName);
+        hashMap.put(StringsRepository.USERNAME, username);
+        hashMap.put(StringsRepository.BIO, bio);
+        hashMap.put(StringsRepository.URL, url);
 
         reference.updateChildren(hashMap);
     }
 
+    public void follow(String userId) {
+        //updates db -> currentUser -> following -> otherUser -> true
+        FirebaseDatabase.getInstance().getReference()
+                .child(StringsRepository.FOLLOW_CAP)
+                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .child(StringsRepository.FOLLOWING)
+                .child(userId).setValue(true);
+
+        //updates db -> otherUser -> followers -> currentUser -> true
+        FirebaseDatabase.getInstance().getReference()
+                .child(StringsRepository.FOLLOW_CAP)
+                .child(userId)
+                .child(StringsRepository.FOLLOWERS)
+                .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(true);
+
+        isFollowing.setValue(true);
+
+    }
+
+    //method is called when current user unfollows another user
+    public void unFollow(String userId) {
+        //updates db -> currentUser -> following -> otherUser -> removes value
+        FirebaseDatabase.getInstance().getReference()
+                .child(StringsRepository.FOLLOW_CAP)
+                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .child(StringsRepository.FOLLOWING)
+                .child(userId).removeValue();
+
+        //updates db -> otherUser -> followers -> currentUser -> removes value
+        FirebaseDatabase.getInstance().getReference()
+                .child(StringsRepository.FOLLOW_CAP)
+                .child(userId)
+                .child(StringsRepository.FOLLOWERS)
+                .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).removeValue();
+
+        isFollowing.setValue(false);
+
+    }
+
+    public MutableLiveData<Boolean> getIsFollowing() {
+        return isFollowing;
+    }
+
+    public void followNotification(String profileid){
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(StringsRepository.NOTIFICATIONS_CAP).child(profileid);
+
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put(StringsRepository.USER_ID, firebaseUser.getUid());
+        hashMap.put(StringsRepository.TEXT, StringsRepository.STARTED_FOLLOWING_YOU);
+        hashMap.put(StringsRepository.POST_ID, "");
+        hashMap.put(StringsRepository.IS_POST, false);
+
+        reference.push().setValue(hashMap);
+    }
 
     public void uploadImage(Uri imageUri, String fileExtension, Application application, ProgressDialog progressDialog){
 
-        StorageReference storageRef = FirebaseStorage.getInstance().getReference("uploads");
+        StorageReference storageRef = FirebaseStorage.getInstance().getReference(StringsRepository.UPLOADS);
 
 
         //Log.d(TAG, "uploadImage: file extension: " + getFileExtension(this, imageUri));
@@ -96,7 +184,7 @@ public class ProfileAppRepository extends LiveData<DataSnapshot> {
            // Log.d(TAG, "uploadImage: imageUri: " + imageUri.toString());
 
             final StorageReference fileRef = storageRef.child(System.currentTimeMillis()
-                    + "." + fileExtension);
+                    + StringsRepository.FULL_STOP + fileExtension);
 
 
 
@@ -117,10 +205,10 @@ public class ProfileAppRepository extends LiveData<DataSnapshot> {
                         Uri downloadUri = task.getResult();
                         String myUrl = downloadUri.toString();
 
-                        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Users").child(firebaseUser.getUid());
+                        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(USERS_CAP).child(firebaseUser.getUid());
 
                         HashMap<String, Object> hashMap = new HashMap<>();
-                        hashMap.put("imageurl", myUrl);
+                        hashMap.put(StringsRepository.IMAGE_URL, myUrl);
 
                         reference.updateChildren(hashMap);
 

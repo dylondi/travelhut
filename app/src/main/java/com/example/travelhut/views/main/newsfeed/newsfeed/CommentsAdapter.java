@@ -28,25 +28,23 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.List;
 
-public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHolder>{
+public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHolder>{
 
 
-    private Context mContext;
-    private List<Comment> mComment;
+    private Context context;
+    private List<Comment> comments;
+    private FirebaseUser firebaseUser;
 
-    public CommentAdapter(Context mContext, List<Comment> mComment) {
-        this.mContext = mContext;
-        this.mComment = mComment;
+    public CommentsAdapter(Context context, List<Comment> comments) {
+        this.context = context;
+        this.comments = comments;
     }
 
-    private FirebaseUser firebaseUser;
+
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(mContext).inflate(R.layout.comment_item, parent, false);
-
-
-        return new CommentAdapter.ViewHolder(view);
+        return new CommentsAdapter.ViewHolder(LayoutInflater.from(context).inflate(R.layout.comment_item, parent, false));
     }
 
     @Override
@@ -56,7 +54,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
         //create comment object of current comment
-        Comment comment = mComment.get(position);
+        Comment comment = comments.get(position);
 
         //sets text of comment
         holder.comment.setText(comment.getComment());
@@ -68,9 +66,9 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
         holder.comment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(mContext, NewsFeedActivity.class);
+                Intent intent = new Intent(context, NewsFeedActivity.class);
                 intent.putExtra("publisherid", comment.getPublisher());
-                mContext.startActivity(intent);
+                context.startActivity(intent);
             }
         });
 
@@ -78,16 +76,16 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
         holder.profileImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(mContext, NewsFeedActivity.class);
+                Intent intent = new Intent(context, NewsFeedActivity.class);
                 intent.putExtra("publisherid", comment.getPublisher());
-                mContext.startActivity(intent);
+                context.startActivity(intent);
             }
         });
     }
 
     @Override
     public int getItemCount() {
-        return mComment.size();
+        return comments.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder{
@@ -106,10 +104,10 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
 
 
     //this method retrieves user info of use current comment
-    private void getUserInfo(ImageView imageView, TextView username, String publisherid){
+    private void getUserInfo(ImageView imageView, TextView username, String publisherId){
 
         //db ref
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child(StringsRepository.USERS_CAP).child(publisherid);
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child(StringsRepository.USERS_CAP).child(publisherId);
 
         //ValueEventListener for ref
         reference.addValueEventListener(new ValueEventListener() {
@@ -118,7 +116,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
                 User user = snapshot.getValue(User.class);
 
                 //two lines set profile image and username of user comment
-                Glide.with(mContext).load(user.getImageurl()).into(imageView);
+                Glide.with(context).load(user.getImageurl()).into(imageView);
                 username.setText(user.getUsername());
             }
 

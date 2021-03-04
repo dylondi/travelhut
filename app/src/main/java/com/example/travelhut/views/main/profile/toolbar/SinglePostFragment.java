@@ -4,9 +4,10 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -16,13 +17,11 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.example.travelhut.R;
-import com.example.travelhut.views.main.newsfeed.newsfeed.PostAdapter;
+import com.example.travelhut.viewmodel.main.profile.toolbar.SinglePostFragmentViewModel;
+import com.example.travelhut.viewmodel.main.profile.toolbar.SinglePostFragmentViewModelFactory;
+import com.example.travelhut.views.main.newsfeed.newsfeed.PostsAdapter;
 import com.example.travelhut.views.main.newsfeed.newsfeed.utils.Post;
 import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,9 +32,10 @@ public class SinglePostFragment extends Fragment {
 
     String postid;
     private RecyclerView recyclerView;
-    private PostAdapter postAdapter;
+    private PostsAdapter postsAdapter;
     private List<Post> posts;
     private ImageView backArrow;
+    private SinglePostFragmentViewModel singlePostFragmentViewModel;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -48,6 +48,8 @@ public class SinglePostFragment extends Fragment {
         SharedPreferences preferences = getContext().getSharedPreferences("PREFS", Context.MODE_PRIVATE);
 
         postid = preferences.getString("postid", "none");
+        singlePostFragmentViewModel = ViewModelProviders.of(this, new SinglePostFragmentViewModelFactory(getActivity().getApplication(), postid)).get(SinglePostFragmentViewModel.class);
+
 
 
         recyclerView = view.findViewById(R.id.single_post_fragment_recycler_view);
@@ -56,8 +58,8 @@ public class SinglePostFragment extends Fragment {
         recyclerView.setLayoutManager(linearLayoutManager);
 
         posts = new ArrayList<>();
-        postAdapter = new PostAdapter(getContext(), posts);
-        recyclerView.setAdapter(postAdapter);
+        postsAdapter = new PostsAdapter(getContext(), posts);
+        recyclerView.setAdapter(postsAdapter);
 
 
         readPost();
@@ -76,22 +78,32 @@ public class SinglePostFragment extends Fragment {
 
     private void readPost() {
 
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Posts").child(postid);
 
-        reference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
+        LiveData<DataSnapshot> liveData = singlePostFragmentViewModel.getPostLiveData();
+
+        liveData.observe(getViewLifecycleOwner(), databaseReference -> {
                 posts.clear();
-                Post post = snapshot.getValue(Post.class);
+                Post post = databaseReference.getValue(Post.class);
                 posts.add(post);
 
-                postAdapter.notifyDataSetChanged();
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
+                postsAdapter.notifyDataSetChanged();
         });
+//        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Posts").child(postid);
+//
+//        reference.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                posts.clear();
+//                Post post = snapshot.getValue(Post.class);
+//                posts.add(post);
+//
+//                postAdapter.notifyDataSetChanged();
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//
+//            }
+//        });
     }
 }

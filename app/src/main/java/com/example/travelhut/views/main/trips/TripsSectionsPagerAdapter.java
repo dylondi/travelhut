@@ -9,9 +9,9 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 
 import com.example.travelhut.R;
-import com.example.travelhut.views.main.planner.trip_fragments.CurrentTripsFragment;
-import com.example.travelhut.views.main.planner.trip_fragments.FutureTripsFragment;
-import com.example.travelhut.views.main.planner.trip_fragments.PreviousTripsFragment;
+import com.example.travelhut.views.main.trips.trip_fragments.CurrentTripsFragment;
+import com.example.travelhut.views.main.trips.trip_fragments.FutureTripsFragment;
+import com.example.travelhut.views.main.trips.trip_fragments.PreviousTripsFragment;
 
 public class TripsSectionsPagerAdapter extends FragmentPagerAdapter {
 

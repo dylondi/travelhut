@@ -23,12 +23,14 @@ import java.util.HashMap;
 
 public class AuthAppRepository extends LiveData<DataSnapshot> {
 
+    //Variables
     private Application application;
     private MutableLiveData<FirebaseUser> userMutableLiveData;
     private MutableLiveData<Boolean> loggedOutMutableLiveData;
     private FirebaseAuth firebaseAuth;
     private DatabaseReference databaseReference;
 
+    //Constructor containing application context
     public AuthAppRepository(Application application) {
         this.application = application;
 
@@ -42,12 +44,15 @@ public class AuthAppRepository extends LiveData<DataSnapshot> {
         }
     }
 
+    //Constructor
     public AuthAppRepository() {
         userMutableLiveData = new MutableLiveData<>();
         firebaseAuth = FirebaseAuth.getInstance();
+        loggedOutMutableLiveData = new MutableLiveData<>();
 
         if(firebaseAuth.getCurrentUser() != null) {
             userMutableLiveData.postValue(firebaseAuth.getCurrentUser());
+            loggedOutMutableLiveData.postValue(false);
         }
     }
 
@@ -56,25 +61,26 @@ public class AuthAppRepository extends LiveData<DataSnapshot> {
     public void register(String email, String username, String password){
         firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(application.getMainExecutor(), task -> {
 
-            //if registration is successful
+            //If registration is successful
             if(task.isSuccessful()){
 
-                FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
-                String userId = firebaseUser.getUid();
+                //Get current user UUID
+                String userId = firebaseAuth.getCurrentUser().getUid();
 
+                //Get database reference to current user
                 databaseReference = FirebaseDatabase.getInstance().getReference().child(StringsRepository.USERS_CAP).child(userId);
+
+                //Create HashMap with all of the current user's info
                 HashMap<String, Object> hashMap = getUserHashMap(email, username, userId);
 
                 //attempts to create user object in firebase realtime database with generated hashMap
-                databaseReference.setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        //If successful -> post current user to userMutableLiveData object for ViewModel to observe and go to login screen
-                        if(task.isSuccessful()){
-                            userMutableLiveData.postValue(firebaseAuth.getCurrentUser());
-                            Toast.makeText(application, StringsRepository.USER_CREATED, Toast.LENGTH_SHORT).show();
-                            RegisterLoginActivity.viewPager.setCurrentItem(0);
-                        }
+                databaseReference.setValue(hashMap).addOnCompleteListener(task1 -> {
+
+                    //If successful -> post current user to userMutableLiveData object for ViewModel to observe and go to login screen
+                    if(task1.isSuccessful()){
+                        userMutableLiveData.postValue(firebaseAuth.getCurrentUser());
+                        Toast.makeText(application, StringsRepository.USER_CREATED, Toast.LENGTH_SHORT).show();
+                        RegisterLoginActivity.viewPager.setCurrentItem(0);
                     }
                 });
 
@@ -95,9 +101,9 @@ public class AuthAppRepository extends LiveData<DataSnapshot> {
         HashMap<String, Object> hashMap = new HashMap<>();
         hashMap.put(StringsRepository.ID, userId);
         hashMap.put(StringsRepository.USERNAME, username);
-        hashMap.put("displayname", "");
-        hashMap.put("bio", "");
-        hashMap.put("url", "");
+        hashMap.put(StringsRepository.DISPLAY_NAME, "");
+        hashMap.put(StringsRepository.BIO, "");
+        hashMap.put(StringsRepository.URL, "");
         hashMap.put(StringsRepository.EMAIL, email);
         hashMap.put(StringsRepository.IMAGE_URL, StringsRepository.PLACEHOLDER_PROFILE_IMAGE_URL);
         return hashMap;
@@ -107,29 +113,37 @@ public class AuthAppRepository extends LiveData<DataSnapshot> {
     //attempts to login user
     @RequiresApi(api = Build.VERSION_CODES.P)
     public void login(String email, String password){
+        //Login with firebase sign in method
         firebaseAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(application.getMainExecutor(), task -> {
+                    //If sign in is successful
                     if(task.isSuccessful()){
+                        //Post current user object to userMutableLiveData object
                         userMutableLiveData.postValue(firebaseAuth.getCurrentUser());
-                    }else if(task.getException().getMessage() != null){
+                    }
+                    //Else if sign in failed and there is an exception message to show -> display toast with exception message
+                    else if(task.getException().getMessage() != null){
                         Toast.makeText(application, StringsRepository.LOGIN_FAILED + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                    } else{
+                    }
+                    //Else -> display toast with login failed message
+                    else{
                         Toast.makeText(application, StringsRepository.LOGIN_FAILED , Toast.LENGTH_SHORT).show();
                     }
                 });
 
     }
 
-    //return LiveData object of a FirebaseUser which is the current user in this class
+    //Return LiveData object of a FirebaseUser which is the current user in this class
     public MutableLiveData<FirebaseUser> getUserMutableLiveData() {
         return userMutableLiveData;
     }
 
+    //Return MutableLiveData Boolean object telling if user is logged out or not
     public MutableLiveData<Boolean> getLoggedOutMutableLiveData() {
         return loggedOutMutableLiveData;
     }
 
-    //this method logs out a signed in user
+    //This method logs out a signed in user
     public void logout(){
         firebaseAuth.signOut();
         loggedOutMutableLiveData.postValue(true);
