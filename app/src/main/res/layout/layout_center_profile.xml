@@ -27,8 +27,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:id="@+id/profile_linear_layout"
-                android:weightSum="100"
-                android:layout_marginTop="20dp">
+                android:weightSum="100">
 
                 <RelativeLayout
                     android:layout_width="0dp"
