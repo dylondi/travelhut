@@ -2,6 +2,8 @@ package com.example.travelhut.model;
 
 import android.app.Application;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -23,12 +25,16 @@ import java.util.HashMap;
 
 public class AuthAppRepository extends LiveData<DataSnapshot> {
 
+
+    private Handler mainHandler = new Handler(Looper.getMainLooper());
+
     //Variables
     private Application application;
     private MutableLiveData<FirebaseUser> userMutableLiveData;
     private MutableLiveData<Boolean> loggedOutMutableLiveData;
     private FirebaseAuth firebaseAuth;
     private DatabaseReference databaseReference;
+    private volatile boolean threadFinished;
 
     //Constructor containing application context
     public AuthAppRepository(Application application) {
@@ -59,40 +65,104 @@ public class AuthAppRepository extends LiveData<DataSnapshot> {
     //Registers a user with firebase authentication
     @RequiresApi(api = Build.VERSION_CODES.P)
     public void register(String email, String username, String password){
-        firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(application.getMainExecutor(), task -> {
 
-            //If registration is successful
-            if(task.isSuccessful()){
 
-                //Get current user UUID
-                String userId = firebaseAuth.getCurrentUser().getUid();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(application.getMainExecutor(), task -> {
 
-                //Get database reference to current user
-                databaseReference = FirebaseDatabase.getInstance().getReference().child(StringsRepository.USERS_CAP).child(userId);
+                    //If registration is successful
+                    if(task.isSuccessful()){
 
-                //Create HashMap with all of the current user's info
-                HashMap<String, Object> hashMap = getUserHashMap(email, username, userId);
+                        //Get current user UUID
+                        String userId = firebaseAuth.getCurrentUser().getUid();
 
-                //attempts to create user object in firebase realtime database with generated hashMap
-                databaseReference.setValue(hashMap).addOnCompleteListener(task1 -> {
+                        //Get database reference to current user
+                        databaseReference = FirebaseDatabase.getInstance().getReference().child(StringsRepository.USERS_CAP).child(userId);
 
-                    //If successful -> post current user to userMutableLiveData object for ViewModel to observe and go to login screen
-                    if(task1.isSuccessful()){
-                        userMutableLiveData.postValue(firebaseAuth.getCurrentUser());
-                        Toast.makeText(application, StringsRepository.USER_CREATED, Toast.LENGTH_SHORT).show();
-                        RegisterLoginActivity.viewPager.setCurrentItem(0);
+                        //Create HashMap with all of the current user's info
+                        HashMap<String, Object> hashMap = getUserHashMap(email, username, userId);
+
+                        //attempts to create user object in firebase realtime database with generated hashMap
+                        databaseReference.setValue(hashMap).addOnCompleteListener(task1 -> {
+
+                            //If successful -> post current user to userMutableLiveData object for ViewModel to observe and go to login screen
+                            if(task1.isSuccessful()){
+                                userMutableLiveData.postValue(firebaseAuth.getCurrentUser());
+                                mainHandler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(application, StringsRepository.USER_CREATED, Toast.LENGTH_SHORT).show();
+                                        RegisterLoginActivity.viewPager.setCurrentItem(0);
+                                        return;
+                                    }
+                                });
+
+                            }
+                        });
+
+
+                    }
+                    //else -> registration failed and error message shown if exists
+                    else if(task.getException().getMessage() != null){
+                        mainHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(application, StringsRepository.REG_FAILED + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+                        });
+                    } else{
+                        mainHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(application, StringsRepository.REG_FAILED , Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+                        });
                     }
                 });
+            }
+        }).start();
 
 
-            }
-            //else -> registration failed and error message shown if exists
-            else if(task.getException().getMessage() != null){
-                Toast.makeText(application, StringsRepository.REG_FAILED + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-            } else{
-                Toast.makeText(application, StringsRepository.REG_FAILED , Toast.LENGTH_SHORT).show();
-            }
-        });
+//        RegisterThread registerThread = new RegisterThread(email, password, username);
+//        new Thread(registerThread).start();
+//        firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(application.getMainExecutor(), task -> {
+//
+//            //If registration is successful
+//            if(task.isSuccessful()){
+//
+//                //Get current user UUID
+//                String userId = firebaseAuth.getCurrentUser().getUid();
+//
+//                //Get database reference to current user
+//                databaseReference = FirebaseDatabase.getInstance().getReference().child(StringsRepository.USERS_CAP).child(userId);
+//
+//                //Create HashMap with all of the current user's info
+//                HashMap<String, Object> hashMap = getUserHashMap(email, username, userId);
+//
+//                //attempts to create user object in firebase realtime database with generated hashMap
+//                databaseReference.setValue(hashMap).addOnCompleteListener(task1 -> {
+//
+//                    //If successful -> post current user to userMutableLiveData object for ViewModel to observe and go to login screen
+//                    if(task1.isSuccessful()){
+//                        userMutableLiveData.postValue(firebaseAuth.getCurrentUser());
+//                        Toast.makeText(application, StringsRepository.USER_CREATED, Toast.LENGTH_SHORT).show();
+//                        RegisterLoginActivity.viewPager.setCurrentItem(0);
+//                    }
+//                });
+//
+//
+//            }
+//            //else -> registration failed and error message shown if exists
+//            else if(task.getException().getMessage() != null){
+//                Toast.makeText(application, StringsRepository.REG_FAILED + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+//            } else{
+//                Toast.makeText(application, StringsRepository.REG_FAILED , Toast.LENGTH_SHORT).show();
+//            }
+//        });
     }
 
 
@@ -114,22 +184,50 @@ public class AuthAppRepository extends LiveData<DataSnapshot> {
     @RequiresApi(api = Build.VERSION_CODES.P)
     public void login(String email, String password){
         //Login with firebase sign in method
-        firebaseAuth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener(application.getMainExecutor(), task -> {
-                    //If sign in is successful
-                    if(task.isSuccessful()){
-                        //Post current user object to userMutableLiveData object
-                        userMutableLiveData.postValue(firebaseAuth.getCurrentUser());
-                    }
-                    //Else if sign in failed and there is an exception message to show -> display toast with exception message
-                    else if(task.getException().getMessage() != null){
-                        Toast.makeText(application, StringsRepository.LOGIN_FAILED + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                    //Else -> display toast with login failed message
-                    else{
-                        Toast.makeText(application, StringsRepository.LOGIN_FAILED , Toast.LENGTH_SHORT).show();
-                    }
-                });
+//        firebaseAuth.signInWithEmailAndPassword(email, password)
+//                .addOnCompleteListener(application.getMainExecutor(), task -> {
+//                    //If sign in is successful
+//                    if(task.isSuccessful()){
+//                        //Post current user object to userMutableLiveData object
+//                        userMutableLiveData.postValue(firebaseAuth.getCurrentUser());
+//                    }
+//                    //Else if sign in failed and there is an exception message to show -> display toast with exception message
+//                    else if(task.getException().getMessage() != null){
+//                        Toast.makeText(application, StringsRepository.LOGIN_FAILED + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+//                    }
+//                    //Else -> display toast with login failed message
+//                    else{
+//                        Toast.makeText(application, StringsRepository.LOGIN_FAILED , Toast.LENGTH_SHORT).show();
+//                    }
+//                });
+
+//        LoginThread loginThread = new LoginThread(email, password);
+//        new Thread(loginThread).start();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                firebaseAuth.signInWithEmailAndPassword(email, password)
+                        .addOnCompleteListener(application.getMainExecutor(), task -> {
+                            //If sign in is successful
+                            if(task.isSuccessful()){
+                                //Post current user object to userMutableLiveData object
+                                userMutableLiveData.postValue(firebaseAuth.getCurrentUser());
+                                return;
+                            }
+                            //Else if sign in failed and there is an exception message to show -> display toast with exception message
+                            else if(task.getException().getMessage() != null){
+                                Toast.makeText(application, StringsRepository.LOGIN_FAILED + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+                            //Else -> display toast with login failed message
+                            else{
+                                Toast.makeText(application, StringsRepository.LOGIN_FAILED , Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+                        });
+            }
+        }).start();
 
     }
 
@@ -149,7 +247,101 @@ public class AuthAppRepository extends LiveData<DataSnapshot> {
         loggedOutMutableLiveData.postValue(true);
     }
 
+ class LoginThread implements Runnable{
 
+        String email, password;
+     public LoginThread(String email, String password) {
+         this.email = email;
+         this.password = password;
+     }
+
+     @RequiresApi(api = Build.VERSION_CODES.P)
+     @Override
+     public void run() {
+//         firebaseAuth.signInWithEmailAndPassword(email, password)
+//                 .addOnCompleteListener(application.getMainExecutor(), task -> {
+//                     //If sign in is successful
+//                     if(task.isSuccessful()){
+//                         //Post current user object to userMutableLiveData object
+//                         userMutableLiveData.postValue(firebaseAuth.getCurrentUser());
+//                     }
+//                     //Else if sign in failed and there is an exception message to show -> display toast with exception message
+//                     else if(task.getException().getMessage() != null){
+//                         Toast.makeText(application, StringsRepository.LOGIN_FAILED + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+//                     }
+//                     //Else -> display toast with login failed message
+//                     else{
+//                         Toast.makeText(application, StringsRepository.LOGIN_FAILED , Toast.LENGTH_SHORT).show();
+//                     }
+//                 });
+     }
+ }
+
+ class RegisterThread implements Runnable{
+
+        String email, password, username;
+     public RegisterThread(String email, String password, String username) {
+         this.email = email;
+         this.password = password;
+         this.username = username;
+     }
+
+     @RequiresApi(api = Build.VERSION_CODES.P)
+     @Override
+     public void run() {
+         firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(application.getMainExecutor(), task -> {
+
+             //If registration is successful
+             if(task.isSuccessful()){
+
+                 //Get current user UUID
+                 String userId = firebaseAuth.getCurrentUser().getUid();
+
+                 //Get database reference to current user
+                 databaseReference = FirebaseDatabase.getInstance().getReference().child(StringsRepository.USERS_CAP).child(userId);
+
+                 //Create HashMap with all of the current user's info
+                 HashMap<String, Object> hashMap = getUserHashMap(email, username, userId);
+
+                 //attempts to create user object in firebase realtime database with generated hashMap
+                 databaseReference.setValue(hashMap).addOnCompleteListener(task1 -> {
+
+                     //If successful -> post current user to userMutableLiveData object for ViewModel to observe and go to login screen
+                     if(task1.isSuccessful()){
+                         userMutableLiveData.postValue(firebaseAuth.getCurrentUser());
+                         mainHandler.post(new Runnable() {
+                             @Override
+                             public void run() {
+                            Toast.makeText(application, StringsRepository.USER_CREATED, Toast.LENGTH_SHORT).show();
+                            RegisterLoginActivity.viewPager.setCurrentItem(0);
+                             }
+                         });
+
+                     }
+                 });
+
+
+             }
+             //else -> registration failed and error message shown if exists
+             else if(task.getException().getMessage() != null){
+                 mainHandler.post(new Runnable() {
+                     @Override
+                     public void run() {
+                         Toast.makeText(application, StringsRepository.REG_FAILED + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+
+                     }
+                 });
+             } else{
+                 mainHandler.post(new Runnable() {
+                     @Override
+                     public void run() {
+                         Toast.makeText(application, StringsRepository.REG_FAILED , Toast.LENGTH_SHORT).show();
+                     }
+                 });
+             }
+         });
+     }
+ }
 
 
 }

@@ -44,11 +44,11 @@ public class PlaceholderFragment extends Fragment {
             @NonNull LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_previous_trips, container, false);
-        final TextView textView = root.findViewById(R.id.previous_trips_text);
+       // final TextView textView = root.findViewById(R.id.previous_trips_text);
         pageViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
             public void onChanged(@Nullable String s) {
-                textView.setText(s);
+                //textView.setText(s);
             }
         });
         return root;

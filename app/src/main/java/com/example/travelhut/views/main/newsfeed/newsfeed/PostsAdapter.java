@@ -1,7 +1,10 @@
 package com.example.travelhut.views.main.newsfeed.newsfeed;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +15,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.example.travelhut.R;
 import com.example.travelhut.model.StringsRepository;
 import com.example.travelhut.views.main.newsfeed.NewsFeedStrings;
@@ -62,9 +66,10 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder>{
 
         //get current post from mPost list
         Post post = posts.get(position);
+        int screenWidth = Resources.getSystem().getDisplayMetrics().widthPixels;
 
         //set image for post
-        Glide.with(context).load(post.getPostimage()).into(holder.post_image);
+        Glide.with(context).load(post.getPostimage()).apply(new RequestOptions().override(screenWidth, screenWidth)).into(holder.post_image);
 
         //checks if post description is empty or not -> makes visible or not based on string
         if(post.getDescription().equals("")){

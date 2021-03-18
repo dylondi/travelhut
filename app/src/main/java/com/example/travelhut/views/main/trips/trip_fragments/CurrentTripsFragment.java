@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.travelhut.R;
 import com.example.travelhut.views.main.profile.toolbar.Notification;
+import com.example.travelhut.views.main.trips.TripsActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -47,13 +48,21 @@ public class CurrentTripsFragment extends Fragment {
         recyclerView.setAdapter(tripsAdapter);
 
 
+        List<Trip> trips = ((TripsActivity)getActivity()).getTripList();
+
+
+        long currentTime = System.currentTimeMillis();
+
+
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 currentTrips.clear();
                 for(DataSnapshot snapshot : dataSnapshot.getChildren()){
                     Trip trip = snapshot.getValue(Trip.class);
-                    currentTrips.add(trip);
+                    if(trip.getStartdate()<currentTime && trip.getEnddate()>currentTime){
+                        currentTrips.add(trip);
+                    }
                 }
 //                Collections.reverse(notificationList);
                 tripsAdapter.notifyDataSetChanged();

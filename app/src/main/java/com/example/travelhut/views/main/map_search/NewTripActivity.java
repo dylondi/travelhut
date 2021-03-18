@@ -35,7 +35,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.annotations.NotNull;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -131,12 +133,27 @@ public class NewTripActivity extends AppCompatActivity {
                 //Retrieve story key for story to be uploaded
                 String tripId = tripsReference.push().getKey();
 
+
+                Pair selectedDates = (Pair) materialDatePicker.getSelection();
+//              then obtain the startDate & endDate from the range
+                final Pair<Date, Date> rangeDate = new Pair<>(new Date((Long) selectedDates.first), new Date((Long) selectedDates.second));
+//              assigned variables
+                Date startDate1 = rangeDate.first;
+                Date endDate = rangeDate.second;
+                Log.i(TAG, "onClick: startDate: " + startDate1 + " , endDate: " + endDate   );
+//              Format the dates in ur desired display mode
+                SimpleDateFormat simpleFormat = new SimpleDateFormat("dd MMM yyyy");
+//              Display it by setText
+                //datedisplay.setText("SELECTED DATE : " +  simpleFormat.format(startDate) + " Second : " + simpleFormat.format(endDate));
+
                 HashMap<String, Object> hashMap = new HashMap<>();
                 hashMap.put("tripid", tripId);
                 hashMap.put("placeid", place2[0].getId());
                 hashMap.put("placename", place2[0].getName());
                 hashMap.put("placeaddress", place2[0].getAddress());
                 hashMap.put("daterange", startDate.getText().toString());
+                hashMap.put("startdate", (Long) selectedDates.first);
+                hashMap.put("enddate", (Long) selectedDates.second);
 
                 tripsReference.child(tripId).setValue(hashMap);
                 finish();

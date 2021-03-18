@@ -7,16 +7,37 @@ public class Trip {
     private String placename;
     private String placeaddress;
     private String daterange;
+    private long startdate;
+    private long enddate;
 
-    public Trip(String placename, String daterange, String placeaddress, String tripid, String placeid) {
+    public Trip(String placename, String daterange, String placeaddress, String tripid, String placeid, long startdate, long enddate) {
         this.placename = placename;
         this.placeaddress = placeaddress;
         this.daterange = daterange;
         this.tripid = tripid;
         this.placeid = placeid;
+        this.startdate = startdate;
+        this.enddate = enddate;
     }
 
     public Trip() {
+    }
+
+
+    public long getStartdate() {
+        return startdate;
+    }
+
+    public void setStartdate(long startdate) {
+        this.startdate = startdate;
+    }
+
+    public long getEnddate() {
+        return enddate;
+    }
+
+    public void setEnddate(long enddate) {
+        this.enddate = enddate;
     }
 
     public String getPlaceid() {

@@ -308,24 +308,27 @@ public class NewsFeedFragment extends Fragment {
 
     //retrieves posts from ViewModel
     private void readPosts() {
-
         LiveData<DataSnapshot> liveData = newsFeedActivityViewModel.getPostsLiveData();
 
-        liveData.observe(getViewLifecycleOwner(), dataSnapshot -> {
-            postList.clear();
-            for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
 
 
-                Post post = snapshot.getValue(Post.class);
-                Log.d(TAG, "onDataChange: POST IMAGE: " + post.getPostimage());
-                for (String id : followingList) {
-                    if (post.getPublisher().equals(id)) {
-                        postList.add(post);
+                liveData.observe(getViewLifecycleOwner(), dataSnapshot -> {
+                    postList.clear();
+                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+
+
+                        Post post = snapshot.getValue(Post.class);
+                        Log.d(TAG, "onDataChange: POST IMAGE: " + post.getPostimage());
+                        for (String id : followingList) {
+                            if (post.getPublisher().equals(id)) {
+                                postList.add(post);
+                            }
+                        }
                     }
-                }
-            }
-            postsAdapter.notifyDataSetChanged();
-        });
+                    postsAdapter.notifyDataSetChanged();
+                });
+
+
     }
 
 

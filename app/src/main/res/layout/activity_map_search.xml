@@ -48,8 +48,7 @@
             android:background="@drawable/map_layout_bg"
             android:layout_marginRight="10dp"
             android:layout_marginLeft="10dp"
-            android:layout_marginBottom="10dp"
-            android:visibility="gone">
+            android:layout_marginBottom="10dp">
 
 
 
@@ -66,7 +65,7 @@
         android:background="@drawable/place_image_rounded_bg">
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="80dp"
+                android:layout_height="120dp"
                 android:background="@drawable/place_image_rounded_bg">
 
                 <ImageView
@@ -107,7 +106,7 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="120dp"
+            android:layout_height="140dp"
             android:background="@color/light_blue">
             <TextView
                 android:layout_width="wrap_content"

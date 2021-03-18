@@ -177,7 +177,7 @@ public class MapSearchActivity extends AppCompatActivity implements OnMapReadyCa
                     placeId = place.getId();
                     currentMarker = mMap.addMarker(new MarkerOptions().position(place.getLatLng()).title(place.getName()));
 
-                    LatLng latLng = new LatLng(place.getLatLng().latitude - 0.009, place.getLatLng().longitude);
+                    LatLng latLng = new LatLng(place.getLatLng().latitude - 0.006 , place.getLatLng().longitude);
                     mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
                     relativeLayout.setVisibility(View.VISIBLE);
                     relativeLayout.setClickable(true);

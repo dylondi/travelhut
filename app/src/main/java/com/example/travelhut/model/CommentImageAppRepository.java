@@ -15,7 +15,7 @@ import com.google.firebase.database.ValueEventListener;
 public class CommentImageAppRepository extends LiveData<DataSnapshot> {
 
     //Variables
-    private static final String TAG = "CommentImageAppReposito";
+    private static final String TAG = "CommentImageAppRepository";
     private CommentImageEventListener listener = new CommentImageEventListener();
     private DatabaseReference reference;
     private FirebaseUser firebaseUser;
