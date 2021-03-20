@@ -48,7 +48,8 @@
             android:background="@drawable/map_layout_bg"
             android:layout_marginRight="10dp"
             android:layout_marginLeft="10dp"
-            android:layout_marginBottom="10dp">
+            android:layout_marginBottom="10dp"
+            android:visibility="gone">
 
 
 
@@ -106,13 +107,10 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="140dp"
-            android:background="@color/light_blue">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="weather"
-                android:textSize="20dp"/>
+            android:layout_height="160dp">
+
+            <include layout="@layout/weather_item"/>
+
 
         </RelativeLayout>
         <RelativeLayout

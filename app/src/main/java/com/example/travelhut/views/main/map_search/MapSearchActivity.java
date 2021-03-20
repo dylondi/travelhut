@@ -8,10 +8,12 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -31,7 +33,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.bumptech.glide.Glide;
 import com.example.travelhut.R;
+import com.example.travelhut.common.Common;
 import com.example.travelhut.utils.BottomNavigationViewHelper;
 import com.example.travelhut.views.main.newsfeed.newsfeed.CommentActivity;
 import com.google.android.gms.common.ConnectionResult;
@@ -67,11 +71,22 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.database.annotations.NotNull;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 public class MapSearchActivity extends AppCompatActivity implements OnMapReadyCallback {
     private static final String TAG = "MapSearchActivity";
@@ -102,7 +117,142 @@ public class MapSearchActivity extends AppCompatActivity implements OnMapReadyCa
     private Location lastKnownLocation;
     double offset = 0.015;
     private String placeId;
+    private TextView tempText, humidityText, timeText;
+    private ImageView weatherIcon;
+    String nameIcon;
 
+    Bitmap bitmap;
+
+    public class DowbloadJSON extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... strings) {
+
+            URL url;
+            HttpURLConnection httpURLConnection;
+            InputStream inputStream;
+            InputStreamReader inputStreamReader;
+            String result = "";
+
+            try {
+                url = new URL(strings[0]);
+                httpURLConnection = (HttpURLConnection) url.openConnection();
+
+                inputStream = httpURLConnection.getInputStream();
+
+                inputStreamReader = new InputStreamReader(inputStream);
+
+                int data = inputStreamReader.read();
+
+                while(data != -1){
+                    result += (char) data;
+                    data = inputStreamReader.read();
+                }
+
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return result;
+        }
+    }
+
+
+    public class DownloadIcon extends AsyncTask<String, Void, Bitmap>{
+        @Override
+        protected Bitmap doInBackground(String... strings) {
+
+//            Bitmap bitmap = null;
+//            URL url;
+//
+//            HttpURLConnection httpURLConnection;
+//
+//            InputStream inputStream;
+//
+//            //InputStreamReader inputStreamReader;
+//
+//            try {
+//                url = new URL(strings[0]);
+//                httpURLConnection = (HttpURLConnection) url.openConnection();
+//                inputStream = httpURLConnection.getInputStream();
+//
+//                bitmap = BitmapFactory.decodeStream(inputStream);
+//
+//            } catch (MalformedURLException e) {
+//                e.printStackTrace();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+
+
+            String stringUrl = strings[0];
+            bitmap = null;
+            InputStream inputStream;
+            try {
+                inputStream = new java.net.URL(stringUrl).openStream();
+                bitmap = BitmapFactory.decodeStream(inputStream);
+            } catch (Exception e) {
+                Log.e("Error", e.getMessage());
+                e.printStackTrace();
+            }
+
+            return bitmap;
+        }
+    }
+
+
+    public void loading(double lat, double lon){
+        String weatherAPI = Common.WEATHER_API;
+        String url = "https://api.openweathermap.org/data/2.5/onecall?lat=" + lat +"&lon=" + lon +"&exclude={part}&appid=" + weatherAPI;
+        DowbloadJSON dowbloadJSON = new DowbloadJSON();
+        String sTime;
+        try {
+            String result = "abc";
+
+            result = dowbloadJSON.execute(url).get();
+
+            JSONObject jsonObject = new JSONObject(result);
+            JSONObject main = jsonObject.getJSONObject("current");
+            String temp = main.getString("temp");
+
+            String humidity = main.getString("humidity");
+
+            Long time = main.getLong("dt");
+
+
+            sTime = new SimpleDateFormat("hh:mm", Locale.ENGLISH)
+                    .format(new Date(time*1000));
+
+            Long kelvToCel = 273L;
+            long l = (new Double(Double.parseDouble(temp))).longValue(); //129
+
+            timeText.setText(sTime);
+            tempText.setText(l- kelvToCel + "°C");
+            humidityText.setText("Humidity: "+humidity+"%");
+
+
+
+
+            nameIcon = main.getJSONArray("weather").getJSONObject(0).getString("icon");
+
+            String urlIcon = "http://openweathermap.org/img/wn/" + nameIcon + "@2x.png";
+            Glide.with(this).load(urlIcon).dontAnimate().into(weatherIcon);
+//            DownloadIcon downloadIcon = new DownloadIcon();
+//
+//            Bitmap bitmap = downloadIcon.execute(urlIcon).get();
+//
+//            weatherIcon.setImageBitmap(bitmap);
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -114,6 +264,11 @@ public class MapSearchActivity extends AppCompatActivity implements OnMapReadyCa
         placeAddress = findViewById(R.id.place_address);
         relativeLayout = findViewById(R.id.maps_center_rel_layout);
         placeImage = findViewById(R.id.place_image_view);
+        tempText = findViewById(R.id.temp);
+        humidityText = findViewById(R.id.humidity);
+        timeText = findViewById(R.id.time);
+        weatherIcon = findViewById(R.id.weather_icon);
+
         placeImage.setClipToOutline(true);
         Button button = findViewById(R.id.floating_button);
 
@@ -177,13 +332,15 @@ public class MapSearchActivity extends AppCompatActivity implements OnMapReadyCa
                     placeId = place.getId();
                     currentMarker = mMap.addMarker(new MarkerOptions().position(place.getLatLng()).title(place.getName()));
 
-                    LatLng latLng = new LatLng(place.getLatLng().latitude - 0.006 , place.getLatLng().longitude);
+                    LatLng latLng = new LatLng(place.getLatLng().latitude - 0.007 , place.getLatLng().longitude);
                     mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
                     relativeLayout.setVisibility(View.VISIBLE);
                     relativeLayout.setClickable(true);
                     //button.setImageResource(R.drawable.ic_new_trip);
                     placeName.setText(place.getName());
                     placeAddress.setText(place.getAddress());
+                    loading(place.getLatLng().latitude, place.getLatLng().longitude);
+
                     Log.i(TAG, "getName(): " + place.getName());
                     Log.i(TAG, "getAddress: " + place.getAddress());
                     Log.i(TAG, "getAddressComponents: " + place.getAddressComponents());
@@ -224,6 +381,7 @@ public class MapSearchActivity extends AppCompatActivity implements OnMapReadyCa
                             // TODO: Handle error with given status code.
                         }
                     });
+
                 }
             }
 

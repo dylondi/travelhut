@@ -125,44 +125,6 @@ public class AuthAppRepository extends LiveData<DataSnapshot> {
                 });
             }
         }).start();
-
-
-//        RegisterThread registerThread = new RegisterThread(email, password, username);
-//        new Thread(registerThread).start();
-//        firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(application.getMainExecutor(), task -> {
-//
-//            //If registration is successful
-//            if(task.isSuccessful()){
-//
-//                //Get current user UUID
-//                String userId = firebaseAuth.getCurrentUser().getUid();
-//
-//                //Get database reference to current user
-//                databaseReference = FirebaseDatabase.getInstance().getReference().child(StringsRepository.USERS_CAP).child(userId);
-//
-//                //Create HashMap with all of the current user's info
-//                HashMap<String, Object> hashMap = getUserHashMap(email, username, userId);
-//
-//                //attempts to create user object in firebase realtime database with generated hashMap
-//                databaseReference.setValue(hashMap).addOnCompleteListener(task1 -> {
-//
-//                    //If successful -> post current user to userMutableLiveData object for ViewModel to observe and go to login screen
-//                    if(task1.isSuccessful()){
-//                        userMutableLiveData.postValue(firebaseAuth.getCurrentUser());
-//                        Toast.makeText(application, StringsRepository.USER_CREATED, Toast.LENGTH_SHORT).show();
-//                        RegisterLoginActivity.viewPager.setCurrentItem(0);
-//                    }
-//                });
-//
-//
-//            }
-//            //else -> registration failed and error message shown if exists
-//            else if(task.getException().getMessage() != null){
-//                Toast.makeText(application, StringsRepository.REG_FAILED + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-//            } else{
-//                Toast.makeText(application, StringsRepository.REG_FAILED , Toast.LENGTH_SHORT).show();
-//            }
-//        });
     }
 
 
@@ -183,26 +145,6 @@ public class AuthAppRepository extends LiveData<DataSnapshot> {
     //attempts to login user
     @RequiresApi(api = Build.VERSION_CODES.P)
     public void login(String email, String password){
-        //Login with firebase sign in method
-//        firebaseAuth.signInWithEmailAndPassword(email, password)
-//                .addOnCompleteListener(application.getMainExecutor(), task -> {
-//                    //If sign in is successful
-//                    if(task.isSuccessful()){
-//                        //Post current user object to userMutableLiveData object
-//                        userMutableLiveData.postValue(firebaseAuth.getCurrentUser());
-//                    }
-//                    //Else if sign in failed and there is an exception message to show -> display toast with exception message
-//                    else if(task.getException().getMessage() != null){
-//                        Toast.makeText(application, StringsRepository.LOGIN_FAILED + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-//                    }
-//                    //Else -> display toast with login failed message
-//                    else{
-//                        Toast.makeText(application, StringsRepository.LOGIN_FAILED , Toast.LENGTH_SHORT).show();
-//                    }
-//                });
-
-//        LoginThread loginThread = new LoginThread(email, password);
-//        new Thread(loginThread).start();
 
         new Thread(new Runnable() {
             @Override
@@ -242,106 +184,10 @@ public class AuthAppRepository extends LiveData<DataSnapshot> {
     }
 
     //This method logs out a signed in user
-    public void logout(){
+    public void logout() {
         firebaseAuth.signOut();
         loggedOutMutableLiveData.postValue(true);
     }
-
- class LoginThread implements Runnable{
-
-        String email, password;
-     public LoginThread(String email, String password) {
-         this.email = email;
-         this.password = password;
-     }
-
-     @RequiresApi(api = Build.VERSION_CODES.P)
-     @Override
-     public void run() {
-//         firebaseAuth.signInWithEmailAndPassword(email, password)
-//                 .addOnCompleteListener(application.getMainExecutor(), task -> {
-//                     //If sign in is successful
-//                     if(task.isSuccessful()){
-//                         //Post current user object to userMutableLiveData object
-//                         userMutableLiveData.postValue(firebaseAuth.getCurrentUser());
-//                     }
-//                     //Else if sign in failed and there is an exception message to show -> display toast with exception message
-//                     else if(task.getException().getMessage() != null){
-//                         Toast.makeText(application, StringsRepository.LOGIN_FAILED + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-//                     }
-//                     //Else -> display toast with login failed message
-//                     else{
-//                         Toast.makeText(application, StringsRepository.LOGIN_FAILED , Toast.LENGTH_SHORT).show();
-//                     }
-//                 });
-     }
- }
-
- class RegisterThread implements Runnable{
-
-        String email, password, username;
-     public RegisterThread(String email, String password, String username) {
-         this.email = email;
-         this.password = password;
-         this.username = username;
-     }
-
-     @RequiresApi(api = Build.VERSION_CODES.P)
-     @Override
-     public void run() {
-         firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(application.getMainExecutor(), task -> {
-
-             //If registration is successful
-             if(task.isSuccessful()){
-
-                 //Get current user UUID
-                 String userId = firebaseAuth.getCurrentUser().getUid();
-
-                 //Get database reference to current user
-                 databaseReference = FirebaseDatabase.getInstance().getReference().child(StringsRepository.USERS_CAP).child(userId);
-
-                 //Create HashMap with all of the current user's info
-                 HashMap<String, Object> hashMap = getUserHashMap(email, username, userId);
-
-                 //attempts to create user object in firebase realtime database with generated hashMap
-                 databaseReference.setValue(hashMap).addOnCompleteListener(task1 -> {
-
-                     //If successful -> post current user to userMutableLiveData object for ViewModel to observe and go to login screen
-                     if(task1.isSuccessful()){
-                         userMutableLiveData.postValue(firebaseAuth.getCurrentUser());
-                         mainHandler.post(new Runnable() {
-                             @Override
-                             public void run() {
-                            Toast.makeText(application, StringsRepository.USER_CREATED, Toast.LENGTH_SHORT).show();
-                            RegisterLoginActivity.viewPager.setCurrentItem(0);
-                             }
-                         });
-
-                     }
-                 });
-
-
-             }
-             //else -> registration failed and error message shown if exists
-             else if(task.getException().getMessage() != null){
-                 mainHandler.post(new Runnable() {
-                     @Override
-                     public void run() {
-                         Toast.makeText(application, StringsRepository.REG_FAILED + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-
-                     }
-                 });
-             } else{
-                 mainHandler.post(new Runnable() {
-                     @Override
-                     public void run() {
-                         Toast.makeText(application, StringsRepository.REG_FAILED , Toast.LENGTH_SHORT).show();
-                     }
-                 });
-             }
-         });
-     }
- }
 
 
 }

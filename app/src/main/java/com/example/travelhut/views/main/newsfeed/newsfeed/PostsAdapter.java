@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.os.Handler;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -98,16 +99,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder>{
             public void onClick(View view) {
 
                 //if not liked then like
-                if (holder.like.getTag().equals(NewsFeedStrings.LIKE)) {
-                    FirebaseDatabase.getInstance().getReference().child(NewsFeedStrings.LIKES_CAP).child(post.getPostid())
-                            .child(firebaseUser.getUid()).setValue(true);
-                    addNotification(post.getPublisher(), post.getPostid());
-                }
-                //if already liked then unlike
-                else {
-                    FirebaseDatabase.getInstance().getReference().child(NewsFeedStrings.LIKES_CAP).child(post.getPostid())
-                            .child(firebaseUser.getUid()).removeValue();
-                }
+                ifNotLikedThenLike(holder, post);
             }
         });
 
@@ -133,8 +125,34 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder>{
             }
         });
 
+        holder.post_image.setOnClickListener(new DoubleClickListener() {
+            @Override
+            public void onSingleClick() {
+
+            }
+
+            @Override
+            public void onDoubleClick() {
+                ifNotLikedThenLike(holder, post);
+
+            }
+        });
 
 
+
+    }
+
+    private void ifNotLikedThenLike(@NonNull ViewHolder holder, Post post) {
+        if (holder.like.getTag().equals(NewsFeedStrings.LIKE)) {
+            FirebaseDatabase.getInstance().getReference().child(NewsFeedStrings.LIKES_CAP).child(post.getPostid())
+                    .child(firebaseUser.getUid()).setValue(true);
+            addNotification(post.getPublisher(), post.getPostid());
+        }
+        //if already liked then unlike
+        else {
+            FirebaseDatabase.getInstance().getReference().child(NewsFeedStrings.LIKES_CAP).child(post.getPostid())
+                    .child(firebaseUser.getUid()).removeValue();
+        }
     }
 
     @Override
@@ -171,7 +189,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder>{
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.getChildrenCount()<1){
-                    comments.setText("");
+                    comments.setText("Be first to comment!");
 
                 }else {
                     comments.setText("View all " + snapshot.getChildrenCount() + " comments");
@@ -279,6 +297,39 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder>{
         });
     }
 
+    public abstract class DoubleClickListener implements View.OnClickListener {
 
+        private static final long DOUBLE_CLICK_TIME_DELTA = 200;//milliseconds
+
+        long lastClickTime = 0;
+        private boolean doubleClicked = false;
+
+        @Override
+        public void onClick(final View v) {
+            long clickTime = System.currentTimeMillis();
+            if (clickTime - lastClickTime < DOUBLE_CLICK_TIME_DELTA){
+                doubleClicked = true;
+                onDoubleClick();
+            } else {
+                doubleClicked = false;
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        if (!doubleClicked) {
+                            onSingleClick();
+                        }
+
+                    }
+                }, 180);
+
+            }
+            lastClickTime = clickTime;
+        }
+
+        public abstract void onSingleClick();
+        public abstract void onDoubleClick();
+    }
 
 }

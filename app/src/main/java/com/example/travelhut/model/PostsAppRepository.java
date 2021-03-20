@@ -56,11 +56,4 @@ public class PostsAppRepository extends LiveData<DataSnapshot> {
         }
     }
 
-
-//    public MutableLiveData<DataSnapshot> getPostMutableLiveData(String postid) {
-//        postMutableLiveData.postValue(FirebaseDatabase.getInstance().getReference("Posts").child(postid));
-//
-//
-//        return postMutableLiveData;
-//    }
 }

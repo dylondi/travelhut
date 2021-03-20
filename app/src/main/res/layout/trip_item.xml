@@ -34,7 +34,7 @@
             android:textSize="25sp"
             android:textColor="@color/white"
             android:paddingHorizontal="10dp"
-            android:id="@+id/trip_place_name"
+            android:id="@+id/trip_item_place_name"
             android:layout_weight="50"/>
 
             <TextView
@@ -44,7 +44,7 @@
             android:textColor="@color/white"
             android:paddingHorizontal="10dp"
             android:layout_weight="50"
-            android:id="@+id/trip_date"
+            android:id="@+id/trip_item_date"
             android:gravity="right"/>
 
         </LinearLayout>
@@ -54,7 +54,7 @@
             android:textSize="10sp"
             android:textColor="@color/white"
             android:paddingHorizontal="15dp"
-            android:id="@+id/trip_place_address"/>
+            android:id="@+id/trip_item_place_address"/>
 
 
     </LinearLayout>

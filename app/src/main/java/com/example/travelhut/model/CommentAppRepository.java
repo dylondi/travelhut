@@ -68,27 +68,36 @@ public class CommentAppRepository extends LiveData<DataSnapshot> {
     public void createComment(String comment){
 
         //Create HashMap and put comment and publisher into HashMap
-        HashMap<String, Object> hashMap = new HashMap<>();
-        hashMap.put("comment", comment);
-        hashMap.put("publisher", firebaseUser.getUid());
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                HashMap<String, Object> hashMap = new HashMap<>();
+                hashMap.put("comment", comment);
+                hashMap.put("publisher", firebaseUser.getUid());
 
-        commentsReference.push().setValue(hashMap);
+                commentsReference.push().setValue(hashMap);
+            }});
     }
 
     //This method adds a notification to the receiving users notifications database section
     public void addNotification(String comment){
 
-        //Get reference to receiving users Notifications database section
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(StringsRepository.NOTIFICATIONS_CAP).child(publisherId);
 
-        //Create HashMap and put relevant info into HashMap
-        HashMap<String, Object> hashMap = new HashMap<>();
-        hashMap.put(StringsRepository.USER_ID, firebaseUser.getUid());
-        hashMap.put(StringsRepository.TEXT, "commented: " + comment);
-        hashMap.put(StringsRepository.POST_ID, postId);
-        hashMap.put(StringsRepository.IS_POST, true);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                //Get reference to receiving users Notifications database section
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference(StringsRepository.NOTIFICATIONS_CAP).child(publisherId);
 
-        //Push HashMap to database
-        reference.push().setValue(hashMap);
+                //Create HashMap and put relevant info into HashMap
+                HashMap<String, Object> hashMap = new HashMap<>();
+                hashMap.put(StringsRepository.USER_ID, firebaseUser.getUid());
+                hashMap.put(StringsRepository.TEXT, "commented: " + comment);
+                hashMap.put(StringsRepository.POST_ID, postId);
+                hashMap.put(StringsRepository.IS_POST, true);
+
+                //Push HashMap to database
+                reference.push().setValue(hashMap);
+            }});
     }
 }

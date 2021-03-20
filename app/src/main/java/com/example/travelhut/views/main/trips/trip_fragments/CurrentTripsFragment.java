@@ -60,7 +60,7 @@ public class CurrentTripsFragment extends Fragment {
                 currentTrips.clear();
                 for(DataSnapshot snapshot : dataSnapshot.getChildren()){
                     Trip trip = snapshot.getValue(Trip.class);
-                    if(trip.getStartdate()<currentTime && trip.getEnddate()>currentTime){
+                    if(trip.getStartdate()<currentTime && trip.getEnddate()+86400000>currentTime){
                         currentTrips.add(trip);
                     }
                 }

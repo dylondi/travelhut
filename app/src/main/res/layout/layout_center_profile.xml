@@ -9,12 +9,13 @@
 
         <!--top toolbar -->
         <RelativeLayout
+            android:id="@+id/profile_rel_layout_1"
             android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:id="@+id/profile_rel_layout_1">
+            android:layout_height="60dp">
 
-            <include layout="@layout/snippet_top_profile_bar"/>
+            <include layout="@layout/snippet_top_profile_bar" />
         </RelativeLayout>
+
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -22,91 +23,115 @@
             android:layout_below="@+id/profile_rel_layout_1"
             android:background="@drawable/white_light_blue_bottom_border">
 
-            <LinearLayout
+
+            <androidx.core.widget.NestedScrollView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:id="@+id/profile_linear_layout"
-                android:weightSum="100">
+                android:layout_height="wrap_content">
 
                 <RelativeLayout
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="25"
-                    android:layout_marginStart="25dp">
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
 
-                    <de.hdodenhof.circleimageview.CircleImageView
-                        android:layout_width="100dp"
-                        android:layout_height="100dp"
-                        android:id="@+id/profile_image"
-                        app:civ_border_color="@color/dark_blue"
-                        app:civ_border_width="2dp"
-                        android:layout_centerVertical="true"/>
-                    
+                    <FrameLayout
+                        android:id="@+id/profile_frame_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        <!--                    <ImageView-->
+                        <!--                        android:layout_width="match_parent"-->
+                        <!--                        android:layout_height="match_parent"-->
+                        <!--                        android:src="@drawable/profile_bg"-->
+                        <!--                        android:scaleType="centerCrop"/>-->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:weightSum="100">
+
+                            <RelativeLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="160dp">
+
+                                <ImageView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="100dp"
+                                    android:background="@color/dark_blue" />
+
+                                <RelativeLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="30dp"
+                                    android:layout_marginBottom="20dp">
+
+                                    <include layout="@layout/snippet_top_profile" />
+                                </RelativeLayout>
+
+                                <de.hdodenhof.circleimageview.CircleImageView
+                                    android:id="@+id/profile_image"
+                                    android:layout_width="120dp"
+                                    android:layout_height="120dp"
+                                    android:layout_centerHorizontal="true"
+                                    android:layout_marginTop="40dp"
+                                    app:civ_border_color="#5ca9ff"
+                                    app:civ_border_width="2dp" />
+
+                            </RelativeLayout>
+
+
+                        </LinearLayout>
+                    </FrameLayout>
+
+                    <LinearLayout
+                        android:id="@+id/profile_linear_layout_2"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/profile_frame_layout"
+                        android:orientation="vertical"
+                        android:padding="15dp">
+
+
+                        <TextView
+                            android:id="@+id/display_name"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/black"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/bio_profile_activity"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="5dp"
+                            android:textColor="@color/black"
+                            android:textSize="16sp" />
+
+                        <TextView
+                            android:id="@+id/url_profile_activity"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="5dp"
+                            android:textColor="@color/dark_blue"
+                            android:textSize="16sp" />
+
+
+                    </LinearLayout>
+
+                    <RelativeLayout
+                        android:id="@+id/profile_rel_layout_2"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/profile_linear_layout_2"
+                        android:layout_marginBottom="50dp">
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/profile_activity_recycler_view"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+
+
+                    </RelativeLayout>
                 </RelativeLayout>
-
-                <RelativeLayout
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="30dp"
-                    android:layout_marginEnd="30dp"
-                    android:layout_weight="75">
-
-                    <include layout="@layout/snippet_top_profile" />
-                </RelativeLayout>
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_below="@+id/profile_linear_layout"
-                android:padding="15dp"
-                android:id="@+id/profile_linear_layout_2">
-
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/display_name"
-                    android:textColor="@color/black"
-                    android:textSize="16sp"
-                    android:textStyle="bold"/>
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/bio_profile_activity"
-                    android:textColor="@color/black"
-                    android:layout_marginTop="5dp"
-                    android:textSize="16sp"/>
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/url_profile_activity"
-                    android:textColor="@color/dark_blue"
-                    android:textSize="16sp"
-                    android:layout_marginTop="5dp"/>
-
-
-            </LinearLayout>
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/profile_rel_layout_2"
-                android:layout_below="@id/profile_linear_layout_2"
-                android:layout_marginBottom="50dp">
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/profile_activity_recycler_view" />
-
-
-            </RelativeLayout>
-
+            </androidx.core.widget.NestedScrollView>
         </RelativeLayout>
 
     </RelativeLayout>

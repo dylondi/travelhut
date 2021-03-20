@@ -1,6 +1,8 @@
 package com.example.travelhut.views.main.trips.trip_fragments;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,6 +18,7 @@ import com.bumptech.glide.Glide;
 import com.example.travelhut.R;
 import com.example.travelhut.viewmodel.main.profile.toolbar.NotificationAdapterViewModel;
 import com.example.travelhut.views.main.newsfeed.newsfeed.utils.Post;
+import com.example.travelhut.views.main.trips.TripActivity;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.PhotoMetadata;
@@ -85,38 +88,17 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ViewHolder>{
             }
         });
 
-//        if (places[0].getPhotoMetadatas() != null) {
-//            final List<PhotoMetadata> metadata = places[0].getPhotoMetadatas();
-//            if (metadata == null || metadata.isEmpty()) {
-//                Log.w(TAG, "No photo metadata.");
-//                return;
-//            }
-//            final PhotoMetadata photoMetadata = metadata.get(0);
-//
-//            // Get the attribution text.
-//            final String attributions = photoMetadata.getAttributions();
-//
-//            // Create a FetchPhotoRequest.
-//            final FetchPhotoRequest photoRequest = FetchPhotoRequest.builder(photoMetadata)
-//                    .setMaxWidth(500) // Optional.
-//                    .setMaxHeight(300) // Optional.
-//                    .build();
-//            placesClient.fetchPhoto(photoRequest).addOnSuccessListener((fetchPhotoResponse) -> {
-//                Bitmap bitmap = fetchPhotoResponse.getBitmap();
-//                holder.tripImage.setImageBitmap(bitmap);
-//                holder.tripImage.setAdjustViewBounds(true);
-//                holder.tripImage.setScaleType(ImageView.ScaleType.CENTER_CROP);
-//                //placeImage.setScaleType(ImageView.ScaleType.FIT_XY);
-//
-//            }).addOnFailureListener((exception) -> {
-//                if (exception instanceof ApiException) {
-//                    final ApiException apiException = (ApiException) exception;
-//                    Log.e(TAG, "Place not found: " + exception.getMessage());
-//                    final int statusCode = apiException.getStatusCode();
-//                    // TODO: Handle error with given status code.
-//                }
-//            });
-//        }
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //SharedPreferences.Editor editor = mContext.getSharedPreferences("PREFS", Context.MODE_PRIVATE).edit();
+
+                Intent intent = new Intent(mContext, TripActivity.class);
+                intent.putExtra("tripid", trip.getTripid());
+                intent.putExtra("placeid", placeid);
+                mContext.startActivity(intent);
+            }
+        });
     }
 
     public void setPlaceImage(ViewHolder viewHolder, PlacesClient placesClient, Place place){
@@ -200,9 +182,9 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ViewHolder>{
 
 
             tripImage = itemView.findViewById(R.id.trip_place_image_view);
-            placeName = itemView.findViewById(R.id.trip_place_name);
-            placeAddress = itemView.findViewById(R.id.trip_place_address);
-            date = itemView.findViewById(R.id.trip_date);
+            placeName = itemView.findViewById(R.id.trip_item_place_name);
+            placeAddress = itemView.findViewById(R.id.trip_item_place_address);
+            date = itemView.findViewById(R.id.trip_item_date);
         }
     }
 

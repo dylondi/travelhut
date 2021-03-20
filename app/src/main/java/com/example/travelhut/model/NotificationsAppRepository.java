@@ -49,14 +49,6 @@ public class NotificationsAppRepository extends LiveData<DataSnapshot> {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 setValue(dataSnapshot);
-//                notificationList.clear();
-//                for(DataSnapshot snapshot : dataSnapshot.getChildren()){
-//                    Notification notification = snapshot.getValue(Notification.class);
-//                    notificationList.add(notification);
-//                }
-//
-//                Collections.reverse(notificationList);
-//                notificationAdapter.notifyDataSetChanged();
             }
 
             @Override
