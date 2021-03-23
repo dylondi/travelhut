@@ -42,7 +42,7 @@ import java.util.List;
 
 import static android.content.Context.MODE_PRIVATE;
 
-public class NewsFeedFragment extends Fragment {
+public class  NewsFeedFragment extends Fragment {
 
     public RecyclerView recyclerViewSearch;
     private UserSearchAdapter userSearchAdapter;
