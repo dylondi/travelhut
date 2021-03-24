@@ -63,10 +63,22 @@
                                 android:layout_margin="5dp" />
 
 
+                            <RelativeLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content">
                             <androidx.recyclerview.widget.RecyclerView
                                 android:id="@+id/news_feed_recycler_view"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content" />
+
+                            <ProgressBar
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerInParent="true"
+                                android:id="@+id/posts_progress_bar"
+                                android:theme="@style/RedAccent"/>
+                            </RelativeLayout>
+
 
 
                         </LinearLayout>

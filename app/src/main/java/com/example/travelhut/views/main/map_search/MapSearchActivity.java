@@ -2,61 +2,60 @@ package com.example.travelhut.views.main.map_search;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.location.Address;
+import android.graphics.drawable.Drawable;
 import android.location.Geocoder;
 import android.location.Location;
-import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.example.travelhut.R;
 import com.example.travelhut.common.Common;
 import com.example.travelhut.utils.BottomNavigationViewHelper;
-import com.example.travelhut.views.main.newsfeed.newsfeed.CommentActivity;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.common.util.IOUtils;
 import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationCallback;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
@@ -67,192 +66,56 @@ import com.google.android.libraries.places.api.net.FetchPhotoRequest;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.database.annotations.NotNull;
+import com.google.gson.JsonObject;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 public class MapSearchActivity extends AppCompatActivity implements OnMapReadyCallback {
     private static final String TAG = "MapSearchActivity";
     private Context mContext = MapSearchActivity.this;
     private static final int ACTIVITY_NUM = 0;
-    private boolean mLocationPermissionGranted = false;
     private GoogleMap mMap;
     private SupportMapFragment supportMapFragment;
     static final int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 23;
     private FusedLocationProviderClient mFusedLocationProviderClient;
-    Location mLastLocation;
-    private int locationRequestCode = 1000;
-    private double wayLatitude = 0.0, wayLongitude = 0.0;
-    private LocationRequest locationRequest;
-    private LocationCallback locationCallback;
-    private SearchView searchView;
     private Marker currentMarker;
     private TextView placeName;
     private TextView placeAddress;
     private RelativeLayout relativeLayout;
     private ImageView placeImage;
-    private CameraPosition cameraPosition;
-    private PlacesClient placesClient;
-    private final LatLng defaultLocation = new LatLng(-33.8523341, 151.2106085);
-    private static final int DEFAULT_ZOOM = 15;
-    private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
-    private boolean locationPermissionGranted;
-    private Location lastKnownLocation;
-    double offset = 0.015;
     private String placeId;
     private TextView tempText, humidityText, timeText;
     private ImageView weatherIcon;
     String nameIcon;
+    private Handler mainHandler = new Handler(Looper.getMainLooper());
 
-    Bitmap bitmap;
-
-    public class DowbloadJSON extends AsyncTask<String, Void, String> {
-
-        @Override
-        protected String doInBackground(String... strings) {
-
-            URL url;
-            HttpURLConnection httpURLConnection;
-            InputStream inputStream;
-            InputStreamReader inputStreamReader;
-            String result = "";
-
-            try {
-                url = new URL(strings[0]);
-                httpURLConnection = (HttpURLConnection) url.openConnection();
-
-                inputStream = httpURLConnection.getInputStream();
-
-                inputStreamReader = new InputStreamReader(inputStream);
-
-                int data = inputStreamReader.read();
-
-                while(data != -1){
-                    result += (char) data;
-                    data = inputStreamReader.read();
-                }
-
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            return result;
-        }
-    }
-
-
-    public class DownloadIcon extends AsyncTask<String, Void, Bitmap>{
-        @Override
-        protected Bitmap doInBackground(String... strings) {
-
-//            Bitmap bitmap = null;
-//            URL url;
-//
-//            HttpURLConnection httpURLConnection;
-//
-//            InputStream inputStream;
-//
-//            //InputStreamReader inputStreamReader;
-//
-//            try {
-//                url = new URL(strings[0]);
-//                httpURLConnection = (HttpURLConnection) url.openConnection();
-//                inputStream = httpURLConnection.getInputStream();
-//
-//                bitmap = BitmapFactory.decodeStream(inputStream);
-//
-//            } catch (MalformedURLException e) {
-//                e.printStackTrace();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-
-
-            String stringUrl = strings[0];
-            bitmap = null;
-            InputStream inputStream;
-            try {
-                inputStream = new java.net.URL(stringUrl).openStream();
-                bitmap = BitmapFactory.decodeStream(inputStream);
-            } catch (Exception e) {
-                Log.e("Error", e.getMessage());
-                e.printStackTrace();
-            }
-
-            return bitmap;
-        }
-    }
-
-
-    public void loading(double lat, double lon){
-        String weatherAPI = Common.WEATHER_API;
-        String url = "https://api.openweathermap.org/data/2.5/onecall?lat=" + lat +"&lon=" + lon +"&exclude={part}&appid=" + weatherAPI;
-        DowbloadJSON dowbloadJSON = new DowbloadJSON();
-        String sTime;
-        try {
-            String result = "abc";
-
-            result = dowbloadJSON.execute(url).get();
-
-            JSONObject jsonObject = new JSONObject(result);
-            JSONObject main = jsonObject.getJSONObject("current");
-            String temp = main.getString("temp");
-
-            String humidity = main.getString("humidity");
-
-            Long time = main.getLong("dt");
-
-
-            sTime = new SimpleDateFormat("hh:mm", Locale.ENGLISH)
-                    .format(new Date(time*1000));
-
-            Long kelvToCel = 273L;
-            long l = (new Double(Double.parseDouble(temp))).longValue(); //129
-
-            timeText.setText(sTime);
-            tempText.setText(l- kelvToCel + "°C");
-            humidityText.setText("Humidity: "+humidity+"%");
+    private List<Event> eventsList = new ArrayList<>();
+    private EventAdapter eventAdapter;
+    private LinearLayout eventsLinearLayout;
+    private RecyclerView eventsRecyclerView;
 
 
 
-
-            nameIcon = main.getJSONArray("weather").getJSONObject(0).getString("icon");
-
-            String urlIcon = "http://openweathermap.org/img/wn/" + nameIcon + "@2x.png";
-            Glide.with(this).load(urlIcon).dontAnimate().into(weatherIcon);
-//            DownloadIcon downloadIcon = new DownloadIcon();
-//
-//            Bitmap bitmap = downloadIcon.execute(urlIcon).get();
-//
-//            weatherIcon.setImageBitmap(bitmap);
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -268,6 +131,15 @@ public class MapSearchActivity extends AppCompatActivity implements OnMapReadyCa
         humidityText = findViewById(R.id.humidity);
         timeText = findViewById(R.id.time);
         weatherIcon = findViewById(R.id.weather_icon);
+        eventsLinearLayout = findViewById(R.id.events_lin_layout);
+
+        eventAdapter = new EventAdapter(this, eventsList);
+
+        eventsRecyclerView = findViewById(R.id.events_recycler_view);
+        eventsRecyclerView.setHasFixedSize(true);
+        eventsRecyclerView.setAdapter(eventAdapter);
+        eventsRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+
 
         placeImage.setClipToOutline(true);
         Button button = findViewById(R.id.floating_button);
@@ -333,20 +205,20 @@ public class MapSearchActivity extends AppCompatActivity implements OnMapReadyCa
                     currentMarker = mMap.addMarker(new MarkerOptions().position(place.getLatLng()).title(place.getName()));
 
                     LatLng latLng = new LatLng(place.getLatLng().latitude - 0.007 , place.getLatLng().longitude);
-                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
+
                     relativeLayout.setVisibility(View.VISIBLE);
                     relativeLayout.setClickable(true);
                     //button.setImageResource(R.drawable.ic_new_trip);
                     placeName.setText(place.getName());
                     placeAddress.setText(place.getAddress());
+
                     loading(place.getLatLng().latitude, place.getLatLng().longitude);
 
+                    loadEvents(place.getName());
+                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
                     Log.i(TAG, "getName(): " + place.getName());
                     Log.i(TAG, "getAddress: " + place.getAddress());
                     Log.i(TAG, "getAddressComponents: " + place.getAddressComponents());
-                    System.out.println("getName(): " + place.getName());
-                    System.out.println("getAddress: " + place.getAddress());
-                    System.out.println("getAddressComponents: " + place.getAddressComponents());
 
 
 
@@ -394,13 +266,13 @@ public class MapSearchActivity extends AppCompatActivity implements OnMapReadyCa
         });
 
         supportMapFragment.getMapAsync(this);
-        mFusedLocationProviderClient.getLastLocation().addOnSuccessListener(this, location -> {
-            if (location != null) {
-                wayLatitude = location.getLatitude();
-                wayLongitude = location.getLongitude();
-                //txtLocation.setText(String.format(Locale.US, "%s -- %s", wayLatitude, wayLongitude));
-            }
-        });
+//        mFusedLocationProviderClient.getLastLocation().addOnSuccessListener(this, location -> {
+//            if (location != null) {
+//                wayLatitude = location.getLatitude();
+//                wayLongitude = location.getLongitude();
+//                //txtLocation.setText(String.format(Locale.US, "%s -- %s", wayLatitude, wayLongitude));
+//            }
+//        });
 
 
 //        locationRequest = LocationRequest.create();
@@ -423,6 +295,83 @@ public class MapSearchActivity extends AppCompatActivity implements OnMapReadyCa
 //        };
     }
 
+
+    private static JSONObject getJSONObject(String _url) throws Exception {
+        if (_url.equals(""))
+            throw new Exception("URL can't be empty");
+
+        URL url = new URL(_url);
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setReadTimeout(10000 /* milliseconds */);
+        conn.setConnectTimeout(15000 /* milliseconds */);
+        conn.setDoInput(true);
+        conn.setRequestProperty("User-Agent", "android");
+        conn.setRequestProperty("Accept", "application/json");
+        conn.addRequestProperty("Content-Type", "application/json");
+        BufferedReader in = new BufferedReader(
+                new InputStreamReader(conn.getInputStream()));
+
+        if (!url.getHost().equals(conn.getURL().getHost())) {
+            conn.disconnect();
+            return new JSONObject();
+        }
+        String inputLine;
+        StringBuilder response = new StringBuilder();
+        while ((inputLine = in.readLine()) != null) {
+            response.append(inputLine);
+        }
+        in.close();
+        conn.disconnect();
+
+        return new JSONObject(response.toString());
+
+    }
+
+    private void loadEvents(String eventPlaceName) {
+
+
+        String eventApi = Common.EVENT_API;
+        String url = "http://app.ticketmaster.com/discovery/v2/events.json?apikey=" + eventApi + "&city=" + eventPlaceName;
+        eventsList.clear();
+        eventAdapter.notifyDataSetChanged();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run(){
+        try {
+
+            JSONObject jsonObject = getJSONObject(url);
+            JSONArray main = jsonObject.getJSONObject("_embedded").getJSONArray("events");
+
+
+            for (int i = 0; i < main.length(); i++) {
+
+                String eventId = main.getJSONObject(i).getString("id");
+                String eventName = main.getJSONObject(i).getString("name");
+                String eventDate = main.getJSONObject(i).getJSONObject("dates").getJSONObject("start").getString("localDate");
+                String eventPlace = main.getJSONObject(i).getJSONObject("_embedded").getJSONArray("venues").getJSONObject(0).getString("name");
+                String eventImageUrl = main.getJSONObject(i).getJSONArray("images").getJSONObject(0).getString("url");
+
+                System.out.println("run: eventName:" + eventName + ", eventDate: " + eventDate);
+                eventsList.add(new Event(eventName, eventPlace, eventDate, eventId, eventImageUrl));
+            }
+
+            mainHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    eventAdapter.notifyDataSetChanged();
+                }
+            });
+            return;
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+            }}).start();
+    }
+
     private void getCurrentLocation() {
 
 
@@ -437,7 +386,7 @@ public class MapSearchActivity extends AppCompatActivity implements OnMapReadyCa
                                 LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
                                 MarkerOptions options = new MarkerOptions().position(latLng).title("Current Location");
 
-                                googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 12));
+                                googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
                                 googleMap.addMarker(options);
                             }
                         });
@@ -448,6 +397,84 @@ public class MapSearchActivity extends AppCompatActivity implements OnMapReadyCa
 
 
 
+    }
+
+
+
+
+
+
+
+
+    public void loading(double lat, double lon){
+
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+        String weatherAPI = Common.WEATHER_API;
+        String url = "https://api.openweathermap.org/data/2.5/onecall?lat=" + lat + "&lon=" + lon + "&exclude={part}&appid=" + weatherAPI;
+        DownloadJSON downloadJSON = new DownloadJSON();
+        String sTime;
+        try {
+            String result = "abc";
+
+            result = downloadJSON.execute(url).get();
+
+            JSONObject jsonObject = new JSONObject(result);
+            JSONObject main = jsonObject.getJSONObject("current");
+            String temp = main.getString("temp");
+
+            String humidity = main.getString("humidity");
+
+            Long time = main.getLong("dt");
+            Long timeShift = jsonObject.getLong("timezone_offset");
+
+
+            sTime = new SimpleDateFormat("hh:mm", Locale.ENGLISH)
+                    .format(new Date((time + timeShift)*1000));
+
+            Long kelvToCel = 273L;
+            long l = (new Double(Double.parseDouble(temp))).longValue(); //129
+            nameIcon = main.getJSONArray("weather").getJSONObject(0).getString("icon");
+
+
+                    mainHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+
+            timeText.setText(sTime);
+            tempText.setText(l - kelvToCel + "°C");
+            humidityText.setText("Humidity: " + humidity + "%");
+
+
+
+            String urlIcon = "http://openweathermap.org/img/wn/" + nameIcon + "@2x.png";
+            Glide.with(getApplicationContext()).load(urlIcon).listener(new RequestListener<Drawable>() {
+                @Override
+                public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                    //progressBar.setVisibility(View.GONE);
+                    return false;
+                }
+
+                @Override
+                public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                    //progressBar.setVisibility(View.GONE);
+
+                    return false;
+                }
+            }).dontAnimate().into(weatherIcon);
+
+                        }
+                    });
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+            }}).start();
     }
 
 //
@@ -526,8 +553,8 @@ public class MapSearchActivity extends AppCompatActivity implements OnMapReadyCa
                     getCurrentLocation();
                     mFusedLocationProviderClient.getLastLocation().addOnSuccessListener(this, location -> {
                         if (location != null) {
-                            wayLatitude = location.getLatitude();
-                            wayLongitude = location.getLongitude();
+//                            wayLatitude = location.getLatitude();
+//                            wayLongitude = location.getLongitude();
                             //txtLocation.setText(String.format(Locale.US, "%s -- %s", wayLatitude, wayLongitude));
                         }
                     });
@@ -589,16 +616,16 @@ public class MapSearchActivity extends AppCompatActivity implements OnMapReadyCa
 //                }
 
 
-                LatLng latlng=new LatLng(location.getLatitude(),location.getLongitude());
-                MarkerOptions markerOptions = new MarkerOptions();
-                markerOptions.position(latlng);
-
-                markerOptions.title("My Marker");
-                mMap.clear();
-                CameraUpdate cameraUpdate= CameraUpdateFactory.newLatLngZoom(
-                        latlng, 15);
-                mMap.animateCamera(cameraUpdate);
-                mMap.addMarker(markerOptions);
+//                LatLng latlng=new LatLng(location.getLatitude(),location.getLongitude());
+//                MarkerOptions markerOptions = new MarkerOptions();
+//                markerOptions.position(latlng);
+//
+//                markerOptions.title("My Marker");
+//                mMap.clear();
+//                CameraUpdate cameraUpdate= CameraUpdateFactory.newLatLngZoom(
+//                        latlng, 15);
+//                mMap.animateCamera(cameraUpdate);
+//                mMap.addMarker(markerOptions);
 
             }
         });

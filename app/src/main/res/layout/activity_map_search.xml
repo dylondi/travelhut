@@ -48,8 +48,8 @@
             android:background="@drawable/map_layout_bg"
             android:layout_marginRight="10dp"
             android:layout_marginLeft="10dp"
-            android:layout_marginBottom="10dp"
-            android:visibility="gone">
+            android:layout_marginBottom="10dp">
+
 
 
 
@@ -66,7 +66,7 @@
         android:background="@drawable/place_image_rounded_bg">
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="120dp"
+                android:layout_height="160dp"
                 android:background="@drawable/place_image_rounded_bg">
 
                 <ImageView
@@ -76,22 +76,44 @@
                     android:fadingEdge="horizontal"
                     android:fadingEdgeLength="30dp"
                     android:fillViewport="false"
+                    android:scaleType="fitXY"
                     android:background="@drawable/place_image_rounded_bg"
                     android:requiresFadingEdge="vertical"/>
+
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_alignParentBottom="true"
                     android:background="@drawable/transparent_gradient_top_bottom"
+                    android:weightSum="2">
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:orientation="vertical"
-                    android:layout_alignParentBottom="true">
+                    android:layout_gravity="bottom"
+                    android:layout_marginBottom="10dp">
+
+
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="25sp"
                 android:textColor="@color/white"
                 android:paddingHorizontal="10dp"
+                android:layout_gravity="bottom"
                 android:id="@+id/place_name"/>
+
+
+
+
+
+
 
 
                 <TextView
@@ -103,25 +125,56 @@
                     android:id="@+id/place_address"/>
 
                 </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_weight="1"
+                        android:layout_marginBottom="10dp">
+                <include layout="@layout/weather_item"/>
+                    </LinearLayout>
+                </LinearLayout>
         </RelativeLayout>
 
+<!--        <RelativeLayout-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="130dp">-->
+
+<!--            <include layout="@layout/weather_item"/>-->
+
+
+<!--        </RelativeLayout>-->
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="160dp">
-
-            <include layout="@layout/weather_item"/>
-
-
-        </RelativeLayout>
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="180dp"
+            android:layout_height="215dp"
             android:background="@color/white">
+<!--            <TextView-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="Events &amp; Tours"-->
+<!--                android:textSize="20dp"/>-->
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Events &amp; Tours"
-                android:textSize="20dp"/>
+                android:text="Events"
+                android:layout_marginLeft="7dp"
+                android:layout_marginTop="7dp"
+                android:textSize="20dp"
+                android:id="@+id/events_text"/>
+            <LinearLayout
+                android:id="@+id/events_lin_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_below="@+id/events_text">
+            <androidx.recyclerview.widget.RecyclerView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="10dp"
+                android:id="@+id/events_recycler_view"/>
+            </LinearLayout>
 
         </RelativeLayout>
         <RelativeLayout

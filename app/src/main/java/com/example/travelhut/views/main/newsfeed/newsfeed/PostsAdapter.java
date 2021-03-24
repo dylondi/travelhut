@@ -4,19 +4,26 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.Target;
 import com.example.travelhut.R;
 import com.example.travelhut.model.StringsRepository;
 import com.example.travelhut.views.main.newsfeed.NewsFeedStrings;
@@ -70,7 +77,20 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder>{
         int screenWidth = Resources.getSystem().getDisplayMetrics().widthPixels;
 
         //set image for post
-        Glide.with(context).load(post.getPostimage()).apply(new RequestOptions().override(screenWidth, screenWidth)).into(holder.post_image);
+        Glide.with(context).load(post.getPostimage()).listener(new RequestListener<Drawable>() {
+            @Override
+            public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                holder.progressBar.setVisibility(View.GONE);
+                return false;
+            }
+
+            @Override
+            public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                holder.progressBar.setVisibility(View.GONE);
+
+                return false;
+            }
+        }).apply(new RequestOptions().override(screenWidth, screenWidth)).into(holder.post_image);
 
         //checks if post description is empty or not -> makes visible or not based on string
         if(post.getDescription().equals("")){
@@ -164,6 +184,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder>{
 
         public ImageView profile_image, post_image, like, comment;
         public TextView username, likes, publisher, description, comments;
+        public ProgressBar progressBar;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -178,6 +199,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder>{
             publisher = itemView.findViewById(R.id.publisher);
             description = itemView.findViewById(R.id.post_description);
             comments = itemView.findViewById(R.id.comments);
+            progressBar = itemView.findViewById(R.id.post_item_progress_bar);
         }
     }
 

@@ -35,15 +35,29 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <ImageView
-                android:id="@+id/image_post"
+
+            <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintDimensionRatio="1:1"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent">
+            <ImageView
+                android:id="@+id/image_post"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+ />
+
+            <ProgressBar
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:id="@+id/post_item_progress_bar"
+                android:theme="@style/RedAccent"
+                />
+            </FrameLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -55,7 +55,8 @@ public class NewsFeedFragment extends Fragment {
     private List<String> followingList;
     private static final String TAG = "NewsFeedFragment";
     private SearchView searchView;
-    ProgressBar progressBar;
+    ProgressBar progressBarUsers;
+    ProgressBar progressBarPosts;
 
     private RecyclerView storyRecyclerView;
     private StoryAdapter storyAdapter;
@@ -86,7 +87,7 @@ public class NewsFeedFragment extends Fragment {
         linearLayout = view.findViewById(R.id.news_feed_lin_layout);
 
 
-        progressBar = view.findViewById(R.id.newsfeed_progress_bar);
+        progressBarUsers = view.findViewById(R.id.newsfeed_progress_bar);
         newsFeedActivityViewModel = new NewsFeedActivityViewModel();
 
         //create linearLayoutManager
@@ -273,7 +274,7 @@ public class NewsFeedFragment extends Fragment {
                 }
 
                 userSearchAdapter.notifyDataSetChanged();
-                progressBar.setVisibility(View.GONE);
+                progressBarUsers.setVisibility(View.GONE);
             }
         });
     }
@@ -302,6 +303,7 @@ public class NewsFeedFragment extends Fragment {
 
             readPosts();
 
+
         });
     }
 
@@ -325,7 +327,9 @@ public class NewsFeedFragment extends Fragment {
                             }
                         }
                     }
+
                     postsAdapter.notifyDataSetChanged();
+
                 });
 
 
