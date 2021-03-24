@@ -5,7 +5,9 @@ plugins {
 
 android {
     compileSdkVersion 29
-
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES'
+    }
     defaultConfig {
         applicationId "com.example.travelhut"
         minSdkVersion 24
@@ -70,12 +72,14 @@ dependencies {
 
     implementation 'com.karumi:dexter:6.2.2'
     implementation 'com.squareup.retrofit2:adapter-rxjava2:2.9.0'
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
     implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
     implementation 'io.reactivex.rxjava3:rxjava:3.0.0'
 
     implementation 'com.squareup.picasso:picasso:2.5.2'
 
+    implementation 'com.squareup.okhttp3:okhttp:4.8.0'
 
 
 

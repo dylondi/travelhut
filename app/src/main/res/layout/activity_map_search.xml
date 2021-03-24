@@ -48,8 +48,7 @@
             android:background="@drawable/map_layout_bg"
             android:layout_marginRight="10dp"
             android:layout_marginLeft="10dp"
-            android:layout_marginBottom="10dp"
-            android:visibility="gone">
+            android:layout_marginBottom="10dp">
 
 
 
@@ -85,7 +84,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
+                    android:baselineAligned="false" android:orientation="horizontal"
                     android:layout_alignParentBottom="true"
                     android:background="@drawable/transparent_gradient_top_bottom"
                     android:weightSum="2">
@@ -162,7 +161,8 @@
                 android:text="Events"
                 android:layout_marginLeft="7dp"
                 android:layout_marginTop="7dp"
-                android:textSize="20dp"
+                android:textSize="20sp"
+                android:textColor="@color/light_blue"
                 android:id="@+id/events_text"/>
             <LinearLayout
                 android:id="@+id/events_lin_layout"
@@ -180,70 +180,25 @@
         </RelativeLayout>
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:background="@color/light_blue">
+            android:layout_height="wrap_content"
+            android:paddingVertical="5dp">
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#d9d9d9"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="@color/light_blue"
+                android:id="@+id/covid_info_title"
                 android:text="Covid-19 Info"
-                android:textSize="20dp"/>
+                android:textSize="20sp"
+                android:layout_marginStart="5dp"/>
+
+            <include layout="@layout/snippet_coronavirus_stats"/>
 
         </RelativeLayout>
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:background="@color/light_blue">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="weather"
-                android:textSize="20dp"/>
 
-        </RelativeLayout>
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:background="@color/light_blue">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="weather"
-                android:textSize="20dp"/>
-
-        </RelativeLayout>
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:background="@color/light_blue">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="weather"
-                android:textSize="20dp"/>
-
-        </RelativeLayout>
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:background="@color/light_blue">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="weather"
-                android:textSize="20dp"/>
-
-        </RelativeLayout>
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:background="@color/light_blue">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="weather"
-                android:textSize="20dp"/>
-
-        </RelativeLayout>
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>
             <Button

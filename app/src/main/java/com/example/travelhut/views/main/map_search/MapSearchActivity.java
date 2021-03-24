@@ -9,7 +9,6 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.location.Geocoder;
 import android.location.Location;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -32,10 +31,7 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
+
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
@@ -46,7 +42,6 @@ import com.example.travelhut.common.Common;
 import com.example.travelhut.utils.BottomNavigationViewHelper;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.Status;
-import com.google.android.gms.common.util.IOUtils;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -67,7 +62,6 @@ import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.firebase.database.annotations.NotNull;
-import com.google.gson.JsonObject;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 
 import org.json.JSONArray;
@@ -76,12 +70,10 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.charset.Charset;
+import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -89,6 +81,15 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.ExecutionException;
+
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Interceptor;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import retrofit2.Retrofit;
 
 public class MapSearchActivity extends AppCompatActivity implements OnMapReadyCallback {
     private static final String TAG = "MapSearchActivity";
@@ -113,6 +114,7 @@ public class MapSearchActivity extends AppCompatActivity implements OnMapReadyCa
     private EventAdapter eventAdapter;
     private LinearLayout eventsLinearLayout;
     private RecyclerView eventsRecyclerView;
+    private TextView recommendation, description, masks, quarantine, tests;
 
 
 
@@ -132,6 +134,11 @@ public class MapSearchActivity extends AppCompatActivity implements OnMapReadyCa
         timeText = findViewById(R.id.time);
         weatherIcon = findViewById(R.id.weather_icon);
         eventsLinearLayout = findViewById(R.id.events_lin_layout);
+        recommendation = findViewById(R.id.recommendation_text);
+        description = findViewById(R.id.description_text);
+        masks = findViewById(R.id.mask_info);
+        quarantine = findViewById(R.id.quarantine_info);
+        tests = findViewById(R.id.test_info);
 
         eventAdapter = new EventAdapter(this, eventsList);
 
@@ -215,6 +222,11 @@ public class MapSearchActivity extends AppCompatActivity implements OnMapReadyCa
                     loading(place.getLatLng().latitude, place.getLatLng().longitude);
 
                     loadEvents(place.getName());
+                    try {
+                        loadCoronaVirusStats(place.getName());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                     mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
                     Log.i(TAG, "getName(): " + place.getName());
                     Log.i(TAG, "getAddress: " + place.getAddress());
@@ -266,35 +278,56 @@ public class MapSearchActivity extends AppCompatActivity implements OnMapReadyCa
         });
 
         supportMapFragment.getMapAsync(this);
-//        mFusedLocationProviderClient.getLastLocation().addOnSuccessListener(this, location -> {
-//            if (location != null) {
-//                wayLatitude = location.getLatitude();
-//                wayLongitude = location.getLongitude();
-//                //txtLocation.setText(String.format(Locale.US, "%s -- %s", wayLatitude, wayLongitude));
-//            }
-//        });
 
-
-//        locationRequest = LocationRequest.create();
-//        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-//        locationRequest.setInterval(20 * 1000);
-//        locationCallback = new LocationCallback() {
-//            @Override
-//            public void onLocationResult(LocationResult locationResult) {
-//                if (locationResult == null) {
-//                    return;
-//                }
-//                for (Location location : locationResult.getLocations()) {
-//                    if (location != null) {
-//                        wayLatitude = location.getLatitude();
-//                        wayLongitude = location.getLongitude();
-//                        //txtLocation.setText(String.format(Locale.US, "%s -- %s", wayLatitude, wayLongitude));
-//                    }
-//                }
-//            }
-//        };
     }
 
+
+    public void loadCoronaVirusStats(String placeName) throws Exception {
+
+// Host url
+        OkHttpClient client = new OkHttpClient();
+
+        Request request = new Request.Builder()
+                .header("X-Access-Token", Common.COVID_API)
+                .url("https://api.traveladviceapi.com/search/" + placeName)
+                .build();
+
+        client.newCall(request).enqueue(new Callback() {
+
+
+            @Override
+            public void onFailure(Call call, IOException e) {
+
+            }
+
+            @Override
+            public void onResponse(Call call, final Response response) throws IOException {
+                try {
+                    String responseData = response.body().string();
+                    JSONObject json = new JSONObject(responseData);
+                    final String owner = json.getString("name");
+                    mainHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                recommendation.setText(json.getString("recommendation"));
+                                description.setText(json.getJSONArray("trips").getJSONObject(0).getJSONObject("advice").getString("level_desc"));
+                                String mask = json.getJSONObject("requirements").getString("masks");
+                                masks.setText(mask);
+                                quarantine.setText(json.getJSONObject("requirements").getString("quarantine"));
+                                tests.setText(json.getJSONObject("requirements").getString("tests"));
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
+                        }});
+                } catch (JSONException e) {
+
+                }
+            }
+        });
+
+    }
 
     private static JSONObject getJSONObject(String _url) throws Exception {
         if (_url.equals(""))
@@ -306,6 +339,7 @@ public class MapSearchActivity extends AppCompatActivity implements OnMapReadyCa
         conn.setConnectTimeout(15000 /* milliseconds */);
         conn.setDoInput(true);
         conn.setRequestProperty("User-Agent", "android");
+        conn.setRequestProperty("X-Access-Token", "a7ab64d2-f9eb-40b1-9634-62caffdc7732");
         conn.setRequestProperty("Accept", "application/json");
         conn.addRequestProperty("Content-Type", "application/json");
         BufferedReader in = new BufferedReader(
@@ -435,7 +469,7 @@ public class MapSearchActivity extends AppCompatActivity implements OnMapReadyCa
                     .format(new Date((time + timeShift)*1000));
 
             Long kelvToCel = 273L;
-            long l = (new Double(Double.parseDouble(temp))).longValue(); //129
+            long l = (Double.valueOf(Double.parseDouble(temp))).longValue(); //129
             nameIcon = main.getJSONArray("weather").getJSONObject(0).getString("icon");
 
 

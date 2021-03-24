@@ -86,19 +86,23 @@
         android:layout_centerInParent="true"
         android:layout_margin="15dp"/>
 
+<androidx.core.widget.NestedScrollView
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
 
+    android:layout_below="@+id/change_dates_button">
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="215dp"
-        android:background="@color/white"
-        android:layout_below="@+id/change_dates_button">
+        android:layout_height="wrap_content"
+        android:background="@color/white">
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Events"
+        android:textColor="@color/light_blue"
         android:layout_marginLeft="7dp"
         android:layout_marginTop="7dp"
-        android:textSize="20dp"
+        android:textSize="20sp"
         android:id="@+id/events_text"/>
     <LinearLayout
         android:id="@+id/trip_events_lin_layout"
@@ -111,6 +115,39 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="10dp"
             android:id="@+id/trip_events_recycler_view"/>
+
     </LinearLayout>
+<!--<RelativeLayout-->
+<!--    android:layout_width="match_parent"-->
+<!--    android:layout_height="wrap_content"-->
+<!--    android:layout_below="@+id/trip_events_lin_layout">-->
+
+<!--    <include layout="@layout/snippet_coronavirus_stats"/>-->
+<!--</RelativeLayout>-->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/trip_events_lin_layout"
+            android:paddingVertical="5dp">
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#d9d9d9"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/light_blue"
+                android:id="@+id/covid_info_title"
+                android:text="Covid-19 Info"
+                android:textSize="20sp"
+                android:layout_marginLeft="7dp"
+                android:layout_marginTop="7dp"/>
+
+            <include layout="@layout/snippet_coronavirus_stats"/>
+
+        </RelativeLayout>
+
     </RelativeLayout>
+</androidx.core.widget.NestedScrollView>
+
 </RelativeLayout>
