@@ -1,6 +1,8 @@
 package com.example.travelhut.views.main.map_search;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,6 +21,7 @@ import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.example.travelhut.R;
+import com.example.travelhut.views.EventActivity;
 
 import java.util.List;
 
@@ -66,6 +69,16 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
             }
         }).dontAnimate().into(holder.eventImage);
 
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context, EventActivity.class);
+                intent.putExtra("eventid", event.getEventid());
+                context.startActivity(intent);
+
+            }
+        });
     }
 
     @Override
