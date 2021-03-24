@@ -477,28 +477,7 @@ public class MapSearchActivity extends AppCompatActivity implements OnMapReadyCa
             }}).start();
     }
 
-//
-//    private void getLastKnownLocation() {
-//        Log.d(TAG, "getLastKnownLocation: called.");
-//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-//            // TODO: Consider calling
-//            //    ActivityCompat#requestPermissions
-//            // here to request the missing permissions, and then overriding
-//            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-//            //                                          int[] grantResults)
-//            // to handle the case where the user grants the permission. See the documentation
-//            // for ActivityCompat#requestPermissions for more details.
-//            return;
-//        }
-//        mFusedLocationProviderClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
-//            @Override
-//            public void onComplete(@NonNull Task<Location> task) {
-//                if (task.isSuccessful()) {
-//                    Location location = task.getResult();
-//                }
-//            }
-//        });
-//    }
+
 
     private void checkPermission() {
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION)
@@ -515,22 +494,6 @@ public class MapSearchActivity extends AppCompatActivity implements OnMapReadyCa
 
     }
 
-//    @Override
-//    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-//        switch (requestCode) {
-//            case MY_PERMISSIONS_REQUEST_READ_CONTACTS: {
-//                if (grantResults.length > 0
-//                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-//                    SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-//                    mapFragment.getMapAsync(this);
-//                } else {
-//                    // permission denied, boo! Disable the
-//                    // functionality that depends on this permission.
-//                }
-//                return;
-//            }
-//        }
-//    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -594,38 +557,7 @@ public class MapSearchActivity extends AppCompatActivity implements OnMapReadyCa
         mMap.setOnMyLocationChangeListener(new GoogleMap.OnMyLocationChangeListener() {
             @Override
             public void onMyLocationChange(Location location) {
-//                mLastLocation = location;
-//                if (mCurrLocationMarker != null) {
-//                    mCurrLocationMarker.remove();
-//                }
-//                //Place current location marker
-//                LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-//                MarkerOptions markerOptions = new MarkerOptions();
-//                markerOptions.position(latLng);
-//                markerOptions.title("Current Position");
-//                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-//                mCurrLocationMarker = mMap.addMarker(markerOptions);
-//
-//                //move map camera
-//                mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-//                mMap.animateCamera(CameraUpdateFactory.zoomTo(11));
-//
-//                //stop location updates
-//                if (mGoogleApiClient != null) {
-//                    LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
-//                }
 
-
-//                LatLng latlng=new LatLng(location.getLatitude(),location.getLongitude());
-//                MarkerOptions markerOptions = new MarkerOptions();
-//                markerOptions.position(latlng);
-//
-//                markerOptions.title("My Marker");
-//                mMap.clear();
-//                CameraUpdate cameraUpdate= CameraUpdateFactory.newLatLngZoom(
-//                        latlng, 15);
-//                mMap.animateCamera(cameraUpdate);
-//                mMap.addMarker(markerOptions);
 
             }
         });

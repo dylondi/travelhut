@@ -3,19 +3,27 @@ package com.example.travelhut.views.main.trips;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.util.Pair;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.travelhut.R;
+import com.example.travelhut.common.Common;
+import com.example.travelhut.views.main.map_search.Event;
+import com.example.travelhut.views.main.map_search.EventAdapter;
 import com.example.travelhut.views.main.trips.trip_fragments.Trip;
 import com.example.travelhut.views.main.trips.trip_fragments.TripsAdapter;
 import com.google.android.gms.common.api.ApiException;
@@ -34,12 +42,18 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -51,10 +65,12 @@ public class TripActivity extends AppCompatActivity {
     private ImageView placeImage, backArrow;
     private Button changeDates;
     private static final String TAG = "TripActivity";
-    String lat, lon;
-    //private String url = "https://api.openweathermap.org/data/2.5/onecall?lat=" + lat +"&lon=" + lon +"&exclude={part}&appid=" + apiKey;
+    private Handler mainHandler = new Handler(Looper.getMainLooper());
 
-
+    private List<Event> eventsList = new ArrayList<>();
+    private EventAdapter eventAdapter;
+    private LinearLayout eventsLinearLayout;
+    private RecyclerView eventsRecyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +82,14 @@ public class TripActivity extends AppCompatActivity {
         placeImage = findViewById(R.id.trip_image_view);
         backArrow = findViewById(R.id.trip_back_arrow);
         changeDates = findViewById(R.id.change_dates_button);
+        eventsLinearLayout = findViewById(R.id.trip_events_lin_layout);
+
+        eventAdapter = new EventAdapter(this, eventsList);
+
+        eventsRecyclerView = findViewById(R.id.trip_events_recycler_view);
+        eventsRecyclerView.setHasFixedSize(true);
+        eventsRecyclerView.setAdapter(eventAdapter);
+        eventsRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         String apiKey = getString(R.string.google_api_key);
 
 
@@ -76,6 +100,9 @@ public class TripActivity extends AppCompatActivity {
         MaterialDatePicker.Builder<Pair<Long, Long>> builder = MaterialDatePicker.Builder.dateRangePicker();
 
         final MaterialDatePicker materialDatePicker = builder.build();
+
+
+
 
         changeDates.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -129,6 +156,7 @@ public class TripActivity extends AppCompatActivity {
         placesClient.fetchPlace(request).addOnSuccessListener((response) -> {
             Place place = response.getPlace();
             setPlaceImage(placesClient, place);
+            loadEvents(place.getName());
         }).addOnFailureListener((exception) -> {
             if (exception instanceof ApiException) {
                 final ApiException apiException = (ApiException) exception;
@@ -197,5 +225,82 @@ public class TripActivity extends AppCompatActivity {
                 // TODO: Handle error with given status code.
             }
         });
+    }
+
+
+    private void loadEvents(String eventPlaceName) {
+
+
+        String eventApi = Common.EVENT_API;
+        String url = "http://app.ticketmaster.com/discovery/v2/events.json?apikey=" + eventApi + "&city=" + eventPlaceName;
+        eventsList.clear();
+        eventAdapter.notifyDataSetChanged();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run(){
+                try {
+
+                    JSONObject jsonObject = getJSONObject(url);
+                    JSONArray main = jsonObject.getJSONObject("_embedded").getJSONArray("events");
+
+
+                    for (int i = 0; i < main.length(); i++) {
+
+                        String eventId = main.getJSONObject(i).getString("id");
+                        String eventName = main.getJSONObject(i).getString("name");
+                        String eventDate = main.getJSONObject(i).getJSONObject("dates").getJSONObject("start").getString("localDate");
+                        String eventPlace = main.getJSONObject(i).getJSONObject("_embedded").getJSONArray("venues").getJSONObject(0).getString("name");
+                        String eventImageUrl = main.getJSONObject(i).getJSONArray("images").getJSONObject(0).getString("url");
+
+                        System.out.println("run: eventName:" + eventName + ", eventDate: " + eventDate);
+                        eventsList.add(new Event(eventName, eventPlace, eventDate, eventId, eventImageUrl));
+                    }
+
+                    mainHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            eventAdapter.notifyDataSetChanged();
+                        }
+                    });
+                    return;
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }}).start();
+    }
+
+    private static JSONObject getJSONObject(String _url) throws Exception {
+        if (_url.equals(""))
+            throw new Exception("URL can't be empty");
+
+        URL url = new URL(_url);
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setReadTimeout(10000 /* milliseconds */);
+        conn.setConnectTimeout(15000 /* milliseconds */);
+        conn.setDoInput(true);
+        conn.setRequestProperty("User-Agent", "android");
+        conn.setRequestProperty("Accept", "application/json");
+        conn.addRequestProperty("Content-Type", "application/json");
+        BufferedReader in = new BufferedReader(
+                new InputStreamReader(conn.getInputStream()));
+
+        if (!url.getHost().equals(conn.getURL().getHost())) {
+            conn.disconnect();
+            return new JSONObject();
+        }
+        String inputLine;
+        StringBuilder response = new StringBuilder();
+        while ((inputLine = in.readLine()) != null) {
+            response.append(inputLine);
+        }
+        in.close();
+        conn.disconnect();
+
+        return new JSONObject(response.toString());
+
     }
 }

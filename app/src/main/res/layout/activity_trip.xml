@@ -85,4 +85,32 @@
         android:text="Change Dates"
         android:layout_centerInParent="true"
         android:layout_margin="15dp"/>
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="215dp"
+        android:background="@color/white"
+        android:layout_below="@+id/change_dates_button">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Events"
+        android:layout_marginLeft="7dp"
+        android:layout_marginTop="7dp"
+        android:textSize="20dp"
+        android:id="@+id/events_text"/>
+    <LinearLayout
+        android:id="@+id/trip_events_lin_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_below="@+id/events_text">
+        <androidx.recyclerview.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="10dp"
+            android:id="@+id/trip_events_recycler_view"/>
+    </LinearLayout>
+    </RelativeLayout>
 </RelativeLayout>

@@ -2,6 +2,8 @@ package com.example.travelhut.views;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
@@ -13,6 +15,7 @@ import android.text.method.LinkMovementMethod;
 import android.text.util.Linkify;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -22,6 +25,8 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.example.travelhut.R;
 import com.example.travelhut.common.Common;
+import com.example.travelhut.views.main.map_search.Event;
+import com.example.travelhut.views.main.map_search.EventAdapter;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -30,6 +35,8 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Pattern;
 
 public class EventActivity extends AppCompatActivity {
@@ -38,6 +45,7 @@ public class EventActivity extends AppCompatActivity {
     private TextView eventName, eventVenue, eventPriceRange, eventLink;
     private String eventid;
     private Handler mainHandler = new Handler(Looper.getMainLooper());
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,8 +61,10 @@ public class EventActivity extends AppCompatActivity {
         eventLink = findViewById(R.id.event_activity_event_link);
 
 
+
         eventid = getIntent().getStringExtra("eventid");
         getEventInfo();
+
 
         backArrow.setOnClickListener(new View.OnClickListener() {
             @Override
