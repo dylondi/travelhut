@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.util.Pair;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
@@ -49,7 +50,7 @@ public class TripActivity extends AppCompatActivity {
 
     private TextView placeName, placeAddress, dateRange;
     private ImageView placeImage, backArrow;
-    private Button changeDates;
+    private Button changeDates, checkFlights;
     private static final String TAG = "TripActivity";
     String lat, lon;
     //private String url = "https://api.openweathermap.org/data/2.5/onecall?lat=" + lat +"&lon=" + lon +"&exclude={part}&appid=" + apiKey;
@@ -66,6 +67,7 @@ public class TripActivity extends AppCompatActivity {
         placeImage = findViewById(R.id.trip_image_view);
         backArrow = findViewById(R.id.trip_back_arrow);
         changeDates = findViewById(R.id.change_dates_button);
+        checkFlights = findViewById(R.id.flights_button);
         String apiKey = getString(R.string.google_api_key);
 
 
@@ -83,6 +85,15 @@ public class TripActivity extends AppCompatActivity {
                 materialDatePicker.show(getSupportFragmentManager(), "DATE_PICKER");
             }
         });
+
+        checkFlights.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(TripActivity.this, FlightsActivity.class));
+            }
+        });
+
+
 
         materialDatePicker.addOnPositiveButtonClickListener(new MaterialPickerOnPositiveButtonClickListener() {
             @Override
