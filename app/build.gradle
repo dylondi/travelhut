@@ -80,6 +80,8 @@ dependencies {
     implementation 'com.squareup.picasso:picasso:2.5.2'
 
     implementation 'com.squareup.okhttp3:okhttp:4.8.0'
+    implementation 'com.github.AnyChart:AnyChart-Android:1.1.2'
+
 
 
 

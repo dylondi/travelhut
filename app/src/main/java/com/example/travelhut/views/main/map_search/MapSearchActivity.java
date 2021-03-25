@@ -32,6 +32,16 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 
+import com.anychart.AnyChart;
+import com.anychart.AnyChartView;
+import com.anychart.chart.common.dataentry.DataEntry;
+import com.anychart.chart.common.dataentry.ValueDataEntry;
+import com.anychart.charts.Cartesian;
+import com.anychart.core.cartesian.series.Column;
+import com.anychart.enums.Anchor;
+import com.anychart.enums.HoverMode;
+import com.anychart.enums.Position;
+import com.anychart.enums.TooltipPositionMode;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
@@ -40,6 +50,7 @@ import com.bumptech.glide.request.target.Target;
 import com.example.travelhut.R;
 import com.example.travelhut.common.Common;
 import com.example.travelhut.utils.BottomNavigationViewHelper;
+import com.example.travelhut.views.main.newsfeed.newsfeed.utils.Comment;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -115,7 +126,10 @@ public class MapSearchActivity extends AppCompatActivity implements OnMapReadyCa
     private LinearLayout eventsLinearLayout;
     private RecyclerView eventsRecyclerView;
     private TextView recommendation, description, masks, quarantine, tests;
-
+    private String air_code;
+    List<DataEntry> data = new ArrayList<>();
+    Cartesian cartesian;
+    AnyChartView anyChartView;
 
 
 
@@ -146,7 +160,9 @@ public class MapSearchActivity extends AppCompatActivity implements OnMapReadyCa
         eventsRecyclerView.setHasFixedSize(true);
         eventsRecyclerView.setAdapter(eventAdapter);
         eventsRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        anyChartView = findViewById(R.id.any_chart_view);
 
+        cartesian = AnyChart.column();
 
         placeImage.setClipToOutline(true);
         Button button = findViewById(R.id.floating_button);
@@ -222,8 +238,10 @@ public class MapSearchActivity extends AppCompatActivity implements OnMapReadyCa
                     loading(place.getLatLng().latitude, place.getLatLng().longitude);
 
                     loadEvents(place.getName());
+
                     try {
                         loadCoronaVirusStats(place.getName());
+                        loadCoronaVirusStatsChart(place.getName());
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -328,6 +346,107 @@ public class MapSearchActivity extends AppCompatActivity implements OnMapReadyCa
         });
 
     }
+
+    public void loadCoronaVirusStatsChart(String placeName) throws Exception {
+
+// Host url
+        OkHttpClient client = new OkHttpClient();
+
+        Request requestOne = new Request.Builder()
+                .header("APC-Auth", "fe6a282ffd")
+                .addHeader("APC-Auth-Secret", "bc28b3b3a87b4cd")
+                .addHeader("Content-Type", "application/json")
+                .url("https://www.air-port-codes.com/api/v1/multi?term=" + placeName)
+                .build();
+
+
+
+
+        client.newCall(requestOne).enqueue(new Callback() {
+
+
+            @Override
+            public void onFailure(Call call, IOException e) {
+
+            }
+
+            @Override
+            public void onResponse(Call call, final Response response) throws IOException {
+                try {
+                    String responseData = response.body().string();
+                    String iata = new JSONObject(responseData).getJSONArray("airports").getJSONObject(0).getString("iata");
+
+                    getDailyCovidInfo(iata);
+
+                } catch (JSONException e) {
+
+                }
+            }
+        });
+
+
+
+    }
+
+    private void getDailyCovidInfo(String air_code) {
+
+        OkHttpClient client = new OkHttpClient();
+
+        Request request = new Request.Builder()
+                .header("X-Access-Token", Common.COVID_API)
+                .url("https://api.traveladviceapi.com/search/stats/" + air_code + "?limit=7")
+                .build();
+        client.newCall(request).enqueue(new Callback() {
+
+
+            @Override
+            public void onFailure(Call call, IOException e) {
+
+            }
+
+            @Override
+            public void onResponse(Call call, final Response response) throws IOException {
+                try {
+                    String responseData = response.body().string();
+                    JSONArray jsonArray = new JSONObject(responseData).getJSONArray(air_code);
+                    for(int i = jsonArray.length()-1; i>=0; i--){
+                        data.add(new ValueDataEntry(jsonArray.getJSONObject(i).getString("date"), jsonArray.getJSONObject(i).getInt("new_cases")));
+                    }
+                    mainHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            Column column = cartesian.column(data);
+
+                            column.tooltip()
+                                    .titleFormat("{%X}")
+                                    .position(Position.CENTER_BOTTOM)
+                                    .anchor(Anchor.CENTER_BOTTOM)
+                                    .offsetX(0d)
+                                    .offsetY(5d)
+                                    .format("{%Value}{groupsSeparator: }");
+
+                            cartesian.animation(true);
+                            cartesian.title("Covid-19 cases in previous 7 days");
+
+                            cartesian.yScale().minimum(0d);
+
+                            cartesian.yAxis(0).labels().format("{%Value}{groupsSeparator: }");
+
+                            cartesian.tooltip().positionMode(TooltipPositionMode.POINT);
+                            cartesian.interactivity().hoverMode(HoverMode.BY_X);
+
+                            cartesian.xAxis(0).title("Date");
+                            cartesian.yAxis(0).title("New Cases");
+
+                            anyChartView.setChart(cartesian);
+                        }});
+                } catch (JSONException e) {
+
+                }
+            }
+        });
+    }
+
 
     private static JSONObject getJSONObject(String _url) throws Exception {
         if (_url.equals(""))

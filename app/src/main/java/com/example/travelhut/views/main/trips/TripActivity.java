@@ -20,6 +20,16 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.anychart.AnyChart;
+import com.anychart.AnyChartView;
+import com.anychart.chart.common.dataentry.DataEntry;
+import com.anychart.chart.common.dataentry.ValueDataEntry;
+import com.anychart.charts.Cartesian;
+import com.anychart.core.cartesian.series.Column;
+import com.anychart.enums.Anchor;
+import com.anychart.enums.HoverMode;
+import com.anychart.enums.Position;
+import com.anychart.enums.TooltipPositionMode;
 import com.example.travelhut.R;
 import com.example.travelhut.common.Common;
 import com.example.travelhut.views.main.map_search.Event;
@@ -58,6 +68,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import okhttp3.Call;
@@ -79,6 +90,11 @@ public class TripActivity extends AppCompatActivity {
     private LinearLayout eventsLinearLayout;
     private RecyclerView eventsRecyclerView;
     private TextView recommendation, description, masks, quarantine, tests;
+    private String air_code;
+    List<DataEntry> data = new ArrayList<>();
+    Cartesian cartesian;
+    AnyChartView anyChartView;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,12 +113,16 @@ public class TripActivity extends AppCompatActivity {
         quarantine = findViewById(R.id.quarantine_info);
         tests = findViewById(R.id.test_info);
         eventAdapter = new EventAdapter(this, eventsList);
-
+        air_code = "";
         eventsRecyclerView = findViewById(R.id.trip_events_recycler_view);
         eventsRecyclerView.setHasFixedSize(true);
         eventsRecyclerView.setAdapter(eventAdapter);
         eventsRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         String apiKey = getString(R.string.google_api_key);
+        anyChartView = findViewById(R.id.any_chart_view);
+
+        cartesian = AnyChart.column();
+
 
 
         Bundle extras = getIntent().getExtras();
@@ -190,6 +210,7 @@ public class TripActivity extends AppCompatActivity {
                 dateRange.setText(trip.getDaterange());
                 try {
                     loadCoronaVirusStats(trip.getPlacename());
+                    loadCoronaVirusStatsChart(trip.getPlacename());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -209,6 +230,8 @@ public class TripActivity extends AppCompatActivity {
                 finish();
             }
         });
+
+
     }
 
 
@@ -297,7 +320,7 @@ public class TripActivity extends AppCompatActivity {
         OkHttpClient client = new OkHttpClient();
 
         Request request = new Request.Builder()
-                .header("X-Access-Token", " a7ab64d2-f9eb-40b1-9634-62caffdc7732")
+                .header("X-Access-Token", Common.COVID_API)
                 .url("https://api.traveladviceapi.com/search/" + placeName)
                 .build();
 
@@ -337,6 +360,111 @@ public class TripActivity extends AppCompatActivity {
         });
 
     }
+
+
+
+
+    public void loadCoronaVirusStatsChart(String placeName) throws Exception {
+
+// Host url
+        OkHttpClient client = new OkHttpClient();
+
+        Request requestOne = new Request.Builder()
+                .header("APC-Auth", "fe6a282ffd")
+                .addHeader("APC-Auth-Secret", "bc28b3b3a87b4cd")
+                .addHeader("Content-Type", "application/json")
+                .url("https://www.air-port-codes.com/api/v1/multi?term=" + placeName)
+                .build();
+
+
+
+
+        client.newCall(requestOne).enqueue(new Callback() {
+
+
+            @Override
+            public void onFailure(Call call, IOException e) {
+
+            }
+
+            @Override
+            public void onResponse(Call call, final Response response) throws IOException {
+                try {
+                    String responseData = response.body().string();
+                    String iata = new JSONObject(responseData).getJSONArray("airports").getJSONObject(0).getString("iata");
+
+                    getDailyCovidInfo(iata);
+
+                } catch (JSONException e) {
+
+                }
+            }
+        });
+
+
+
+    }
+
+    private void getDailyCovidInfo(String air_code) {
+
+        OkHttpClient client = new OkHttpClient();
+
+        Request request = new Request.Builder()
+                .header("X-Access-Token", Common.COVID_API)
+                .url("https://api.traveladviceapi.com/search/stats/" + air_code + "?limit=7")
+                .build();
+        client.newCall(request).enqueue(new Callback() {
+
+
+            @Override
+            public void onFailure(Call call, IOException e) {
+
+            }
+
+            @Override
+            public void onResponse(Call call, final Response response) throws IOException {
+                try {
+                    String responseData = response.body().string();
+                    JSONArray jsonArray = new JSONObject(responseData).getJSONArray(air_code);
+                    for(int i = jsonArray.length()-1; i>=0; i--){
+                        data.add(new ValueDataEntry(jsonArray.getJSONObject(i).getString("date"), jsonArray.getJSONObject(i).getInt("new_cases")));
+                    }
+                    mainHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            Column column = cartesian.column(data);
+
+                            column.tooltip()
+                                    .titleFormat("{%X}")
+                                    .position(Position.CENTER_BOTTOM)
+                                    .anchor(Anchor.CENTER_BOTTOM)
+                                    .offsetX(0d)
+                                    .offsetY(5d)
+                                    .format("{%Value}{groupsSeparator: }");
+
+                            cartesian.animation(true);
+                            cartesian.title("Covid-19 cases in previous 7 days");
+
+                            cartesian.yScale().minimum(0d);
+
+                            cartesian.yAxis(0).labels().format("{%Value}{groupsSeparator: }");
+
+                            cartesian.tooltip().positionMode(TooltipPositionMode.POINT);
+                            cartesian.interactivity().hoverMode(HoverMode.BY_X);
+
+                            cartesian.xAxis(0).title("Date");
+                            cartesian.yAxis(0).title("New Cases");
+
+                            anyChartView.setChart(cartesian);
+                        }});
+                } catch (JSONException e) {
+
+                }
+            }
+        });
+    }
+
+
     private static JSONObject getJSONObject(String _url) throws Exception {
         if (_url.equals(""))
             throw new Exception("URL can't be empty");
