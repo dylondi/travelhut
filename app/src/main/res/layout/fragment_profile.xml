@@ -18,100 +18,143 @@
         <include layout="@layout/snippet_profile_fragment_toolbar"/>
 
     </RelativeLayout>
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/profile_fragment_rel_layout_1"
-        android:background="@drawable/white_light_blue_bottom_border">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:baselineAligned="false" android:orientation="horizontal"
-            android:id="@+id/profile_fragment_linear_layout"
-            android:weightSum="100"
-            android:layout_marginTop="20dp">
-
-            <RelativeLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="25"
-                android:layout_marginStart="25dp">
-
-                <de.hdodenhof.circleimageview.CircleImageView
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
-                    android:id="@+id/profile_image_fragment"
-                    app:civ_border_color="@color/dark_blue"
-                    app:civ_border_width="2dp"
-                    android:layout_centerVertical="true"/>
-
-            </RelativeLayout>
-
-            <RelativeLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_marginStart="30dp"
-                android:layout_marginEnd="30dp"
-                android:layout_weight="75">
-
-                <include layout="@layout/snippet_top_profile_fragment" />
-            </RelativeLayout>
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_below="@+id/profile_fragment_linear_layout"
-            android:padding="15dp"
-            android:id="@+id/profile_linear_layout_2">
-
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/display_name_profile_fragment"
-                android:textColor="@color/black"
-                android:textSize="16sp"
-                android:textStyle="bold"/>
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/bio_profile_fragment"
-                android:textColor="@color/black"
-                android:text="Seasoned traveller"
-                android:layout_marginTop="5dp"
-                android:textSize="16sp"/>
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/url_profile_fragment"
-                android:textColor="@color/dark_blue"
-                android:text="dylon.diruscio@hotmail.com"
-                android:textSize="16sp"
-                android:layout_marginTop="5dp"/>
-
-
-        </LinearLayout>
-
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/profile_rel_layout_2"
-            android:layout_below="@id/profile_linear_layout_2"
-            android:layout_marginBottom="50dp">
+            android:layout_below="@+id/profile_fragment_rel_layout_1"
+            android:background="@drawable/white_light_blue_bottom_border">
 
-            <androidx.recyclerview.widget.RecyclerView
+
+            <androidx.core.widget.NestedScrollView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/profile_fragment_recycler_view" />
+                android:layout_height="wrap_content">
 
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <FrameLayout
+                        android:id="@+id/profile_fragment_frame_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        <!--                    <ImageView-->
+                        <!--                        android:layout_width="match_parent"-->
+                        <!--                        android:layout_height="match_parent"-->
+                        <!--                        android:src="@drawable/profile_bg"-->
+                        <!--                        android:scaleType="centerCrop"/>-->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:weightSum="100">
+
+                            <RelativeLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="160dp">
+
+                                <ImageView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="100dp"
+                                    android:background="@color/dark_blue" />
+
+                                <RelativeLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="30dp"
+                                    android:layout_marginBottom="20dp">
+
+                                    <include layout="@layout/snippet_top_profile_fragment" />
+                                </RelativeLayout>
+
+                                <de.hdodenhof.circleimageview.CircleImageView
+                                    android:id="@+id/profile_image_fragment"
+                                    android:layout_width="120dp"
+                                    android:layout_height="120dp"
+                                    android:layout_centerHorizontal="true"
+                                    android:layout_marginTop="40dp"
+                                    app:civ_border_color="#5ca9ff"
+                                    app:civ_border_width="2dp" />
+
+                                <androidx.appcompat.widget.AppCompatButton
+                                    android:layout_width="100dp"
+                                    android:layout_height="25dp"
+                                    android:id="@+id/follow_button_profile_fragment"
+                                    android:background="@drawable/btn_bg"
+                                    android:layout_alignParentBottom="true"
+                                    android:layout_margin="20dp"
+                                    android:textColor="@color/white"/>
+
+                                <androidx.appcompat.widget.AppCompatButton
+                                    android:layout_width="100dp"
+                                    android:layout_height="25dp"
+                                    android:id="@+id/message_button_profile_fragment"
+                                    android:background="@drawable/btn_bg"
+                                    android:layout_alignParentBottom="true"
+                                    android:layout_margin="20dp"
+                                    android:layout_alignParentRight="true"
+                                    android:text="message"
+                                    android:textColor="@color/white"/>
+
+
+                            </RelativeLayout>
+
+
+                        </LinearLayout>
+                    </FrameLayout>
+
+                    <LinearLayout
+                        android:id="@+id/profile_linear_layout_2"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/profile_fragment_frame_layout"
+                        android:orientation="vertical"
+                        android:padding="15dp">
+
+
+                        <TextView
+                            android:id="@+id/display_name_profile_fragment"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/black"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/bio_profile_fragment"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="5dp"
+                            android:textColor="@color/black"
+                            android:textSize="16sp" />
+
+                        <TextView
+                            android:id="@+id/url_profile_fragment"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="5dp"
+                            android:textColor="@color/dark_blue"
+                            android:textSize="16sp" />
+
+
+                    </LinearLayout>
+
+                    <RelativeLayout
+                        android:id="@+id/profile_rel_layout_2"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/profile_linear_layout_2"
+                        android:layout_marginBottom="50dp">
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/profile_fragment_recycler_view"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+
+
+                    </RelativeLayout>
+                </RelativeLayout>
+            </androidx.core.widget.NestedScrollView>
         </RelativeLayout>
-
-    </RelativeLayout>
     </RelativeLayout>
 
 </FrameLayout>
