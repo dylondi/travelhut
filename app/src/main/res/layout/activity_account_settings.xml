@@ -1,70 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <include layout="@layout/layout_center_viewpager"/>
-
     <RelativeLayout
+        android:id="@+id/acc_settings_rel_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/acc_settings_rel_layout">
+        android:layout_height="match_parent">
 
         <RelativeLayout
+            android:id="@+id/acc_settings_rel_layout_2"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/acc_settings_rel_layout_2">
+            android:layout_height="wrap_content">
 
 
-            <include layout="@layout/snippet_top_account_settings_toolbar"/>
+            <include layout="@layout/snippet_top_account_settings_toolbar" />
 
         </RelativeLayout>
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/acc_settings_rel_layout_3"
-        android:layout_below="@+id/acc_settings_rel_layout_2"
-        android:layout_marginBottom="50dp">
-
-        <TextView
+        <RelativeLayout
+            android:id="@+id/acc_settings_rel_layout_3"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/acc_settings_settings_btn"
-            android:text="Settings"
-            android:textColor="@color/grey"
-            android:textSize="24sp"
-            android:layout_margin="10dp"/>
+            android:layout_height="match_parent"
+            android:layout_below="@+id/acc_settings_rel_layout_2"
+            android:layout_marginBottom="50dp">
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/light_blue"
-            android:id="@+id/acc_Settings_bar_1"
-            android:layout_below="@id/acc_settings_settings_btn"/>
+            <TextView
+                android:id="@+id/acc_settings_settings_btn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:text="Settings"
+                android:textColor="@color/grey"
+                android:textSize="24sp" />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/acc_settings_logout_btn"
-            android:text="Sign Out"
-            android:textColor="@color/grey"
-            android:textSize="24sp"
-            android:layout_below="@+id/acc_Settings_bar_1"
-            android:layout_margin="10dp"/>
+            <TextView
+                android:id="@+id/acc_settings_logout_btn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/acc_Settings_bar_1"
+                android:layout_margin="10dp"
+                android:text="Sign Out"
+                android:textColor="@color/grey"
+                android:textSize="24sp" />
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/light_blue"
-            android:layout_below="@id/acc_settings_logout_btn"/>
+            <View
+                android:id="@+id/acc_Settings_bar_1"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_below="@id/acc_settings_settings_btn"
+                android:background="@color/light_blue" />
 
-<!--        <include layout="@layout/layout_center_account_settings"/>-->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_below="@id/acc_settings_logout_btn"
+                android:background="@color/light_blue" />
 
-    </RelativeLayout>
+        </RelativeLayout>
 
-        <include layout="@layout/layout_bottom_navigation_view"/>
+        <include layout="@layout/layout_bottom_navigation_view" />
 
     </RelativeLayout>
 

@@ -3,50 +3,44 @@ package com.example.travelhut.viewmodel.main.newsfeed;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.example.travelhut.model.AuthAppRepository;
-import com.example.travelhut.model.FollowingAppRepository;
-import com.example.travelhut.model.PostsAppRepository;
-import com.example.travelhut.model.StoriesAppRepository;
-import com.example.travelhut.model.UsersAppRepository;
-import com.google.firebase.auth.FirebaseAuth;
+import com.example.travelhut.model.authentication.AuthRepository;
+import com.example.travelhut.model.main.profile.FollowingRepository;
+import com.example.travelhut.model.main.posts.PostsRepository;
+import com.example.travelhut.model.main.newsfeed.StoriesRepository;
+import com.example.travelhut.model.authentication.UsersRepository;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.Query;
 
 
 public class NewsFeedActivityViewModel extends ViewModel {
 
-    private UsersAppRepository liveData;
-    private Query userSearchQuery;
-    private PostsAppRepository postsAppRepository;
-    private FollowingAppRepository followingAppRepository;
-    private AuthAppRepository authAppRepository;
-    private StoriesAppRepository storiesAppRepository;
 
+    //Instance Variables
+    private UsersRepository liveData;
+    private PostsRepository postsRepository;
+    private FollowingRepository followingRepository;
+    private AuthRepository authRepository;
+    private StoriesRepository storiesRepository;
 
-
-
+    //Constructors
     public NewsFeedActivityViewModel(String s) {
         super();
-        liveData = new UsersAppRepository(s);
-        followingAppRepository = new FollowingAppRepository();
-        postsAppRepository = new PostsAppRepository();
-        this.userSearchQuery = liveData.getUserSearchQuery();
-        authAppRepository = new AuthAppRepository();
-        storiesAppRepository = new StoriesAppRepository();
+        liveData = new UsersRepository(s);
+        followingRepository = new FollowingRepository();
+        postsRepository = new PostsRepository();
+        authRepository = new AuthRepository();
+        storiesRepository = new StoriesRepository();
 
     }
 
     public NewsFeedActivityViewModel() {
-        liveData = new UsersAppRepository();
-        postsAppRepository = new PostsAppRepository();
-        followingAppRepository = new FollowingAppRepository();
-        this.userSearchQuery = liveData.getReference();
-        authAppRepository = new AuthAppRepository();
-        storiesAppRepository = new StoriesAppRepository();
+        liveData = new UsersRepository();
+        postsRepository = new PostsRepository();
+        followingRepository = new FollowingRepository();
+        authRepository = new AuthRepository();
+        storiesRepository = new StoriesRepository();
     }
 
     @NonNull
@@ -56,26 +50,23 @@ public class NewsFeedActivityViewModel extends ViewModel {
 
     @NonNull
     public LiveData<DataSnapshot> getPostsLiveData() {
-        return postsAppRepository;
-    }
-
-    public Query getQuery(){
-        return userSearchQuery;
+        return postsRepository;
     }
 
     @NonNull
     public LiveData<DataSnapshot> getFollowingSnapshot() {
 
-        return followingAppRepository;
+        return followingRepository;
     }
+
     @NonNull
     public LiveData<DataSnapshot> getStoriesLiveData() {
 
-        return storiesAppRepository;
+        return storiesRepository;
     }
 
     @NonNull
-    public LiveData<FirebaseUser> getUserMutableLiveData(){
-        return authAppRepository.getUserMutableLiveData();
+    public LiveData<FirebaseUser> getUserMutableLiveData() {
+        return authRepository.getUserMutableLiveData();
     }
 }

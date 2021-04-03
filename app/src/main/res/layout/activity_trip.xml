@@ -7,147 +7,153 @@
     tools:context=".views.main.trips.TripActivity">
 
 
-    <RelativeLayout
+    <Button
+        android:id="@+id/change_dates_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/trip_toolbar_layout">
-    <include layout="@layout/snippet_trip_toolbar"/>
-    </RelativeLayout>
+        android:layout_below="@+id/trip_top_section_layout"
+        android:layout_centerInParent="true"
+        android:layout_margin="15dp"
+        android:background="@drawable/btn_bg"
+        android:text="Change Dates" />
 
     <RelativeLayout
+        android:id="@+id/trip_top_section_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/trip_top_section_layout"
         android:layout_below="@id/trip_toolbar_layout">
+
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="170dp">
+
             <ImageView
+                android:id="@+id/trip_image_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:id="@+id/trip_image_view"
+                android:background="@drawable/place_image_rounded_bg"
                 android:fadingEdge="horizontal"
                 android:fadingEdgeLength="30dp"
                 android:fillViewport="false"
-                android:background="@drawable/place_image_rounded_bg"
-                android:requiresFadingEdge="vertical"/>
+                android:requiresFadingEdge="vertical" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
                 android:background="@drawable/transparent_gradient_top_bottom"
-                android:orientation="vertical"
-                android:layout_alignParentBottom="true">
+                android:orientation="vertical">
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:weightSum="100">
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textSize="25sp"
-                        android:textColor="@color/white"
-                        android:paddingHorizontal="10dp"
-                        android:id="@+id/trip_place_name"
-                        android:layout_weight="50"/>
 
                     <TextView
+                        android:id="@+id/trip_place_name"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textSize="25sp"
-                        android:textColor="@color/white"
-                        android:paddingHorizontal="10dp"
                         android:layout_weight="50"
+                        android:paddingHorizontal="10dp"
+                        android:textColor="@color/white"
+                        android:textSize="25sp" />
+
+                    <TextView
                         android:id="@+id/trip_date"
-                        android:gravity="right"/>
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="50"
+                        android:gravity="right"
+                        android:paddingHorizontal="10dp"
+                        android:textColor="@color/white"
+                        android:textSize="25sp" />
 
                 </LinearLayout>
+
                 <TextView
+                    android:id="@+id/trip_place_address"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textSize="15sp"
-                    android:textColor="@color/white"
                     android:paddingHorizontal="15dp"
-                    android:id="@+id/trip_place_address"/>
+                    android:textColor="@color/white"
+                    android:textSize="15sp" />
 
 
             </LinearLayout>
         </RelativeLayout>
     </RelativeLayout>
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/change_dates_button"
-        android:background="@drawable/btn_bg"
-        android:layout_below="@+id/trip_top_section_layout"
-        android:text="Change Dates"
-        android:layout_centerInParent="true"
-        android:layout_margin="15dp"/>
-
-<androidx.core.widget.NestedScrollView
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-
-    android:layout_below="@+id/change_dates_button">
     <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/white">
-    <TextView
+        android:id="@+id/trip_toolbar_layout"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Events"
-        android:textColor="@color/light_blue"
-        android:layout_marginLeft="7dp"
-        android:layout_marginTop="7dp"
-        android:textSize="20sp"
-        android:id="@+id/events_text"/>
-    <LinearLayout
-        android:id="@+id/trip_events_lin_layout"
+        android:layout_height="wrap_content">
+
+        <include layout="@layout/snippet_trip_toolbar" />
+    </RelativeLayout>
+
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_below="@+id/events_text">
-        <androidx.recyclerview.widget.RecyclerView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="10dp"
-            android:id="@+id/trip_events_recycler_view"/>
 
-    </LinearLayout>
-<!--<RelativeLayout-->
-<!--    android:layout_width="match_parent"-->
-<!--    android:layout_height="wrap_content"-->
-<!--    android:layout_below="@+id/trip_events_lin_layout">-->
+        android:layout_below="@+id/change_dates_button">
 
-<!--    <include layout="@layout/snippet_coronavirus_stats"/>-->
-<!--</RelativeLayout>-->
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/trip_events_lin_layout"
-            android:paddingVertical="5dp">
-            <View
+            android:background="@color/white">
+
+            <LinearLayout
+                android:id="@+id/trip_events_lin_layout"
                 android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#d9d9d9"/>
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/events_text"
+                android:orientation="vertical">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/trip_events_recycler_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="10dp" />
+
+            </LinearLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/trip_events_lin_layout"
+                android:paddingVertical="5dp">
+
+                <TextView
+                    android:id="@+id/covid_info_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="7dp"
+                    android:layout_marginTop="7dp"
+                    android:text="Covid-19 Info"
+                    android:textColor="@color/light_blue"
+                    android:textSize="20sp" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#d9d9d9" />
+
+                <include layout="@layout/snippet_coronavirus_stats" />
+
+            </RelativeLayout>
+
             <TextView
+                android:id="@+id/events_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/light_blue"
-                android:id="@+id/covid_info_title"
-                android:text="Covid-19 Info"
-                android:textSize="20sp"
                 android:layout_marginLeft="7dp"
-                android:layout_marginTop="7dp"/>
-
-            <include layout="@layout/snippet_coronavirus_stats"/>
+                android:layout_marginTop="7dp"
+                android:text="Events"
+                android:textColor="@color/light_blue"
+                android:textSize="20sp" />
 
         </RelativeLayout>
-
-    </RelativeLayout>
-</androidx.core.widget.NestedScrollView>
+    </androidx.core.widget.NestedScrollView>
 
 </RelativeLayout>

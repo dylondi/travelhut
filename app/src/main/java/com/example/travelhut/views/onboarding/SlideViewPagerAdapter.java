@@ -59,12 +59,7 @@ public class SlideViewPagerAdapter extends PagerAdapter {
 
         next.setOnClickListener(view12 -> OnboardingScreensActivity.viewPager.setCurrentItem(position+1));
 
-        back.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                OnboardingScreensActivity.viewPager.setCurrentItem(position-1);
-            }
-        });
+        back.setOnClickListener(view13 -> OnboardingScreensActivity.viewPager.setCurrentItem(position-1));
 
 
         switch (position){

@@ -6,27 +6,33 @@
 
 
     <!--top toolbar -->
-        <RelativeLayout
-            android:id="@+id/rel_layout1"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+    <RelativeLayout
+        android:id="@+id/rel_layout1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-            <include layout="@layout/layout_top_tabs" />
+        <include layout="@layout/layout_top_tabs" />
 
-        </RelativeLayout>
+    </RelativeLayout>
 
 
     <RelativeLayout
         android:id="@+id/rel_layout2"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/rel_layout1"
         android:layout_above="@id/trips_nav_layout"
-        >
+        android:layout_below="@id/rel_layout1">
 
+
+        <androidx.viewpager.widget.ViewPager
+            android:id="@+id/view_pager_trips"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tabs"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tabs"
@@ -36,22 +42,15 @@
             app:tabIndicatorColor="@color/white"
             app:tabRippleColor="@android:color/transparent"
             app:tabSelectedTextColor="@color/white"
-            app:tabTextColor="@color/light_blue"/>
-
-        <androidx.viewpager.widget.ViewPager
-            android:id="@+id/view_pager_trips"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior"
-            android:layout_below="@id/tabs" />
+            app:tabTextColor="@color/light_blue" />
     </RelativeLayout>
 
     <RelativeLayout
+        android:id="@+id/trips_nav_layout"
         android:layout_width="wrap_content"
         android:layout_height="60dp"
-        android:layout_gravity="bottom"
-        android:id="@+id/trips_nav_layout"
-        android:layout_alignParentBottom="true">
+        android:layout_alignParentBottom="true"
+        android:layout_gravity="bottom">
 
         <include layout="@layout/layout_bottom_navigation_view" />
     </RelativeLayout>

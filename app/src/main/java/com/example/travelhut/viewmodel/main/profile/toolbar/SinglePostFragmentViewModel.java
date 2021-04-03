@@ -5,27 +5,24 @@ import android.app.Application;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
 
-import com.example.travelhut.model.PostsAppRepository;
-import com.example.travelhut.model.SinglePostAppRepository;
+import com.example.travelhut.model.main.profile.SinglePostRepository;
 import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseReference;
 
 public class SinglePostFragmentViewModel extends AndroidViewModel {
 
-    private MutableLiveData<DatabaseReference> postMutableLiveData;
+    //Instance Variable
+    private SinglePostRepository singlePostRepository;
 
-    private SinglePostAppRepository singlePostAppRepository;
+    //Constructor
     public SinglePostFragmentViewModel(@NonNull Application application, String postId) {
         super(application);
-        singlePostAppRepository = new SinglePostAppRepository(postId);
+        singlePostRepository = new SinglePostRepository(postId);
     }
 
     @NonNull
     public LiveData<DataSnapshot> getPostLiveData() {
-
-        return singlePostAppRepository;
+        return singlePostRepository;
     }
 
 

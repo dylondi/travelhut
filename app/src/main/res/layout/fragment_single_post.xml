@@ -6,13 +6,13 @@
     tools:context=".views.main.profile.toolbar.SinglePostFragment">
 
 
-<RelativeLayout
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:id="@+id/post_fragment_toolbar_rel_layout">
+    <RelativeLayout
+        android:id="@+id/post_fragment_toolbar_rel_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-    <include layout="@layout/snippet_single_post_toolbar"/>
-</RelativeLayout>
+        <include layout="@layout/snippet_single_post_toolbar" />
+    </RelativeLayout>
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -20,9 +20,9 @@
         android:layout_below="@+id/post_fragment_toolbar_rel_layout">
 
         <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/single_post_fragment_recycler_view"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/single_post_fragment_recycler_view"/>
+            android:layout_height="wrap_content" />
 
     </RelativeLayout>
 

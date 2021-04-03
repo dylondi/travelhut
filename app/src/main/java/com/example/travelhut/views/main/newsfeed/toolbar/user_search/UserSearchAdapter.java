@@ -15,8 +15,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.travelhut.R;
-import com.example.travelhut.model.StringsRepository;
-import com.example.travelhut.views.authentication.utils.User;
+import com.example.travelhut.model.utils.StringsRepository;
+import com.example.travelhut.model.objects.User;
 import com.example.travelhut.viewmodel.main.newsfeed.toolbar.users.UserSearchAdapterViewModel;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -31,16 +31,17 @@ import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class UserSearchAdapter extends RecyclerView.Adapter<UserSearchAdapter.ViewHolder>{
+public class UserSearchAdapter extends RecyclerView.Adapter<UserSearchAdapter.ViewHolder> {
 
+
+    //Instance Variables
     private final static String TAG = "UserSearchAdapter";
-
     private Context mContext;
     private List<User> mUsers;
     private FirebaseUser firebaseUser;
     private UserSearchAdapterViewModel userSearchAdapterViewModel;
 
-
+    //Constructor
     public UserSearchAdapter(Context mContext, List<User> mUsers) {
         this.mContext = mContext;
         this.mUsers = mUsers;
@@ -50,17 +51,16 @@ public class UserSearchAdapter extends RecyclerView.Adapter<UserSearchAdapter.Vi
     @NonNull
     @Override
     public UserSearchAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        Log.i(TAG, "onCreateViewHolder called" );
+        Log.i(TAG, "onCreateViewHolder called");
         View view = LayoutInflater.from(mContext)
-                .inflate(R.layout.user_item, parent, false);
-        //recyclerView = view.findViewById(R.id.recycler_view);
+                .inflate(R.layout.user_view, parent, false);
         return new ViewHolder(view);
     }
 
 
     @Override
     public int getItemViewType(int position) {
-        return R.layout.user_item;
+        return R.layout.user_view;
     }
 
 
@@ -69,22 +69,21 @@ public class UserSearchAdapter extends RecyclerView.Adapter<UserSearchAdapter.Vi
 
         Log.i(TAG, "onBindViewHolder called, position: " + position);
 
-        //gets current user in recyclerView
+        //Gets current user in recyclerView
         final User user = mUsers.get(position);
 
-        //initialize userSearchAdapterViewModel
+        //Initialize userSearchAdapterViewModel
         userSearchAdapterViewModel = new UserSearchAdapterViewModel(user.getId());
 
-        //current firebase user
-        //firebaseUser = userSearchAdapterViewModel.getUserMutableLiveData().getValue();
+        //Current firebase user
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
 
         setUserItem(holder, user);
-        isFollowing(user.getId(),holder.btn_follow);
+        isFollowing(user.getId(), holder.btn_follow);
 
-        //if this user is current user then remove option to follow/unfollow
-        if(user.getId().equals(firebaseUser.getUid())){
+        //If this user is current user then remove option to follow/unfollow
+        if (user.getId().equals(firebaseUser.getUid())) {
             holder.btn_follow.setVisibility(View.GONE);
         }
 
@@ -92,7 +91,7 @@ public class UserSearchAdapter extends RecyclerView.Adapter<UserSearchAdapter.Vi
         holder.itemView.setOnClickListener(v -> {
             Log.i(TAG, "itemView clicked in RecyclerView");
 
-            //go to user profile
+            //Go to user profile
             showProfileFragment(user);
         });
 
@@ -100,50 +99,50 @@ public class UserSearchAdapter extends RecyclerView.Adapter<UserSearchAdapter.Vi
         holder.btn_follow.setOnClickListener(v -> {
             Log.i(TAG, "itemView clicked in RecyclerView");
 
-            //follow or unfollow user
+            //Follow or unfollow user
             followOrUnfollowUser(holder, user);
         });
 
     }
 
-    //add notification ****NOT FINISHED****
-    private void addNotification(String userid){
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Notifications").child(userid);
+    //Add notification
+    private void addNotification(String userid) {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(StringsRepository.NOTIFICATIONS_CAP).child(userid);
 
         HashMap<String, Object> hashMap = new HashMap<>();
-        hashMap.put("userid", firebaseUser.getUid());
-        hashMap.put("text", "started following you");
-        hashMap.put("postid", "");
-        hashMap.put("ispost", false);
+        hashMap.put(StringsRepository.USER_ID, firebaseUser.getUid());
+        hashMap.put(StringsRepository.TEXT, "started following you");
+        hashMap.put(StringsRepository.POST_ID, "");
+        hashMap.put(StringsRepository.IS_POST, false);
 
         reference.push().setValue(hashMap);
     }
 
 
-    //follow or unfollow user based on if already following or not
+    //Follow or unfollow user based on if already following or not
     private void followOrUnfollowUser(@NonNull ViewHolder holder, User user) {
 
-        //checks if already following
-        if(holder.btn_follow.getText().toString().equals(StringsRepository.FOLLOW)){
+        //Checks if already following
+        if (holder.btn_follow.getText().toString().equals(StringsRepository.FOLLOW)) {
             userSearchAdapterViewModel.follow(user.getId());
             addNotification(user.getId());
-            Log.d("logging","follow " + user.getId());
+            Log.d("logging", "follow " + user.getId());
         } else {
             userSearchAdapterViewModel.unFollow(user.getId());
-            Log.d("logging","unfollow" + user.getId());
+            Log.d("logging", "unfollow" + user.getId());
         }
     }
 
-    //go to user profile
+    //Go to user profile
     private void showProfileFragment(User user) {
-        SharedPreferences.Editor editor = mContext.getSharedPreferences("PREFS", Context.MODE_PRIVATE).edit();
-        editor.putString("profileid", user.getId());
+        SharedPreferences.Editor editor = mContext.getSharedPreferences(StringsRepository.PREFS, Context.MODE_PRIVATE).edit();
+        editor.putString(StringsRepository.PROFILE_ID, user.getId());
         editor.apply();
         ProfileFragment profileFragment = new ProfileFragment();
         ((FragmentActivity) mContext).getSupportFragmentManager().beginTransaction().replace(R.id.frame_layout, profileFragment).commit();
     }
 
-    //this method sets the data for the current item in recyclerView
+    //This method sets the data for the current item in recyclerView
     private void setUserItem(@NonNull ViewHolder holder, User user) {
         holder.btn_follow.setVisibility(View.VISIBLE);
         holder.username.setText(user.getUsername());
@@ -158,15 +157,17 @@ public class UserSearchAdapter extends RecyclerView.Adapter<UserSearchAdapter.Vi
     }
 
 
+    public class ViewHolder extends RecyclerView.ViewHolder {
 
-    public class ViewHolder extends RecyclerView.ViewHolder{
-
+        //Instance Variables
         public TextView username;
         public TextView email;
         public CircleImageView image_profile;
         public Button btn_follow;
 
 
+
+        //Constructor
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
@@ -178,54 +179,31 @@ public class UserSearchAdapter extends RecyclerView.Adapter<UserSearchAdapter.Vi
     }
 
 
-    //this method checks if you are following each user
-    private void isFollowing(final String userid, final Button button) {
+    //This method checks if you are following each user
+    private void isFollowing(final String userId, final Button button) {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference()
+                .child(StringsRepository.FOLLOW_CAP).child(firebaseUser.getUid()).child(StringsRepository.FOLLOWING);
 
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.child(userId).exists()) {
 
-
-//        LiveData<DataSnapshot> liveData = userSearchAdapterViewModel.getFollowing();
-
-//
-//        liveData.observeForever(new Observer<DataSnapshot>() {
-//            @Override
-//            public void onChanged(DataSnapshot dataSnapshot) {
-//                if (dataSnapshot.child(userid).exists()) {
-//
-//                    Log.d("logging", "text currently reads: " + button.getText());
-//                    button.setText("following");
-//                    Log.d("logging", "change text to following : " + userid);
-//                } else {
-//                    Log.d("logging", "text currently reads: " + button.getText());
-//                    button.setText("follow");
-//                    Log.d("logging", "change text to follow : " + userid);
-//                }
-//            }
-//
-//        });
-//
-          DatabaseReference reference = FirebaseDatabase.getInstance().getReference()
-                  .child(StringsRepository.FOLLOW_CAP).child(firebaseUser.getUid()).child(StringsRepository.FOLLOWING);
-
-            reference.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    if (dataSnapshot.child(userid).exists()) {
-
-                        Log.d("logging", "text currently reads: " + button.getText());
-                        button.setText(StringsRepository.FOLLOWING);
-                        Log.d("logging", "change text to following : " + userid);
-                    } else {
-                        Log.d("logging", "text currently reads: " + button.getText());
-                        button.setText(StringsRepository.FOLLOW);
-                        Log.d("logging", "change text to follow : " + userid);
-                    }
+                    Log.d("logging", "text currently reads: " + button.getText());
+                    button.setText(StringsRepository.FOLLOWING);
+                    Log.d("logging", "change text to following : " + userId);
+                } else {
+                    Log.d("logging", "text currently reads: " + button.getText());
+                    button.setText(StringsRepository.FOLLOW);
+                    Log.d("logging", "change text to follow : " + userId);
                 }
+            }
 
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
 
-                }
-            });
+            }
+        });
 
     }
 

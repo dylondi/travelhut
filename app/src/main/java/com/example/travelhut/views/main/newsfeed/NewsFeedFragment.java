@@ -1,9 +1,7 @@
 package com.example.travelhut.views.main.newsfeed;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -19,20 +17,18 @@ import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.ViewCompat;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.LiveData;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.travelhut.R;
 import com.example.travelhut.viewmodel.main.newsfeed.NewsFeedActivityViewModel;
-import com.example.travelhut.views.main.newsfeed.toolbar.user_search.ProfileFragment;
-import com.example.travelhut.views.authentication.utils.User;
-import com.example.travelhut.views.main.newsfeed.newsfeed.AddStoryActivity;
+import com.example.travelhut.model.objects.User;
+import com.example.travelhut.views.main.newsfeed.newsfeed.UploadStoryActivity;
 import com.example.travelhut.views.main.newsfeed.newsfeed.PostsAdapter;
 import com.example.travelhut.views.main.newsfeed.newsfeed.StoryAdapter;
-import com.example.travelhut.views.main.newsfeed.newsfeed.utils.Post;
-import com.example.travelhut.views.main.newsfeed.newsfeed.utils.Story;
+import com.example.travelhut.model.objects.Post;
+import com.example.travelhut.model.objects.Story;
 import com.example.travelhut.views.main.newsfeed.toolbar.user_search.UserSearchAdapter;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -40,170 +36,105 @@ import com.google.firebase.database.DataSnapshot;
 import java.util.ArrayList;
 import java.util.List;
 
-import static android.content.Context.MODE_PRIVATE;
-
 public class NewsFeedFragment extends Fragment {
 
-    public RecyclerView recyclerViewSearch;
-    private UserSearchAdapter userSearchAdapter;
-    private List<User> mUsers;
-    public ViewFlipper viewFlipper;
-    public RecyclerView recyclerView;
-    private PostsAdapter postsAdapter;
-    private List<Post> postList;
-    private NewsFeedActivityViewModel newsFeedActivityViewModel;
-    private List<String> followingList;
+    //Instance Variables
     private static final String TAG = "NewsFeedFragment";
-    private SearchView searchView;
-    ProgressBar progressBarUsers;
-    ProgressBar progressBarPosts;
-
-    private RecyclerView storyRecyclerView;
+    public RecyclerView recyclerViewSearch, recyclerView, storyRecyclerView;
+    private UserSearchAdapter userSearchAdapter;
+    private PostsAdapter postsAdapter;
     private StoryAdapter storyAdapter;
+    private List<User> mUsers;
+    private List<Post> postList;
     private List<Story> storyList;
+    private List<String> followingList;
+    public ViewFlipper viewFlipper;
+    private NewsFeedActivityViewModel newsFeedActivityViewModel;
+    private SearchView searchView;
+    private ProgressBar progressBarUsers, progressBarPosts;
     private LinearLayout linearLayout;
-
+    private Toolbar toolbar;
+    private View viewSplitter;
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_news_feed, container, false);
         setHasOptionsMenu(true);
-
-        Toolbar toolbar = view.findViewById(R.id.toolbar);
-
-        //get toolbar and set title to empty string
-        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
-        ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle("");
-
-        storyList = new ArrayList<>();
-
-        storyAdapter = new StoryAdapter(getContext(), storyList);
-        //assign views
-        viewFlipper = view.findViewById(R.id.viewflipper);
-        recyclerView = view.findViewById(R.id.news_feed_recycler_view);
-        storyRecyclerView = view.findViewById(R.id.story_recycler_view);
-        linearLayout = view.findViewById(R.id.news_feed_lin_layout);
-
-
-        progressBarUsers = view.findViewById(R.id.newsfeed_progress_bar);
         newsFeedActivityViewModel = new NewsFeedActivityViewModel();
 
-        //create linearLayoutManager
+        initViews(view);
+
+        //Get toolbar and set title to empty string
+        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("");
+
+        //Create linearLayoutManager's
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         LinearLayoutManager linearLayoutManager2 = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
 
+        //Config linearLayoutManager
         linearLayoutManager.setReverseLayout(true);
         linearLayoutManager.setStackFromEnd(true);
 
-        //fix recyclerView size and setLayoutManager to linearLayoutManager already initialized
-        recyclerView.setHasFixedSize(true);
-        storyRecyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(linearLayoutManager);
-        storyRecyclerView.setLayoutManager(linearLayoutManager2);
+        //Initialize lists, adapters, and set size of RecyclerViews
+        initializeLists();
+        initializeAdapters();
+        setHasFixedSizeOfRecyclerViews();
 
-        storyRecyclerView.setAdapter(storyAdapter);
-
-
-        postList = new ArrayList<>();
-        postsAdapter = new PostsAdapter(getContext(), postList);
+        //SetLayoutManager to linearLayoutManager of all RecyclerViews
+        setLayoutManagers(linearLayoutManager, linearLayoutManager2);
         postsAdapter.setHasStableIds(true);
 
-        //set adapter for recyclerView
-        recyclerView.setAdapter(postsAdapter);
+        //Set adapters to RecyclerViews
+        setAdapters();
 
-
-        checkFollowing();
-
-        Bundle intent = getActivity().getIntent().getExtras();
-        if(intent != null){
-            String publisher = intent.getString("publisherid");
-
-            SharedPreferences.Editor editor = getActivity().getSharedPreferences("PREFS", MODE_PRIVATE).edit();
-            editor.putString("profileid", publisher);
-            editor.apply();
-
-            ProfileFragment profileFragment = new ProfileFragment();
-            ((FragmentActivity) getContext()).getSupportFragmentManager().beginTransaction().replace(R.id.frame_layout, profileFragment).commit();
-        }
-
-        //assigning recyclerView Search
-        recyclerViewSearch = view.findViewById(R.id.recycler_view);
-        recyclerViewSearch.setHasFixedSize(true);
-        recyclerViewSearch.setLayoutManager(new LinearLayoutManager(getActivity().getApplicationContext()));
-
-        mUsers = new ArrayList<>();
-        readUsers();
-
-
-        userSearchAdapter = new UserSearchAdapter(getContext(), mUsers);
-        recyclerViewSearch.setAdapter(userSearchAdapter);
-
-//        recyclerView.setNestedScrollingEnabled(false);
-//        storyRecyclerView.setNestedScrollingEnabled(false);
-//        linearLayout.setNestedScrollingEnabled(false);
-//        ViewCompat.setNestedScrollingEnabled(recyclerView, false);
-//        ViewCompat.setNestedScrollingEnabled(storyRecyclerView, false);
-        RecyclerView.RecycledViewPool pool= new RecyclerView.RecycledViewPool();
-
+        //Config recyclerView to have 10 max recycled views
+        RecyclerView.RecycledViewPool pool = new RecyclerView.RecycledViewPool();
         pool.setMaxRecycledViews(0, 10);
         recyclerView.setRecycledViewPool(pool);
+
         ViewCompat.setNestedScrollingEnabled(linearLayout, false);
+
+        getListOfFollowing();
+        readUsers();
         return view;
 
     }
 
-
-    //create options menu in toolbar
+    //Create options menu in toolbar
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.news_feed_action_bar_menu, menu);
         MenuItem menuItem = menu.findItem(R.id.search_icon);
-        MenuItem menuItemCamera = menu.findItem(R.id.camera_icon);
         searchView = (SearchView) menuItem.getActionView();
 
-//        menuItemCamera.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
-//            @Override
-//            public boolean onMenuItemActionExpand(MenuItem item) {
-//                return false;
-//            }
-//
-//            @Override
-//            public boolean onMenuItemActionCollapse(MenuItem item) {
-//                return false;
-//            }
-//        });
-
-
-        //setOnActionExpandListener for user search item
+        //SetOnActionExpandListener for user search item
         menuItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
 
 
-            //if search is opened
+            //If search is opened
             @Override
             public boolean onMenuItemActionExpand(MenuItem menuItem) {
                 readUsers();
-                //show next view in viewflipper
+                //Show next view in viewflipper
                 viewFlipper.showNext();
                 return true;
             }
 
-            //if search is closed
+            //If search is closed
             @Override
             public boolean onMenuItemActionCollapse(MenuItem menuItem) {
                 searchView.setQuery("", true);
-                //show previous view in viewflipper
+                //Show previous view in viewflipper
                 viewFlipper.showPrevious();
-                //notify userSearchAdapter of data changes
+                //Notify userSearchAdapter of data changes
                 userSearchAdapter.notifyDataSetChanged();
                 return true;
             }
         });
 
         super.onCreateOptionsMenu(menu, inflater);
-
-        //return super.onCreateOptionsMenu(menu);
     }
 
     //if search is selected
@@ -228,47 +159,55 @@ public class NewsFeedFragment extends Fragment {
                 return true;
 
             case R.id.camera_icon:
-                 Intent intent = new Intent(getContext(), AddStoryActivity.class);
-                 getContext().startActivity(intent);
-                 return true;
+                Intent intent = new Intent(getContext(), UploadStoryActivity.class);
+                getContext().startActivity(intent);
+                return true;
         }
 
         return false;
     }
 
 
-    //search for user with string s
+    //Search for user with string s
     void searchUsers(String s) {
 
-        //get LiveData object from viewmodel for search result
+        //Get LiveData object from ViewModel for search result
         newsFeedActivityViewModel = new NewsFeedActivityViewModel(s);
         LiveData<DataSnapshot> liveData = newsFeedActivityViewModel.getDataSnapshotLiveData();
 
 
-        //observe the LiveData object which returns a DataSnapshot object
+        //Observe the LiveData object which returns a DataSnapshot object
         liveData.observe(this, dataSnapshot -> {
             mUsers.clear();
             for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                 User user = snapshot.getValue(User.class);
 
-                //add each user found in search to list of found users
+                //Add each user found in search to list of found users
                 mUsers.add(user);
             }
 
+            //Notify adapter of updated data set
             userSearchAdapter.notifyDataSetChanged();
         });
 
     }
 
-    //this method gets all possible user in db
+    //This method gets all possible user in db
     void readUsers() {
+
+        //Get LiveData object from viewmodel for users
         newsFeedActivityViewModel = new NewsFeedActivityViewModel();
         LiveData<DataSnapshot> liveData = newsFeedActivityViewModel.getDataSnapshotLiveData();
 
+        //Observe the LiveData object which returns a DataSnapshot object
         liveData.observe(getViewLifecycleOwner(), dataSnapshot -> {
             if ((searchView != null) && (searchView.getQuery().toString().equals(""))) {
                 mUsers.clear();
+
+                //Iterate through users
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+
+                    //Get User object
                     User user = snapshot.getValue(User.class);
                     mUsers.add(user);
                 }
@@ -280,152 +219,158 @@ public class NewsFeedFragment extends Fragment {
     }
 
 
+    //Checks if your following each user from ViewModel
+    private void getListOfFollowing() {
 
-
-    //checks if your following each user from ViewModel
-    private void checkFollowing() {
+        //Init List
         followingList = new ArrayList<>();
 
+        //Init ViewModel
         newsFeedActivityViewModel = new NewsFeedActivityViewModel();
 
+        //Get LiveData object from ViewModel
         LiveData<DataSnapshot> liveData = newsFeedActivityViewModel.getFollowingSnapshot();
 
-        liveData.observe(getViewLifecycleOwner(), dataSnapshot -> {
+        //Observe the LiveData object which returns a DataSnapshot object
+        liveData.observe(getViewLifecycleOwner(), snapshot -> {
             followingList.clear();
-            for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                followingList.add(snapshot.getKey());
+            for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                followingList.add(dataSnapshot.getKey());
             }
-            //followingList.add(newsFeedActivityViewModel.getUserMutableLiveData());
             readStory();
             newsFeedActivityViewModel.getUserMutableLiveData().observe(getViewLifecycleOwner(), firebaseUser -> {
                 followingList.add(firebaseUser.getUid());
             });
 
-            readPosts();
-
-
+            getPostsAndUpdatePostList();
         });
     }
 
 
-    //retrieves posts from ViewModel
-    private void readPosts() {
+    //Retrieves posts from ViewModel
+    private void getPostsAndUpdatePostList() {
+
+    //Get LiveData object from ViewModel
         LiveData<DataSnapshot> liveData = newsFeedActivityViewModel.getPostsLiveData();
 
+        //Observe the LiveData object which returns a DataSnapshot object
+        liveData.observe(getViewLifecycleOwner(), dataSnapshot -> {
+            postList.clear();
 
+            //Iterate through posts
+            for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
 
-                liveData.observe(getViewLifecycleOwner(), dataSnapshot -> {
-                    postList.clear();
-                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                //Get Post object from snapshot
+                Post post = snapshot.getValue(Post.class);
 
-
-                        Post post = snapshot.getValue(Post.class);
-                        Log.d(TAG, "onDataChange: POST IMAGE: " + post.getPostimage());
-                        for (String id : followingList) {
-                            if (post.getPublisher().equals(id)) {
-                                postList.add(post);
-                            }
-                        }
+                for (String id : followingList) {
+                    if (post.getPublisher().equals(id)) {
+                        postList.add(post);
                     }
+                }
+            }
+            progressBarPosts.setVisibility(View.GONE);
+            viewSplitter.setVisibility(View.VISIBLE);
+            postsAdapter.notifyDataSetChanged();
 
-                    postsAdapter.notifyDataSetChanged();
-
-                });
-
-
+        });
     }
-
 
     private void readStory() {
 
+        //Get LiveData object from ViewModel
         LiveData<DataSnapshot> liveData = newsFeedActivityViewModel.getStoriesLiveData();
 
+        //Observe liveData object from ViewModel
         liveData.observe(getViewLifecycleOwner(), dataSnapshot -> {
-            long timecurrent = System.currentTimeMillis();
+            long currentTime = System.currentTimeMillis();
             storyList.clear();
+
+            //Add current users story
             storyList.add(new Story("", 0, 0, "",
                     FirebaseAuth.getInstance().getCurrentUser().getUid()));
 
-
+            //Iterate through list of following users
             for (String id : followingList) {
                 int countStory = 0;
                 Story story = null;
+
+                //Iterate through stories posted by that user
                 for (DataSnapshot snapshot : dataSnapshot.child(id).getChildren()) {
 
-                    //String myId = newsFeedActivityViewModel.getUserMutableLiveData().getValue().getUid();
-
+                    //Check story does not belong to current user
                     if (id != FirebaseAuth.getInstance().getCurrentUser().getUid()) {
+
+                        //Get Story object
                         story = snapshot.getValue(Story.class);
-                        if (timecurrent > story.getTimestart() && timecurrent < story.getTimeend()) {
+
+                        //If story is active
+                        if (currentTime > story.getTimestart() && currentTime < story.getTimeend()) {
+                            //Increment story counter
                             countStory++;
                         }
                     }
                 }
+
+                //If story is active
                 if (countStory > 0) {
+
+                    //Add story to active story list
                     storyList.add(story);
                 }
             }
 
+            //Notify adapter of updated data set
             storyAdapter.notifyDataSetChanged();
         });
 
     }
 
-//        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Story");
-//        reference.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(DataSnapshot dataSnapshot) {
-//                long timecurrent = System.currentTimeMillis();
-//                storyList.clear();
-//                storyList.add(new Story("", 0, 0, "",
-//                        FirebaseAuth.getInstance().getCurrentUser().getUid()));
-//
-//
-//
-//                for (String id : followingList) {
-//                    int countStory = 0;
-//                    Story story = null;
-//                    for (DataSnapshot snapshot : dataSnapshot.child(id).getChildren()) {
-//
-//                        //String myId = newsFeedActivityViewModel.getUserMutableLiveData().getValue().getUid();
-//
-//                        if(id!=FirebaseAuth.getInstance().getCurrentUser().getUid()) {
-//                            story = snapshot.getValue(Story.class);
-//                            if (timecurrent > story.getTimestart() && timecurrent < story.getTimeend()) {
-//                                countStory++;
-//                            }
-//                        }
-//                    }
-//                    if (countStory > 0){
-//                        storyList.add(story);
-//                    }
-//                }
-//
-//                storyAdapter.notifyDataSetChanged();
- //           }
-//
-//            @Override
-//            public void onCancelled(DatabaseError databaseError) {
-//
-//            }
-//});
-//    }
-
-    public void nextView(){
-        viewFlipper.showNext();
-    }
-    public void previousView(){
-        viewFlipper.showPrevious();
-        userSearchAdapter.notifyDataSetChanged();
-
+    //This method sets adapter's for RecyclerViews
+    private void setAdapters() {
+        storyRecyclerView.setAdapter(storyAdapter);
+        recyclerView.setAdapter(postsAdapter);
+        recyclerViewSearch.setAdapter(userSearchAdapter);
     }
 
-
-    public ViewFlipper getViewFlipper() {
-        return viewFlipper;
+    //This method sets layoutManagers's for RecyclerViews
+    private void setLayoutManagers(LinearLayoutManager linearLayoutManager, LinearLayoutManager linearLayoutManager2) {
+        recyclerView.setLayoutManager(linearLayoutManager);
+        storyRecyclerView.setLayoutManager(linearLayoutManager2);
+        recyclerViewSearch.setLayoutManager(new LinearLayoutManager(getActivity().getApplicationContext()));
     }
 
-    public RecyclerView getRecyclerView() {
-        return recyclerView;
+    //This method fixes RecyclerView's size
+    private void setHasFixedSizeOfRecyclerViews() {
+        recyclerView.setHasFixedSize(true);
+        storyRecyclerView.setHasFixedSize(true);
+        recyclerViewSearch.setHasFixedSize(true);
+    }
+
+    //This method initialize's class Lists
+    private void initializeLists() {
+        storyList = new ArrayList<>();
+        postList = new ArrayList<>();
+        mUsers = new ArrayList<>();
+    }
+
+    //This method initialize's class Adapters
+    private void initializeAdapters() {
+        storyAdapter = new StoryAdapter(getContext(), storyList);
+        postsAdapter = new PostsAdapter(getContext(), postList);
+        userSearchAdapter = new UserSearchAdapter(getContext(), mUsers);
+    }
+
+    //This method initializes views
+    private void initViews(View view) {
+        toolbar = view.findViewById(R.id.toolbar);
+        viewFlipper = view.findViewById(R.id.viewflipper);
+        recyclerView = view.findViewById(R.id.news_feed_recycler_view);
+        storyRecyclerView = view.findViewById(R.id.story_recycler_view);
+        linearLayout = view.findViewById(R.id.news_feed_lin_layout);
+        recyclerViewSearch = view.findViewById(R.id.recycler_view);
+        progressBarUsers = view.findViewById(R.id.newsfeed_progress_bar);
+        progressBarPosts = view.findViewById(R.id.posts_progress_bar);
+        viewSplitter = view.findViewById(R.id.view_splitter);
     }
 }

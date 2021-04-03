@@ -1,29 +1,25 @@
 package com.example.travelhut.views.main.newsfeed.newsfeed;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.ViewModelProviders;
 
 import com.bumptech.glide.Glide;
 import com.example.travelhut.R;
-import com.example.travelhut.views.authentication.utils.User;
-import com.example.travelhut.views.main.newsfeed.newsfeed.utils.Story;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
+import com.example.travelhut.model.utils.StringsRepository;
+import com.example.travelhut.viewmodel.main.newsfeed.newsfeed.StoryActivityViewModel;
+import com.example.travelhut.viewmodel.main.newsfeed.newsfeed.StoryActivityViewModelFactory;
+import com.example.travelhut.model.objects.User;
+import com.example.travelhut.model.objects.Story;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,24 +28,20 @@ import jp.shts.android.storiesprogressview.StoriesProgressView;
 
 public class StoryActivity extends AppCompatActivity implements StoriesProgressView.StoriesListener {
 
-    int counter = 0;
-    long pressTime = 0L;
-    long limit = 500L;
+    //Instance Variables
+    private int storyCounter = 0;
+    private long pressTime = 0L;
+    private long limit = 500L;
+    private StoriesProgressView storiesProgressView;
+    private ImageView storyImage, storyProfileImage, deleteStory;
+    private TextView storyUsername, storyViews;
+    private LinearLayout viewsLayout;
+    private List<String> images, storyIds;
+    private String userId;
+    private View reverse, skip;
+    private StoryActivityViewModel storyActivityViewModel;
 
-    StoriesProgressView storiesProgressView;
-    ImageView image, story_photo;
-    TextView story_username;
-
-    //
-    LinearLayout r_seen;
-    TextView seen_number;
-    ImageView story_delete;
-    //
-
-    List<String> images;
-    List<String> storyids;
-    String userid;
-
+    //OnTouchListener to allow story time to pause while user touches screen
     private View.OnTouchListener onTouchListener = new View.OnTouchListener() {
         @Override
         public boolean onTouch(View v, MotionEvent event) {
@@ -72,100 +64,77 @@ public class StoryActivity extends AppCompatActivity implements StoriesProgressV
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_story);
 
-        storiesProgressView = findViewById(R.id.stories);
-        image = findViewById(R.id.image);
-        story_photo = findViewById(R.id.story_photo);
-        story_username = findViewById(R.id.story_username);
+        initViews();
 
-//        //
-        r_seen = findViewById(R.id.r_seen);
-        seen_number = findViewById(R.id.seen_number);
-        story_delete = findViewById(R.id.story_delete);
+        //Get userId from intent
+        userId = getIntent().getStringExtra(StringsRepository.USER_ID);
+        storyActivityViewModel = ViewModelProviders.of(this, new StoryActivityViewModelFactory(this.getApplication(), userId)).get(StoryActivityViewModel.class);
 
-        r_seen.setVisibility(View.GONE);
-        story_delete.setVisibility(View.GONE);
-        //
 
-        userid = getIntent().getStringExtra("userid");
+        //Hide views
+        viewsLayout.setVisibility(View.GONE);
+        deleteStory.setVisibility(View.GONE);
 
-        //
-        if (userid.equals(FirebaseAuth.getInstance().getCurrentUser().getUid())){
-            r_seen.setVisibility(View.VISIBLE);
-            story_delete.setVisibility(View.VISIBLE);
+        //If the story is owned by current user
+        if (userId.equals(FirebaseAuth.getInstance().getCurrentUser().getUid())){
+            viewsLayout.setVisibility(View.VISIBLE);
+            deleteStory.setVisibility(View.VISIBLE);
         }
-        //
 
-        getStories(userid);
-        userInfo(userid);
+        getStories();
+        userInfo();
 
-        View reverse = findViewById(R.id.reverse);
-        reverse.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                storiesProgressView.reverse();
-            }
-        });
+        //Set OnClickListener for reverse view (left half of screen) to go to previous story if one exists
+        reverse.setOnClickListener(v -> storiesProgressView.reverse());
+
+        //Set OnTouchListener for reverse view to allow user to pause timer by holding on the screen
         reverse.setOnTouchListener(onTouchListener);
 
+        //Set OnClickListener for skip view (right half of screen) to go to next story if one exists
+        skip.setOnClickListener(v -> storiesProgressView.skip());
 
-        View skip = findViewById(R.id.skip);
-        skip.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                storiesProgressView.skip();
-            }
-        });
+        //Set OnTouchListener for skip view to allow user to pause timer by holding on the screen
         skip.setOnTouchListener(onTouchListener);
 
+        //Set OnClickListener for deleteStory
+        deleteStory.setOnClickListener(view -> {
 
-        r_seen.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-//                Intent intent = new Intent(StoryActivity.this, FollowersActivity.class);
-//                intent.putExtra("id", userid);
-//                intent.putExtra("storyid", storyids.get(counter));
-//                intent.putExtra("title", "views");
-//                startActivity(intent);
-            }
+            //Call ViewModel to delete current story
+            storyActivityViewModel.deleteStory(storyIds.get(storyCounter));
+
+            //Finish activity
+            finish();
         });
 
-        story_delete.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Story")
-                        .child(userid).child(storyids.get(counter));
-                reference.removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()){
-                            Toast.makeText(StoryActivity.this, "Deleted!", Toast.LENGTH_SHORT).show();
-                            finish();
-                        }
-                    }
-                });
-            }
-        });
+    }
 
-        //
-
+    private void initViews() {
+        storiesProgressView = findViewById(R.id.stories);
+        storyImage = findViewById(R.id.image);
+        storyProfileImage = findViewById(R.id.story_photo);
+        storyUsername = findViewById(R.id.story_username);
+        viewsLayout = findViewById(R.id.r_seen);
+        storyViews = findViewById(R.id.seen_number);
+        deleteStory = findViewById(R.id.story_delete);
+        reverse = findViewById(R.id.reverse);
+        skip = findViewById(R.id.skip);
     }
 
     @Override
     public void onNext() {
-        Glide.with(getApplicationContext()).load(images.get(++counter)).into(image);
-        //
-        addView(storyids.get(counter));
-        seenNumber(storyids.get(counter));
-        //
+        Glide.with(getApplicationContext()).load(images.get(++storyCounter)).into(storyImage);
+
+        //Add a view to the story and update seen number on screen
+        updateSeenNumber(true);
     }
 
     @Override
     public void onPrev() {
-        if ((counter - 1) < 0) return;
-        Glide.with(getApplicationContext()).load(images.get(--counter)).into(image);
-        //
-        seenNumber(storyids.get(counter));
-        //
+        if ((storyCounter - 1) < 0) return;
+        Glide.with(getApplicationContext()).load(images.get(--storyCounter)).into(storyImage);
+
+        //Update seen number on screen
+        updateSeenNumber(false);
     }
 
     @Override
@@ -191,82 +160,88 @@ public class StoryActivity extends AppCompatActivity implements StoriesProgressV
         super.onResume();
     }
 
-    private void getStories(String userid){
+    private void getStories(){
+
+        //Initialize Lists
         images = new ArrayList<>();
-        storyids = new ArrayList<>();
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Story")
-                .child(userid);
-        reference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                images.clear();
-                storyids.clear();
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()){
-                    Story story = snapshot.getValue(Story.class);
-                    long timecurrent = System.currentTimeMillis();
-                    if (timecurrent > story.getTimestart() && timecurrent < story.getTimeend()) {
-                        images.add(story.getImageurl());
-                        storyids.add(story.getStoryid());
-                    }
+        storyIds = new ArrayList<>();
+
+        //Get LiveData object from ViewModel
+        LiveData<DataSnapshot> liveData = storyActivityViewModel.getStories();
+
+        //Observe  LiveData object
+        liveData.observe(this, dataSnapshot -> {
+
+            //Clear Lists
+            images.clear();
+            storyIds.clear();
+
+            //Iterate through stories from DatabaseReference
+            for (DataSnapshot snapshot : dataSnapshot.getChildren()){
+
+                //Data from snapshot is converted to a Story object
+                Story story = snapshot.getValue(Story.class);
+
+                //Get current time
+                long timecurrent = System.currentTimeMillis();
+
+                //If story is active. ie if it has not been published for 24 hours already
+                if (timecurrent > story.getTimestart() && timecurrent < story.getTimeend()) {
+
+                    //Add imageUrl to images List and add storyId to storyIds List
+                    images.add(story.getImageurl());
+                    storyIds.add(story.getStoryid());
                 }
+            }
 
+
+            if(storyIds.size()>0&&images.size()>0) {
+                //Configure storiesProgressView -> num of stories, story duration time, set story listener and start story with the counter variable
                 storiesProgressView.setStoriesCount(images.size());
-                storiesProgressView.setStoryDuration(5000L);
+                storiesProgressView.setStoryDuration(6000L);
                 storiesProgressView.setStoriesListener(StoryActivity.this);
-                storiesProgressView.startStories(counter);
+                storiesProgressView.startStories(storyCounter);
 
-                Glide.with(getApplicationContext()).load(images.get(counter)).into(image);
-                //
-                addView(storyids.get(counter));
-                seenNumber(storyids.get(counter));
-                //
+                //Load image from given story and load into storyImage View
+                Glide.with(getApplicationContext()).load(images.get(storyCounter)).into(storyImage);
+
+                //Add a view to the story and update seen number on screen
+                updateSeenNumber(true);
             }
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
         });
     }
 
-    private void userInfo(String userid){
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Users")
-                .child(userid);
-        reference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
+    //This method adds a view to the stories view's if the addView boolean is true, and then updates the seen number on screen
+    private void updateSeenNumber(boolean addView) {
+
+        if(addView) {
+            //Add view to this story
+            storyActivityViewModel.addView(storyIds.get(storyCounter));
+        }
+
+        //Get number of views ViewModel
+        storyActivityViewModel.seenNumber(storyIds.get(storyCounter));
+        LiveData<Long> liveDataSeenNumber = storyActivityViewModel.getSeenNumber();
+        liveDataSeenNumber.observe(this, seenNumber -> {
+            storyViews.setText(""+seenNumber);
+        });
+    }
+
+    private void userInfo(){
+
+        //Get LiveData object from StoryActivityViewModel
+        LiveData<DataSnapshot> liveData = storyActivityViewModel.getStoriesUserInfo();
+
+        //Observe this LiveData object
+        liveData.observe(this, dataSnapshot -> {
+
+                //Data from snapshot is converted to a User object
                 User user = dataSnapshot.getValue(User.class);
-                Glide.with(getApplicationContext()).load(user.getImageurl()).into(story_photo);
-                story_username.setText(user.getUsername());
-            }
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
+                //Profile picture and username of story owner is set
+                Glide.with(getApplicationContext()).load(user.getImageurl()).into(storyProfileImage);
+                storyUsername.setText(user.getUsername());
         });
     }
-
-    //
-    private void addView(String storyid){
-        FirebaseDatabase.getInstance().getReference().child("Story").child(userid)
-                .child(storyid).child("views").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(true);
-    }
-
-    private void seenNumber(String storyid){
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Story")
-                .child(userid).child(storyid).child("views");
-        reference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                seen_number.setText(""+dataSnapshot.getChildrenCount());
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-    }
-    //
 }

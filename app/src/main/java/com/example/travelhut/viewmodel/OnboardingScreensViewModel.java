@@ -6,19 +6,20 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 
-import com.example.travelhut.model.AuthAppRepository;
+import com.example.travelhut.model.authentication.AuthRepository;
 import com.google.firebase.auth.FirebaseUser;
 
 public class OnboardingScreensViewModel extends AndroidViewModel {
 
-    private AuthAppRepository authAppRepository;
+    //Instance Variables
+    private AuthRepository authRepository;
     private MutableLiveData<FirebaseUser> userMutableLiveData;
 
+    //Constructor
     public OnboardingScreensViewModel(@NonNull Application application) {
         super(application);
-
-        authAppRepository = new AuthAppRepository(application);
-        userMutableLiveData = authAppRepository.getUserMutableLiveData();
+        authRepository = new AuthRepository(application);
+        userMutableLiveData = authRepository.getUserMutableLiveData();
     }
 
     public MutableLiveData<FirebaseUser> getUserMutableLiveData() {

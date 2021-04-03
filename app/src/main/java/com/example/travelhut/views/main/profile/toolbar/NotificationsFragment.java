@@ -14,7 +14,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.example.travelhut.R;
-import com.example.travelhut.viewmodel.main.profile.toolbar.NotificationAdapterViewModel;
+import com.example.travelhut.model.objects.Notification;
 import com.example.travelhut.viewmodel.main.profile.toolbar.NotificationsActivityViewModel;
 import com.google.firebase.database.DataSnapshot;
 
@@ -24,48 +24,49 @@ import java.util.List;
 
 public class NotificationsFragment extends Fragment {
 
+    //Instance Variables
     private RecyclerView recyclerView;
     private NotificationAdapter notificationAdapter;
     private List<Notification> notificationList;
     private ImageView backArrow;
-    NotificationsActivityViewModel notificationsActivityViewModel;
+    private NotificationsActivityViewModel notificationsActivityViewModel;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view =  inflater.inflate(R.layout.fragment_notifications, container, false);
+        View view = inflater.inflate(R.layout.fragment_notifications, container, false);
 
         notificationsActivityViewModel = ViewModelProviders.of(this).get(NotificationsActivityViewModel.class);
 
-        recyclerView = view.findViewById(R.id.notifications_recycler_view);
-        recyclerView.setHasFixedSize(true);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
-        recyclerView.setLayoutManager(linearLayoutManager);
+
+        //Initialize objects
+        recyclerView = view.findViewById(R.id.notifications_recycler_view);
+        backArrow = view.findViewById(R.id.notifications_back_arrow);
         notificationList = new ArrayList<>();
         notificationAdapter = new NotificationAdapter(getContext(), notificationList);
+
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(linearLayoutManager);
+
         recyclerView.setAdapter(notificationAdapter);
-        backArrow = view.findViewById(R.id.notifications_back_arrow);
         readNotifications();
 
-        backArrow.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                getActivity().finish();
-            }
-        });
-
+        backArrow.setOnClickListener(v -> getActivity().finish());
 
         return view;
     }
 
 
-    private void readNotifications(){
+    //This method updates the list of Notifications from the ViewModel
+    private void readNotifications() {
 
         LiveData<DataSnapshot> liveData = notificationsActivityViewModel.getFollowingSnapshot();
 
         liveData.observe(getViewLifecycleOwner(), dataSnapshot -> {
             notificationList.clear();
-            for(DataSnapshot snapshot : dataSnapshot.getChildren()){
+            for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                 Notification notification = snapshot.getValue(Notification.class);
                 notificationList.add(notification);
             }

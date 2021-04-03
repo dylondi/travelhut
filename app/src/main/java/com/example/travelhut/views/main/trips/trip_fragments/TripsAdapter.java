@@ -2,7 +2,6 @@ package com.example.travelhut.views.main.trips.trip_fragments;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,10 +13,9 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
 import com.example.travelhut.R;
-import com.example.travelhut.viewmodel.main.profile.toolbar.NotificationAdapterViewModel;
-import com.example.travelhut.views.main.newsfeed.newsfeed.utils.Post;
+import com.example.travelhut.model.utils.StringsRepository;
+import com.example.travelhut.model.objects.Trip;
 import com.example.travelhut.views.main.trips.TripActivity;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.libraries.places.api.Places;
@@ -36,15 +34,16 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.Arrays;
 import java.util.List;
 
-public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ViewHolder>{
+public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ViewHolder> {
 
 
+    //Instance Variables
+    private static final String TAG = "TripsAdapter";
     private Context mContext;
     private List<Trip> trips;
-    private NotificationAdapterViewModel notificationAdapterViewModel;
-    private Place[] places = new Place[1];
-    private static final String TAG = "TripsAdapter";
+    private PlacesClient placesClient;
 
+    //Constructor
     public TripsAdapter(Context mContext, List<Trip> trips) {
         this.mContext = mContext;
         this.trips = trips;
@@ -53,133 +52,92 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ViewHolder>{
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(mContext).inflate(R.layout.trip_item, parent, false);
+        View view = LayoutInflater.from(mContext).inflate(R.layout.trip_view, parent, false);
         return new TripsAdapter.ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull TripsAdapter.ViewHolder holder, int position) {
 
+        //Get current Trip
         final Trip trip = trips.get(position);
-        //holder.placeName.setText(trip.getPlacename());
 
-        getTripInfo(holder, FirebaseAuth.getInstance().getCurrentUser().getUid(), trip.getTripid());
-        String placeid = trip.getPlaceid();
-
+        //placeId and apiKey
+        String placeId = trip.getPlaceid();
         String apiKey = mContext.getString(R.string.google_api_key);
 
-        final List<Place.Field> placeFields = Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.ADDRESS, Place.Field.PHOTO_METADATAS);
+        initPlacesAndPlacesClient(apiKey);
+        getTripInfo(holder, FirebaseAuth.getInstance().getCurrentUser().getUid(), trip.getTripid());
 
-        final FetchPlaceRequest request = FetchPlaceRequest.newInstance(placeid, placeFields);
-        if (!Places.isInitialized()) {
-            Places.initialize(mContext, apiKey);
-        }
-        PlacesClient placesClient = Places.createClient(mContext);
+        final List<Place.Field> placeFields = Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.ADDRESS, Place.Field.PHOTO_METADATAS);
+        final FetchPlaceRequest request = FetchPlaceRequest.newInstance(placeId, placeFields);
+
+        //Send request to placesClient
         placesClient.fetchPlace(request).addOnSuccessListener((response) -> {
             Place place = response.getPlace();
 
             setPlaceImage(holder, placesClient, place);
         }).addOnFailureListener((exception) -> {
             if (exception instanceof ApiException) {
-                final ApiException apiException = (ApiException) exception;
                 Log.e(TAG, "Place not found: " + exception.getMessage());
-                final int statusCode = apiException.getStatusCode();
-                // TODO: Handle error with given status code.
             }
         });
 
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //SharedPreferences.Editor editor = mContext.getSharedPreferences("PREFS", Context.MODE_PRIVATE).edit();
+        holder.itemView.setOnClickListener(v -> {
 
-                Intent intent = new Intent(mContext, TripActivity.class);
-                intent.putExtra("tripid", trip.getTripid());
-                intent.putExtra("placeid", placeid);
-                mContext.startActivity(intent);
-            }
+            Intent intent = new Intent(mContext, TripActivity.class);
+            intent.putExtra(StringsRepository.TRIP_ID, trip.getTripid());
+            intent.putExtra(StringsRepository.PLACE_ID, placeId);
+            mContext.startActivity(intent);
         });
     }
 
-    public void setPlaceImage(ViewHolder viewHolder, PlacesClient placesClient, Place place){
+    private void initPlacesAndPlacesClient(String apiKey) {
+        if (!Places.isInitialized()) {
+            Places.initialize(mContext, apiKey);
+        }
+        placesClient = Places.createClient(mContext);
+    }
+
+    public void setPlaceImage(ViewHolder viewHolder, PlacesClient placesClient, Place place) {
         final List<PhotoMetadata> metadata = place.getPhotoMetadatas();
         if (metadata == null || metadata.isEmpty()) {
-            Log.w(TAG, "No photo metadata.");
             return;
         }
         final PhotoMetadata photoMetadata = metadata.get(0);
 
-        // Get the attribution text.
-        final String attributions = photoMetadata.getAttributions();
-
         // Create a FetchPhotoRequest.
         final FetchPhotoRequest photoRequest = FetchPhotoRequest.builder(photoMetadata)
-                .setMaxWidth(500) // Optional.
-                .setMaxHeight(300) // Optional.
+                .setMaxWidth(500)
+                .setMaxHeight(300)
                 .build();
         placesClient.fetchPhoto(photoRequest).addOnSuccessListener((fetchPhotoResponse) -> {
             Bitmap bitmap = fetchPhotoResponse.getBitmap();
             viewHolder.tripImage.setImageBitmap(bitmap);
             viewHolder.tripImage.setAdjustViewBounds(true);
             viewHolder.tripImage.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            //placeImage.setScaleType(ImageView.ScaleType.FIT_XY);
 
         }).addOnFailureListener((exception) -> {
             if (exception instanceof ApiException) {
-                final ApiException apiException = (ApiException) exception;
                 Log.e(TAG, "Place not found: " + exception.getMessage());
-                final int statusCode = apiException.getStatusCode();
-                // TODO: Handle error with given status code.
             }
         });
     }
-//        if(notification.isIspost()){
-//            holder.tripImage.setVisibility(View.VISIBLE);
-//            getPostImage(holder.tripImage, notification.getPostid());
-//        }else{
-//            holder.tripImage.setVisibility(View.GONE);
-//        }
-
-
-//        holder.tripImage.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                SharedPreferences.Editor editor = mContext.getSharedPreferences("PREFS", Context.MODE_PRIVATE).edit();
-//                editor.putString("postid", notification.getPostid());
-//                editor.apply();
-//
-//                ((FragmentActivity)mContext).getSupportFragmentManager().beginTransaction().replace(R.id.notifications_frame_layout, new SinglePostFragment()).commit();
-//            }
-//        });
-
-//        holder.itemView.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                if(notification.isIspost()){
-//                    SharedPreferences.Editor editor = mContext.getSharedPreferences("PREFS", Context.MODE_PRIVATE).edit();
-//                    editor.putString("postid", notification.getPostid());
-//                    editor.apply();
-//
-//                    ((FragmentActivity)mContext).getSupportFragmentManager().beginTransaction().replace(R.id.fr)
-//                }
-//            }
-//        });
-//    }
 
     @Override
     public int getItemCount() {
         return trips.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder{
+    public class ViewHolder extends RecyclerView.ViewHolder {
 
-
+        //Instance Variables
         public ImageView tripImage;
         public TextView placeName, placeAddress, date;
 
+        //Constructor
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-
 
             tripImage = itemView.findViewById(R.id.trip_place_image_view);
             placeName = itemView.findViewById(R.id.trip_item_place_name);
@@ -188,19 +146,21 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ViewHolder>{
         }
     }
 
-    private void getTripInfo(final ViewHolder viewHolder, String publisherid, String tripId){
+    //This method info of current trip
+    private void getTripInfo(final ViewHolder viewHolder, String publisherId, String tripId) {
 
-//        notificationAdapterViewModel = new NotificationAdapterViewModel(publisherid);
-//
-//        LiveData<DataSnapshot> liveData = notificationAdapterViewModel.getFollowingSnapshot();
-//
-//        liveData.observe(, dataSnapshot -> {});
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Trips").child(publisherid).child(tripId);
+        //DatabaseReference of current trip
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(StringsRepository.TRIPS_CAP).child(publisherId).child(tripId);
+
+        //SingleValueEventListener for DatabaseReference
         reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                //Get Trip object from snapshot
                 Trip trip = snapshot.getValue(Trip.class);
-                //Glide.with(mContext).load(user.getImageurl()).into(imageView);
+
+                //Set TextViews text with info
                 viewHolder.placeName.setText(trip.getPlacename());
                 viewHolder.placeAddress.setText(trip.getPlaceaddress());
                 viewHolder.date.setText(trip.getDaterange());
@@ -213,20 +173,4 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ViewHolder>{
         });
     }
 
-
-    private void getPostImage(final ImageView imagePost, String postid){
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Posts").child(postid);
-        reference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                Post post = snapshot.getValue(Post.class);
-                Glide.with(mContext).load(post.getPostimage()).into(imagePost);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-    }
 }

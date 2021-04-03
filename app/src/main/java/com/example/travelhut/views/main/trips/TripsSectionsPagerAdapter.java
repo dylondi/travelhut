@@ -24,10 +24,9 @@ public class TripsSectionsPagerAdapter extends FragmentPagerAdapter {
         mContext = context;
     }
 
+    //This method is called to initialize the fragment for the selected page.
     @Override
     public Fragment getItem(int position) {
-        // getItem is called to instantiate the fragment for the given page.
-        // Return a PlaceholderFragment (defined as a static inner class below).
         Fragment fragment = null;
         switch (position){
             case 0:
@@ -52,7 +51,6 @@ public class TripsSectionsPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public int getCount() {
-        // Show 2 total pages.
         return 3;
     }
 }

@@ -1,7 +1,6 @@
 package com.example.travelhut.views.main.newsfeed.newsfeed;
 
 import android.content.Context;
-import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,10 +12,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.travelhut.R;
-import com.example.travelhut.model.StringsRepository;
-import com.example.travelhut.views.main.newsfeed.newsfeed.utils.Comment;
-import com.example.travelhut.views.authentication.utils.User;
-import com.example.travelhut.views.main.newsfeed.NewsFeedActivity;
+import com.example.travelhut.model.utils.StringsRepository;
+import com.example.travelhut.model.objects.Comment;
+import com.example.travelhut.model.objects.User;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -31,10 +29,12 @@ import java.util.List;
 public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHolder>{
 
 
+    //Instance Variables
     private Context context;
     private List<Comment> comments;
     private FirebaseUser firebaseUser;
 
+    //Constructor
     public CommentsAdapter(Context context, List<Comment> comments) {
         this.context = context;
         this.comments = comments;
@@ -50,37 +50,18 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 
-        //gets current firebase user
+        //Initialize firebaseUser to current user
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
-        //create comment object of current comment
+        //Create comment object of current comment
         Comment comment = comments.get(position);
 
-        //sets text of comment
+        //Sets text of comment
         holder.comment.setText(comment.getComment());
 
-        //sets the user data for user who commented
+        //Sets the user data for user that commented
         getUserInfo(holder.profileImage, holder.username, comment.getPublisher());
 
-        //OnClickListener for comment
-        holder.comment.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(context, NewsFeedActivity.class);
-                intent.putExtra("publisherid", comment.getPublisher());
-                context.startActivity(intent);
-            }
-        });
-
-        //OnClickListener for user profile image
-        holder.profileImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(context, NewsFeedActivity.class);
-                intent.putExtra("publisherid", comment.getPublisher());
-                context.startActivity(intent);
-            }
-        });
     }
 
     @Override
@@ -90,12 +71,15 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
 
     public class ViewHolder extends RecyclerView.ViewHolder{
 
+        //Instance Variables
         public ImageView profileImage;
         public TextView username, comment;
 
+        //Constructor
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
+            //Initialize views
             profileImage = itemView.findViewById(R.id.comment_item_profile_image);
             username = itemView.findViewById(R.id.comment_item_username);
             comment = itemView.findViewById(R.id.comment_item_comment);
@@ -103,19 +87,19 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
     }
 
 
-    //this method retrieves user info of use current comment
+    //This method retrieves user info of use current comment
     private void getUserInfo(ImageView imageView, TextView username, String publisherId){
 
-        //db ref
+        //DatabaseReference to user
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child(StringsRepository.USERS_CAP).child(publisherId);
 
-        //ValueEventListener for ref
+        //ValueEventListener for DatabaseReference
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 User user = snapshot.getValue(User.class);
 
-                //two lines set profile image and username of user comment
+                //Next two lines set profile image and username of user comment
                 Glide.with(context).load(user.getImageurl()).into(imageView);
                 username.setText(user.getUsername());
             }

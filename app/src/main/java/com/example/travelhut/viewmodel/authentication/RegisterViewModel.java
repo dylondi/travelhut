@@ -9,46 +9,60 @@ import androidx.annotation.RequiresApi;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 
-import com.example.travelhut.model.AuthAppRepository;
+import com.example.travelhut.model.authentication.AuthRepository;
 import com.google.firebase.auth.FirebaseUser;
 
 public class RegisterViewModel extends AndroidViewModel {
 
-    private AuthAppRepository authAppRepository;
+    //Instance Variables
+    private AuthRepository authRepository;
     private MutableLiveData<FirebaseUser> userMutableLiveData;
     private RegisterLoginFormValidator registerLoginFormValidator;
 
+    //Constructor
     public RegisterViewModel(@NonNull Application application) {
         super(application);
 
-        authAppRepository = new AuthAppRepository(application);
-        userMutableLiveData = authAppRepository.getUserMutableLiveData();
+        //Initialize objects
+        authRepository = new AuthRepository(application);
+        userMutableLiveData = authRepository.getUserMutableLiveData();
         registerLoginFormValidator = new RegisterLoginFormValidator();
-
     }
 
+    //This method calls the register() method in the Model class AuthRepository.java
     @RequiresApi(api = Build.VERSION_CODES.P)
-    public void register(String email, String username, String password){
-        authAppRepository.register(email, username, password);
+    public void register(String email, String username, String password) {
+        authRepository.register(email, username, password);
     }
 
-    public boolean validateEmail(EditText email){
+    //This method calls and returns the boolean result from validateEmail method in RegisterLoginFormValidator.java
+    public boolean validateEmail(EditText email) {
         return registerLoginFormValidator.validateEmail(email);
     }
 
-    public boolean validateUsername(EditText username){
+    //This method calls and returns the boolean result from validateUsername method in RegisterLoginFormValidator.java
+    public boolean validateUsername(EditText username) {
         return registerLoginFormValidator.validateUsername(username);
     }
-    public boolean validatePasswordOne(EditText password){
+
+    //This method calls and returns the boolean result from validatePassword method in RegisterLoginFormValidator.java
+    public boolean validatePasswordOne(EditText password) {
         return registerLoginFormValidator.validatePasswordOne(password);
     }
 
-    public boolean validatePasswordTwo(EditText passwordOne, EditText passwordTwo){
+    //This method calls and returns the boolean result from validatePasswordTwo method in RegisterLoginFormValidator.java
+    public boolean validatePasswordTwo(EditText passwordOne, EditText passwordTwo) {
         return registerLoginFormValidator.validatePasswordTwo(passwordOne, passwordTwo);
     }
 
-    public MutableLiveData<FirebaseUser> getUserMutableLiveData() {
-        return userMutableLiveData;
+    //This method returns the boolean value of registeredMutableLiveData object from the Model class AuthRepository.java
+    public MutableLiveData<Boolean> getRegisteredMutableLiveData() {
+        return authRepository.getRegisteredMutableLiveData();
+    }
+
+    //This method returns the registration failed message from the Model class AuthRepository.java
+    public MutableLiveData<String> getRegFailedMessageMutableLiveData() {
+        return authRepository.getRegFailedMessageMutableLiveData();
     }
 
 

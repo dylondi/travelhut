@@ -1,7 +1,5 @@
 package com.example.travelhut.views.main.map_search;
 
-import android.graphics.Bitmap;
-import android.location.Geocoder;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -11,182 +9,140 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.util.Pair;
+import androidx.lifecycle.ViewModelProviders;
 
 import com.example.travelhut.R;
-import com.example.travelhut.model.StringsRepository;
+import com.example.travelhut.model.utils.StringsRepository;
+import com.example.travelhut.viewmodel.main.map_search.NewTripActivityViewModel;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.Status;
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.libraries.places.api.Places;
-import com.google.android.libraries.places.api.model.PhotoMetadata;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.model.RectangularBounds;
-import com.google.android.libraries.places.api.net.FetchPhotoRequest;
 import com.google.android.libraries.places.api.net.FetchPlaceRequest;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.android.material.datepicker.MaterialDatePicker;
-import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClickListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.annotations.NotNull;
 
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 
 public class NewTripActivity extends AppCompatActivity {
 
-    private String placeid;
+    //Instance Variables
     private static final String TAG = "NewTripActivity";
+    private final Place[] placeArray = new Place[1];
+    private String placeid, apiKey;
     private Button chooseDatesButton;
-    private TextView startDate,endDate;
+    private TextView startDate;
     private ImageView newTripBackButton, newTripCheckButton;
-    final Place[] place2 = new Place[1];
+    private MaterialDatePicker.Builder<Pair<Long, Long>> builder;
+    private AutocompleteSupportFragment autocompleteFragment;
+    private PlacesClient placesClient;
+    private NewTripActivityViewModel newTripActivityViewModel;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_trip);
 
-        chooseDatesButton = findViewById(R.id.choose_dates_button);
-        startDate = findViewById(R.id.start_date);
-        newTripBackButton = findViewById(R.id.new_trip_back_arrow);
-        newTripCheckButton = findViewById(R.id.new_trip_check);
+        newTripActivityViewModel = ViewModelProviders.of(this).get(NewTripActivityViewModel.class);
 
-
-        MaterialDatePicker.Builder<Pair<Long, Long>> builder = MaterialDatePicker.Builder.dateRangePicker();
+        initVariables();
+        initPlacesAndPlacesClient();
+        configAutoCompleteFragment();
 
         final MaterialDatePicker materialDatePicker = builder.build();
-
-        chooseDatesButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                materialDatePicker.show(getSupportFragmentManager(), "DATE_PICKER");
-            }
-        });
-
-        materialDatePicker.addOnPositiveButtonClickListener(new MaterialPickerOnPositiveButtonClickListener() {
-            @Override
-            public void onPositiveButtonClick(Object selection) {
-               startDate.setText(materialDatePicker.getHeaderText());
-            }
-        });
-
-        newTripBackButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
-
-
-
-
-        placeid = getIntent().getStringExtra("placeid");
-
-        String apiKey = getString(R.string.google_api_key);
         final List<Place.Field> placeFields = Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.ADDRESS);
-
         final FetchPlaceRequest request = FetchPlaceRequest.newInstance(placeid, placeFields);
-        if (!Places.isInitialized()) {
-            Places.initialize(getApplicationContext(), apiKey);
-        }
-        AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment)
-                getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
 
-
-        autocompleteFragment.setLocationBias(RectangularBounds.newInstance(
-                new LatLng(-33.880490, 151.184363),
-                new LatLng(-33.858754, 151.229596)
-        ));
-
-        PlacesClient placesClient = Places.createClient(this);
+        //Fetch place with PlacesClient and given request
         placesClient.fetchPlace(request).addOnSuccessListener((response) -> {
+
+            //Get place object from response
             Place place = response.getPlace();
-            place2[0] = place;
+            placeArray[0] = place;
+
+            //Set text of autocompleteFragment to selected place's name
             autocompleteFragment.setText(place.getName());
             Log.i(TAG, "Place found: " + place.getName());
         }).addOnFailureListener((exception) -> {
             if (exception instanceof ApiException) {
-                final ApiException apiException = (ApiException) exception;
                 Log.e(TAG, "Place not found: " + exception.getMessage());
-                final int statusCode = apiException.getStatusCode();
-                // TODO: Handle error with given status code.
-            }
-        });
-        if (!Places.isInitialized()) {
-            Places.initialize(getApplicationContext(), apiKey);
-        }
-        newTripCheckButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                DatabaseReference  tripsReference = FirebaseDatabase.getInstance().getReference("Trips").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
-                //Retrieve the database reference to the current users stories
-
-
-                //Retrieve story key for story to be uploaded
-                String tripId = tripsReference.push().getKey();
-
-
-                Pair selectedDates = (Pair) materialDatePicker.getSelection();
-//              then obtain the startDate & endDate from the range
-                final Pair<Date, Date> rangeDate = new Pair<>(new Date((Long) selectedDates.first), new Date((Long) selectedDates.second));
-//              assigned variables
-                Date startDate1 = rangeDate.first;
-                Date endDate = rangeDate.second;
-                Log.i(TAG, "onClick: startDate: " + startDate1 + " , endDate: " + endDate   );
-//              Format the dates in ur desired display mode
-                SimpleDateFormat simpleFormat = new SimpleDateFormat("dd MMM yyyy");
-//              Display it by setText
-                //datedisplay.setText("SELECTED DATE : " +  simpleFormat.format(startDate) + " Second : " + simpleFormat.format(endDate));
-
-                HashMap<String, Object> hashMap = new HashMap<>();
-                hashMap.put("tripid", tripId);
-                hashMap.put("placeid", place2[0].getId());
-                hashMap.put("placename", place2[0].getName());
-                hashMap.put("placeaddress", place2[0].getAddress());
-                hashMap.put("daterange", startDate.getText().toString());
-                hashMap.put("startdate", (Long) selectedDates.first);
-                hashMap.put("enddate", (Long) selectedDates.second);
-
-                tripsReference.child(tripId).setValue(hashMap);
-                finish();
             }
         });
 
+        //Set OnClickListener to newTripCheckButton
+        newTripCheckButton.setOnClickListener(v -> {
 
-        // Initialize the AutocompleteSupportFragment.
+            //Get selected dates and store in a Pair object
+            Pair selectedDates = (Pair) materialDatePicker.getSelection();
 
-        // Specify the types of place data to return.
-        autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG, Place.Field.PHOTO_METADATAS, Place.Field.ADDRESS));
+            //Call ViewModel to create new trip in the database
+            newTripActivityViewModel.createTrip(selectedDates, placeArray[0], startDate.getText().toString());
+
+            //Finish activity
+            finish();
+        });
+
+        //Set OnClickListener to chooseDatesButton
+        chooseDatesButton.setOnClickListener(v -> materialDatePicker.show(getSupportFragmentManager(), StringsRepository.DATE_PICKER));
+
+        materialDatePicker.addOnPositiveButtonClickListener(selection -> startDate.setText(materialDatePicker.getHeaderText()));
+
+        //Set OnClickListener to newTripBackButton
+        newTripBackButton.setOnClickListener(v -> finish());
 
         // Set up a PlaceSelectionListener to handle the response.
         autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
             public void onPlaceSelected(@NotNull Place place) {
-                // TODO: Get info about the selected place.
-
-
-
-                if (place.getName() != null || !place.getName().equals("")) {
-
+                if (place.getName() != null || !place.getName().equals(StringsRepository.EMPTY_STRING)) {
 
                 }
             }
 
-
             @Override
             public void onError(@NotNull Status status) {
-                // TODO: Handle the error.
-               // Log.i(TAG, "An error occurred: " + status);
+                Log.i(TAG, "An error occurred: " + status);
             }
         });
+    }
 
+    private void configAutoCompleteFragment() {
+        // Specify the types of place data to return.
+        autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG, Place.Field.PHOTO_METADATAS, Place.Field.ADDRESS));
+
+        //Set location bias
+        autocompleteFragment.setLocationBias(RectangularBounds.newInstance(
+                new LatLng(-33.880490, 151.184363),
+                new LatLng(-33.858754, 151.229596)
+        ));
+    }
+
+    private void initVariables() {
+        chooseDatesButton = findViewById(R.id.choose_dates_button);
+        startDate = findViewById(R.id.start_date);
+        newTripBackButton = findViewById(R.id.new_trip_back_arrow);
+        newTripCheckButton = findViewById(R.id.new_trip_check);
+        apiKey = getString(R.string.google_api_key);
+        placeid = getIntent().getStringExtra(StringsRepository.PLACE_ID);
+        builder = MaterialDatePicker.Builder.dateRangePicker();
+        autocompleteFragment = (AutocompleteSupportFragment) getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
+    }
+
+    //This method initializes the Places and PlacesClient Objects
+    private void initPlacesAndPlacesClient() {
+        if (!Places.isInitialized()) {
+            Places.initialize(getApplicationContext(), apiKey);
+        }
+        placesClient = Places.createClient(this);
     }
 }

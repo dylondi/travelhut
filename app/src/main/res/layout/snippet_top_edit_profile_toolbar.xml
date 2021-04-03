@@ -7,9 +7,9 @@
         android:background="@color/dark_blue">
 
         <androidx.appcompat.widget.Toolbar
+            android:id="@+id/profile_toolbar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/profile_toolbar">
+            android:layout_height="wrap_content">
 
 
             <RelativeLayout
@@ -17,33 +17,34 @@
                 android:layout_height="wrap_content">
 
                 <ImageView
+                    android:id="@+id/edit_profile_back_arrow"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
+                    android:layout_centerVertical="true"
                     android:layout_marginStart="10dp"
                     android:layout_marginEnd="20dp"
+                    android:src="@drawable/ic_back_arrow" />
+
+                <ImageView
+                    android:id="@+id/check"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
-                    android:id="@+id/edit_profile_back_arrow"
-                    android:src="@drawable/ic_back_arrow"/>
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="20dp"
+                    android:src="@drawable/ic_check" />
+
                 <TextView
+                    android:id="@+id/profileName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
+                    android:layout_marginStart="5dp"
                     android:layout_toRightOf="@id/edit_profile_back_arrow"
                     android:text="Edit Profile"
-                    android:textSize="20sp"
                     android:textColor="@color/white"
-                    android:layout_marginStart="5dp"
-                    android:id="@+id/profileName"/>
-
-                <ImageView
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginEnd="20dp"
-                    android:layout_centerVertical="true"
-                    android:id="@+id/check"
-                    android:src="@drawable/ic_check"
-                    android:layout_alignParentRight="true"/>
+                    android:textSize="20sp" />
 
             </RelativeLayout>
 

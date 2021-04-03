@@ -4,50 +4,46 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.example.travelhut.model.FollowersAppRepository;
-import com.example.travelhut.model.FollowingAppRepository;
-import com.example.travelhut.model.PostsAppRepository;
-import com.example.travelhut.model.ProfileAppRepository;
+import com.example.travelhut.model.main.profile.FollowersRepository;
+import com.example.travelhut.model.main.profile.FollowingRepository;
+import com.example.travelhut.model.main.posts.PostsRepository;
+import com.example.travelhut.model.main.profile.ProfileRepository;
 import com.google.firebase.database.DataSnapshot;
 
 public class ProfileActivityViewModel extends ViewModel{
 
+    //Instance Variables
+    private ProfileRepository profileRepository;
+    private FollowersRepository followersRepository;
+    private FollowingRepository followingRepository;
+    private PostsRepository postsRepository;
 
-    ProfileAppRepository profileAppRepository;
-    FollowersAppRepository followersAppRepository;
-    FollowingAppRepository followingAppRepository;
-    PostsAppRepository postsAppRepository;
-    LiveData<DataSnapshot> liveData;
-
+    //Constructors
     public ProfileActivityViewModel(String profileId) {
-        profileAppRepository = new ProfileAppRepository();
-        followersAppRepository = new FollowersAppRepository(profileId);
-        followingAppRepository = new FollowingAppRepository(profileId);
-        postsAppRepository = new PostsAppRepository();
-        //liveData = profileAppRepository.getUserMutableLiveData();
+        profileRepository = new ProfileRepository();
+        followersRepository = new FollowersRepository(profileId);
+        followingRepository = new FollowingRepository(profileId);
+        postsRepository = new PostsRepository();
 
     }
 
     @NonNull
     public LiveData<DataSnapshot> getDataSnapshotLiveData() {
-
-        return profileAppRepository;
+        return profileRepository;
     }
 
     @NonNull
     public LiveData<DataSnapshot> getFollowersSnapshot() {
-
-        return followersAppRepository;
+        return followersRepository;
     }
 
     @NonNull
     public LiveData<DataSnapshot> getFollowingSnapshot() {
-
-        return followingAppRepository;
+        return followingRepository;
     }
 
     @NonNull
     public LiveData<DataSnapshot> getPostsLiveData() {
-        return postsAppRepository;
+        return postsRepository;
     }
 }

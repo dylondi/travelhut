@@ -6,81 +6,53 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
 import android.webkit.MimeTypeMap;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.example.travelhut.R;
-import com.example.travelhut.model.StringsRepository;
+import com.example.travelhut.model.utils.StringsRepository;
 import com.example.travelhut.viewmodel.main.profile.CreatePostActivityViewModel;
-import com.example.travelhut.viewmodel.main.profile.EditProfileActivityViewModel;
 import com.example.travelhut.views.main.profile.ProfileActivity;
-import com.google.android.gms.tasks.Continuation;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.StorageTask;
 import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.io.File;
-import java.util.HashMap;
 
 public class CreatePostActivity extends AppCompatActivity {
 
-    private static final String TAG = "CreatePostActivity";
-    Uri imageUri;
-    CreatePostActivityViewModel createPostActivityViewModel;
-
-    ImageView close, imageAdded, post;
-
-    EditText description;
+    //Instance Variables
+    private Uri imageUri;
+    private CreatePostActivityViewModel createPostActivityViewModel;
+    private ImageView close, imageAdded, post;
+    private EditText description;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_post);
 
-        //assigning views
-        close = findViewById(R.id.create_post_back_arrow);
-        imageAdded = findViewById(R.id.image_posted);
-        post = findViewById(R.id.create_post_check);
-        description = findViewById(R.id.description);
+        initViews();
         createPostActivityViewModel = ViewModelProviders.of(this).get(CreatePostActivityViewModel.class);
 
-        //discard post
-        close.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //go to profile page
-                startActivity(new Intent(CreatePostActivity.this, ProfileActivity.class));
-            }
+        //Discard post
+        close.setOnClickListener(v -> {
+            //Go to profile page
+            startActivity(new Intent(CreatePostActivity.this, ProfileActivity.class));
         });
 
 
-        //confirm post
-        post.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //upload post
-                uploadImage();
-            }
+        //Confirm post
+        post.setOnClickListener(v -> {
+            //Upload post
+            uploadImage();
         });
 
-        //sets aspect ratio of post to make sure it is square image
+        //Sets aspect ratio of post to make sure it is square image
         CropImage.activity()
                 .setAspectRatio(1, 1)
                 .start(CreatePostActivity.this);
@@ -89,8 +61,16 @@ public class CreatePostActivity extends AppCompatActivity {
 
     }
 
+    //Initialize Views
+    private void initViews() {
+        close = findViewById(R.id.create_post_back_arrow);
+        imageAdded = findViewById(R.id.image_posted);
+        post = findViewById(R.id.create_post_check);
+        description = findViewById(R.id.description);
+    }
 
-    //gets file extension of Uri
+
+    //Gets file extension of Uri
     public static String getFileExtension(Context context, Uri uri) {
         String extension;
 
@@ -109,7 +89,7 @@ public class CreatePostActivity extends AppCompatActivity {
         return extension;
     }
 
-    //this method calls the upload image in the ViewModel to upload the post
+    //This method calls the upload image in the ViewModel to upload the post
     private void uploadImage(){
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setMessage(StringsRepository.POSTING_CAP);

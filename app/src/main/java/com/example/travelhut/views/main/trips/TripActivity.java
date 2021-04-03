@@ -1,29 +1,22 @@
 package com.example.travelhut.views.main.trips;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.util.Pair;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.preference.PreferenceManager;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.anychart.AnyChart;
 import com.anychart.AnyChartView;
 import com.anychart.chart.common.dataentry.DataEntry;
-import com.anychart.chart.common.dataentry.ValueDataEntry;
 import com.anychart.charts.Cartesian;
 import com.anychart.core.cartesian.series.Column;
 import com.anychart.enums.Anchor;
@@ -31,11 +24,13 @@ import com.anychart.enums.HoverMode;
 import com.anychart.enums.Position;
 import com.anychart.enums.TooltipPositionMode;
 import com.example.travelhut.R;
-import com.example.travelhut.common.Common;
-import com.example.travelhut.views.main.map_search.Event;
+import com.example.travelhut.model.utils.StringsRepository;
+import com.example.travelhut.viewmodel.main.trips.TripActivityViewModel;
+import com.example.travelhut.viewmodel.main.trips.TripsActivityViewModelFactory;
+import com.example.travelhut.model.objects.Event;
 import com.example.travelhut.views.main.map_search.EventAdapter;
-import com.example.travelhut.views.main.trips.trip_fragments.Trip;
-import com.example.travelhut.views.main.trips.trip_fragments.TripsAdapter;
+import com.example.travelhut.model.objects.Trip;
+import com.example.travelhut.model.objects.CovidStatistics;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.PhotoMetadata;
@@ -47,452 +42,277 @@ import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClickListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 
 public class TripActivity extends AppCompatActivity {
 
-    private TextView placeName, placeAddress, dateRange;
+    //Instance Variables
+    private static final String TAG = "TripActivity";
+    private TextView placeName, placeAddress, dateRange, recommendation, description, masks, quarantine, tests;
     private ImageView placeImage, backArrow;
     private Button changeDates;
-    private static final String TAG = "TripActivity";
-    private Handler mainHandler = new Handler(Looper.getMainLooper());
-
     private List<Event> eventsList = new ArrayList<>();
+    private List<DataEntry> data = new ArrayList<>();
     private EventAdapter eventAdapter;
-    private LinearLayout eventsLinearLayout;
     private RecyclerView eventsRecyclerView;
-    private TextView recommendation, description, masks, quarantine, tests;
-    private String air_code;
-    List<DataEntry> data = new ArrayList<>();
-    Cartesian cartesian;
-    AnyChartView anyChartView;
+    private Cartesian cartesian;
+    private AnyChartView anyChartView;
+    private TripActivityViewModel tripActivityViewModel;
+    private PlacesClient placesClient;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_trip);
+
+        String apiKey = getString(R.string.google_api_key);
+
+        //Get string extras from intent
+        Bundle extras = getIntent().getExtras();
+        String tripId = extras.getString(StringsRepository.TRIP_ID, null);
+        String placeId = extras.getString(StringsRepository.PLACE_ID, null);
+
+        tripActivityViewModel = ViewModelProviders.of(this, new TripsActivityViewModelFactory(this.getApplication(), tripId)).get(TripActivityViewModel.class);
+
+        initViews();
+        initPlacesAndPlacesClient(apiKey);
+
+        configRecyclerView();
+
+        cartesian = AnyChart.column();
+
+        //Setup MaterialDatePicker
+        MaterialDatePicker.Builder<Pair<Long, Long>> builder = MaterialDatePicker.Builder.dateRangePicker();
+
+        final MaterialDatePicker materialDatePicker = builder.build();
+
+        //Get LiveData object from ViewModel
+        LiveData<DataSnapshot> liveData = tripActivityViewModel.getTripInfo();
+
+        //Observe LiveData object from ViewModel
+        liveData.observe(this, dataSnapshot -> {
+
+            //Get Trip object from data from dataSnapshot
+            Trip trip = dataSnapshot.getValue(Trip.class);
+
+            //Set text of Views
+            placeName.setText(trip.getPlacename());
+            placeAddress.setText(trip.getPlaceaddress());
+            dateRange.setText(trip.getDaterange());
+
+        });
+
+        //Set OnClickListener for changeDates button
+        changeDates.setOnClickListener(v -> materialDatePicker.show(getSupportFragmentManager(), "DATE_PICKER"));
+
+        materialDatePicker.addOnPositiveButtonClickListener(selection -> {
+
+            //DatabaseReference to current trip
+            DatabaseReference tripsReference = FirebaseDatabase.getInstance().getReference(StringsRepository.TRIPS_CAP).child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child(tripId);
+
+            //Obtain the startDate & endDate from the range selected
+            Pair selectedDates = (Pair) materialDatePicker.getSelection();
+
+
+            //Create HashMap of updated date values
+            HashMap<String, Object> hashMap = new HashMap<>();
+            hashMap.put(StringsRepository.DATERANGE, materialDatePicker.getHeaderText());
+            hashMap.put(StringsRepository.STARTDATE, selectedDates.first);
+            hashMap.put(StringsRepository.ENDDATE, selectedDates.second);
+
+            //Update reference with hashMap
+            tripsReference.updateChildren(hashMap);
+
+            //Set text of view displaying dates
+            dateRange.setText(materialDatePicker.getHeaderText());
+
+        });
+
+
+        //Set Fields of data to be retrieved from the Google Places API
+        final List<Place.Field> placeFields = Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.ADDRESS, Place.Field.PHOTO_METADATAS);
+
+        //Create a FetchPlaceRequest with placeId and placeFields
+        final FetchPlaceRequest request = FetchPlaceRequest.newInstance(placeId, placeFields);
+
+        //Use placesClient to fetch the Place requested with an OnSuccessListener and an OnFailureListener
+        placesClient.fetchPlace(request).addOnSuccessListener((response) -> {
+
+            //Get Place object
+            Place place = response.getPlace();
+
+            //Set placeImage from Place object
+            setPlaceImage(placesClient, place);
+        }).addOnFailureListener((exception) -> {
+            if (exception instanceof ApiException) {
+                Log.e(TAG, "Place not found: " + exception.getMessage());
+            }
+        });
+
+        //Set OnClickListener for backArrow which finishes the activity
+        backArrow.setOnClickListener(v -> finish());
+
+        loadEvents();
+        try {
+            loadCoronaVirusStats();
+            loadCoronaVirusStatsChart();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    //This method initializes the Places and PlacesClient Objects
+    private void initPlacesAndPlacesClient(String apiKey) {
+        if (!Places.isInitialized()) {
+            Places.initialize(this, apiKey);
+        }
+        placesClient = Places.createClient(this);
+    }
+
+    private void configRecyclerView() {
+        eventAdapter = new EventAdapter(this, eventsList);
+        eventsRecyclerView.setHasFixedSize(true);
+        eventsRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        eventsRecyclerView.setAdapter(eventAdapter);
+    }
+
+    //This method initializes view objects
+    private void initViews() {
         placeName = findViewById(R.id.trip_place_name);
         placeAddress = findViewById(R.id.trip_place_address);
         dateRange = findViewById(R.id.trip_date);
         placeImage = findViewById(R.id.trip_image_view);
         backArrow = findViewById(R.id.trip_back_arrow);
         changeDates = findViewById(R.id.change_dates_button);
-        eventsLinearLayout = findViewById(R.id.trip_events_lin_layout);
         recommendation = findViewById(R.id.recommendation_text);
         description = findViewById(R.id.description_text);
         masks = findViewById(R.id.mask_info);
         quarantine = findViewById(R.id.quarantine_info);
         tests = findViewById(R.id.test_info);
-        eventAdapter = new EventAdapter(this, eventsList);
-        air_code = "";
         eventsRecyclerView = findViewById(R.id.trip_events_recycler_view);
-        eventsRecyclerView.setHasFixedSize(true);
-        eventsRecyclerView.setAdapter(eventAdapter);
-        eventsRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-        String apiKey = getString(R.string.google_api_key);
         anyChartView = findViewById(R.id.any_chart_view);
-
-        cartesian = AnyChart.column();
-
-
-
-        Bundle extras = getIntent().getExtras();
-        String tripId = extras.getString("tripid", null);
-        String placeId = extras.getString("placeid", null);
-
-        MaterialDatePicker.Builder<Pair<Long, Long>> builder = MaterialDatePicker.Builder.dateRangePicker();
-
-        final MaterialDatePicker materialDatePicker = builder.build();
-
-
-
-
-        changeDates.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                materialDatePicker.show(getSupportFragmentManager(), "DATE_PICKER");
-            }
-        });
-
-        materialDatePicker.addOnPositiveButtonClickListener(new MaterialPickerOnPositiveButtonClickListener() {
-            @Override
-            public void onPositiveButtonClick(Object selection) {
-
-                DatabaseReference  tripsReference = FirebaseDatabase.getInstance().getReference("Trips").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child(tripId);
-                //Retrieve the database reference to the current users stories
-
-
-                //Retrieve story key for story to be uploaded
-
-
-
-                Pair selectedDates = (Pair) materialDatePicker.getSelection();
-//              then obtain the startDate & endDate from the range
-                final Pair<Date, Date> rangeDate = new Pair<>(new Date((Long) selectedDates.first), new Date((Long) selectedDates.second));
-//              assigned variables
-                Date startDate1 = rangeDate.first;
-                Date endDate = rangeDate.second;
-                Log.i(TAG, "onClick: startDate: " + startDate1 + " , endDate: " + endDate   );
-//              Format the dates in ur desired display mode
-                SimpleDateFormat simpleFormat = new SimpleDateFormat("dd MMM yyyy");
-//              Display it by setText
-                //datedisplay.setText("SELECTED DATE : " +  simpleFormat.format(startDate) + " Second : " + simpleFormat.format(endDate));
-
-                HashMap<String, Object> hashMap = new HashMap<>();
-                hashMap.put("daterange", materialDatePicker.getHeaderText());
-                hashMap.put("startdate", (Long) selectedDates.first);
-                hashMap.put("enddate", (Long) selectedDates.second);
-
-                tripsReference.updateChildren(hashMap);
-                dateRange.setText(materialDatePicker.getHeaderText());
-
-            }
-        });
-
-        final List<Place.Field> placeFields = Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.ADDRESS, Place.Field.PHOTO_METADATAS);
-
-        final FetchPlaceRequest request = FetchPlaceRequest.newInstance(placeId, placeFields);
-        if (!Places.isInitialized()) {
-            Places.initialize(this, apiKey);
-        }
-        PlacesClient placesClient = Places.createClient(this);
-        placesClient.fetchPlace(request).addOnSuccessListener((response) -> {
-            Place place = response.getPlace();
-            setPlaceImage(placesClient, place);
-            loadEvents(place.getName());
-        }).addOnFailureListener((exception) -> {
-            if (exception instanceof ApiException) {
-                final ApiException apiException = (ApiException) exception;
-                Log.e(TAG, "Place not found: " + exception.getMessage());
-                final int statusCode = apiException.getStatusCode();
-                // TODO: Handle error with given status code.
-            }
-        });
-
-
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Trips").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child(tripId);
-        reference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                Trip trip = snapshot.getValue(Trip.class);
-                //Glide.with(mContext).load(user.getImageurl()).into(imageView);
-                placeName.setText(trip.getPlacename());
-                placeAddress.setText(trip.getPlaceaddress());
-                dateRange.setText(trip.getDaterange());
-                try {
-                    loadCoronaVirusStats(trip.getPlacename());
-                    loadCoronaVirusStatsChart(trip.getPlacename());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-
-
-        backArrow.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
-
-
     }
 
 
-    public void setPlaceImage(PlacesClient placesClient, Place place){
+    public void setPlaceImage(PlacesClient placesClient, Place place) {
+
+        //List of PhotoMetaData from the place selected
         final List<PhotoMetadata> metadata = place.getPhotoMetadatas();
+
         if (metadata == null || metadata.isEmpty()) {
-            Log.w(TAG, "No photo metadata.");
             return;
         }
+
+        //Get first PhotoMetData object from metadata list
         final PhotoMetadata photoMetadata = metadata.get(0);
 
-        // Get the attribution text.
-        final String attributions = photoMetadata.getAttributions();
-
-        // Create a FetchPhotoRequest.
+        // Create a FetchPhotoRequest using the photoMetaData object
         final FetchPhotoRequest photoRequest = FetchPhotoRequest.builder(photoMetadata)
-                .setMaxWidth(500) // Optional.
-                .setMaxHeight(300) // Optional.
+                .setMaxWidth(500)
+                .setMaxHeight(300)
                 .build();
+
+        //Use placesClient to fetch the photo from the photoRequest
         placesClient.fetchPhoto(photoRequest).addOnSuccessListener((fetchPhotoResponse) -> {
-            Bitmap bitmap = fetchPhotoResponse.getBitmap();
-            placeImage.setImageBitmap(bitmap);
+
+            //Get Bitmap from response
+            Bitmap bitMap = fetchPhotoResponse.getBitmap();
+
+            //Set bitMap to placeImage View and config placeImage view
+            placeImage.setImageBitmap(bitMap);
             placeImage.setAdjustViewBounds(true);
             placeImage.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            //placeImage.setScaleType(ImageView.ScaleType.FIT_XY);
 
         }).addOnFailureListener((exception) -> {
             if (exception instanceof ApiException) {
-                final ApiException apiException = (ApiException) exception;
                 Log.e(TAG, "Place not found: " + exception.getMessage());
-                final int statusCode = apiException.getStatusCode();
-                // TODO: Handle error with given status code.
             }
         });
     }
 
+    //This method loads events from the ViewModel
+    private void loadEvents() {
 
-    private void loadEvents(String eventPlaceName) {
+        //Get LiveDat object from ViewModel
+        LiveData<List<Event>> liveData = tripActivityViewModel.getEventsList();
 
+        //Observe liveData object
+        liveData.observe(this, events -> {
 
-        String eventApi = Common.EVENT_API;
-        String url = "http://app.ticketmaster.com/discovery/v2/events.json?apikey=" + eventApi + "&city=" + eventPlaceName;
-        eventsList.clear();
-        eventAdapter.notifyDataSetChanged();
+            //Clear list, add the updated data, and notify the eventAdapter of the updated data set
+            eventsList.clear();
+            eventsList.addAll(events);
+            eventAdapter.notifyDataSetChanged();
 
-        new Thread(new Runnable() {
-            @Override
-            public void run(){
-                try {
-
-                    JSONObject jsonObject = getJSONObject(url);
-                    JSONArray main = jsonObject.getJSONObject("_embedded").getJSONArray("events");
-
-
-                    for (int i = 0; i < main.length(); i++) {
-
-                        String eventId = main.getJSONObject(i).getString("id");
-                        String eventName = main.getJSONObject(i).getString("name");
-                        String eventDate = main.getJSONObject(i).getJSONObject("dates").getJSONObject("start").getString("localDate");
-                        String eventPlace = main.getJSONObject(i).getJSONObject("_embedded").getJSONArray("venues").getJSONObject(0).getString("name");
-                        String eventImageUrl = main.getJSONObject(i).getJSONArray("images").getJSONObject(0).getString("url");
-
-                        System.out.println("run: eventName:" + eventName + ", eventDate: " + eventDate);
-                        eventsList.add(new Event(eventName, eventPlace, eventDate, eventId, eventImageUrl));
-                    }
-
-                    mainHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            eventAdapter.notifyDataSetChanged();
-                        }
-                    });
-                    return;
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }}).start();
-    }
-
-    public void loadCoronaVirusStats(String placeName) throws Exception {
-
-// Host url
-        OkHttpClient client = new OkHttpClient();
-
-        Request request = new Request.Builder()
-                .header("X-Access-Token", Common.COVID_API)
-                .url("https://api.traveladviceapi.com/search/" + placeName)
-                .build();
-
-        client.newCall(request).enqueue(new Callback() {
-
-
-            @Override
-            public void onFailure(Call call, IOException e) {
-
-            }
-
-            @Override
-            public void onResponse(Call call, final Response response) throws IOException {
-                try {
-                    String responseData = response.body().string();
-                    JSONObject json = new JSONObject(responseData);
-                    final String owner = json.getString("name");
-                    mainHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                recommendation.setText(json.getString("recommendation"));
-                                description.setText(json.getJSONArray("trips").getJSONObject(0).getJSONObject("advice").getString("level_desc"));
-                                String mask = json.getJSONObject("requirements").getString("masks");
-                                masks.setText(mask);
-                                quarantine.setText(json.getJSONObject("requirements").getString("quarantine"));
-                                tests.setText(json.getJSONObject("requirements").getString("tests"));
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-
-                        }});
-                } catch (JSONException e) {
-
-                }
-            }
         });
-
     }
 
+    //This method loads covid-19 stats
+    public void loadCoronaVirusStats() throws Exception {
 
+        //Get LiveData object from ViewModel
+        LiveData<CovidStatistics> liveData = tripActivityViewModel.getCovidStats();
 
+        //Observe liveData object
+        liveData.observe(this, covidStatistics -> {
 
-    public void loadCoronaVirusStatsChart(String placeName) throws Exception {
+            //Set text of all views with updated covid-19 stats
+            recommendation.setText(covidStatistics.getRecommendation());
+            description.setText(covidStatistics.getDescription());
+            masks.setText(covidStatistics.getMasks());
+            quarantine.setText(covidStatistics.getQuarantine());
+            tests.setText(covidStatistics.getTests());
 
-// Host url
-        OkHttpClient client = new OkHttpClient();
-
-        Request requestOne = new Request.Builder()
-                .header("APC-Auth", "fe6a282ffd")
-                .addHeader("APC-Auth-Secret", "bc28b3b3a87b4cd")
-                .addHeader("Content-Type", "application/json")
-                .url("https://www.air-port-codes.com/api/v1/multi?term=" + placeName)
-                .build();
-
-
-
-
-        client.newCall(requestOne).enqueue(new Callback() {
-
-
-            @Override
-            public void onFailure(Call call, IOException e) {
-
-            }
-
-            @Override
-            public void onResponse(Call call, final Response response) throws IOException {
-                try {
-                    String responseData = response.body().string();
-                    String iata = new JSONObject(responseData).getJSONArray("airports").getJSONObject(0).getString("iata");
-
-                    getDailyCovidInfo(iata);
-
-                } catch (JSONException e) {
-
-                }
-            }
-        });
-
-
-
-    }
-
-    private void getDailyCovidInfo(String air_code) {
-
-        OkHttpClient client = new OkHttpClient();
-
-        Request request = new Request.Builder()
-                .header("X-Access-Token", Common.COVID_API)
-                .url("https://api.traveladviceapi.com/search/stats/" + air_code + "?limit=7")
-                .build();
-        client.newCall(request).enqueue(new Callback() {
-
-
-            @Override
-            public void onFailure(Call call, IOException e) {
-
-            }
-
-            @Override
-            public void onResponse(Call call, final Response response) throws IOException {
-                try {
-                    String responseData = response.body().string();
-                    JSONArray jsonArray = new JSONObject(responseData).getJSONArray(air_code);
-                    for(int i = jsonArray.length()-1; i>=0; i--){
-                        data.add(new ValueDataEntry(jsonArray.getJSONObject(i).getString("date"), jsonArray.getJSONObject(i).getInt("new_cases")));
-                    }
-                    mainHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            Column column = cartesian.column(data);
-
-                            column.tooltip()
-                                    .titleFormat("{%X}")
-                                    .position(Position.CENTER_BOTTOM)
-                                    .anchor(Anchor.CENTER_BOTTOM)
-                                    .offsetX(0d)
-                                    .offsetY(5d)
-                                    .format("{%Value}{groupsSeparator: }");
-
-                            cartesian.animation(true);
-                            cartesian.title("Covid-19 cases in previous 7 days");
-
-                            cartesian.yScale().minimum(0d);
-
-                            cartesian.yAxis(0).labels().format("{%Value}{groupsSeparator: }");
-
-                            cartesian.tooltip().positionMode(TooltipPositionMode.POINT);
-                            cartesian.interactivity().hoverMode(HoverMode.BY_X);
-
-                            cartesian.xAxis(0).title("Date");
-                            cartesian.yAxis(0).title("New Cases");
-
-                            anyChartView.setChart(cartesian);
-                        }});
-                } catch (JSONException e) {
-
-                }
-            }
         });
     }
 
 
-    private static JSONObject getJSONObject(String _url) throws Exception {
-        if (_url.equals(""))
-            throw new Exception("URL can't be empty");
+    public void loadCoronaVirusStatsChart() {
 
-        URL url = new URL(_url);
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setReadTimeout(10000 /* milliseconds */);
-        conn.setConnectTimeout(15000 /* milliseconds */);
-        conn.setDoInput(true);
-        conn.setRequestProperty("User-Agent", "android");
-        conn.setRequestProperty("Accept", "application/json");
-        conn.addRequestProperty("Content-Type", "application/json");
-        BufferedReader in = new BufferedReader(
-                new InputStreamReader(conn.getInputStream()));
+        //Get LiveData object from ViewModel
+        LiveData<List<DataEntry>> liveData = tripActivityViewModel.getCovidGraphStats();
 
-        if (!url.getHost().equals(conn.getURL().getHost())) {
-            conn.disconnect();
-            return new JSONObject();
-        }
-        String inputLine;
-        StringBuilder response = new StringBuilder();
-        while ((inputLine = in.readLine()) != null) {
-            response.append(inputLine);
-        }
-        in.close();
-        conn.disconnect();
+        //Observe liveData object which is a list of DataEntry objects, these objects are used to create the graph
+        liveData.observe(this, covidStatistics -> {
 
-        return new JSONObject(response.toString());
+            //Clear list
+            data.clear();
 
+            //Add all stats the data list
+            data.addAll(covidStatistics);
+
+            //Create Column object with our data list
+            Column column = cartesian.column(data);
+
+            //Configure column
+            column.tooltip()
+                    .titleFormat("{%X}")
+                    .position(Position.CENTER_BOTTOM)
+                    .anchor(Anchor.CENTER_BOTTOM)
+                    .offsetX(0d)
+                    .offsetY(5d)
+                    .format("{%Value}{groupsSeparator: }");
+
+            //Configure cartesian
+            cartesian.animation(true);
+            cartesian.title("Covid-19 cases in previous 7 days");
+            cartesian.yScale().minimum(0d);
+            cartesian.yAxis(0).labels().format("{%Value}{groupsSeparator: }");
+            cartesian.tooltip().positionMode(TooltipPositionMode.POINT);
+            cartesian.interactivity().hoverMode(HoverMode.BY_X);
+            cartesian.xAxis(0).title("Date");
+            cartesian.yAxis(0).title("New Cases");
+
+            //Set anyChartView to cartesian chart
+            anyChartView.setChart(cartesian);
+        });
     }
 }

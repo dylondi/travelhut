@@ -1,7 +1,5 @@
 package com.example.travelhut.views.authentication.utils;
 
-import android.content.Context;
-
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
@@ -13,12 +11,12 @@ import com.example.travelhut.views.authentication.RegisterFragment;
 //Adapter class to allow viewpager to switch between register and login fragments
 public class RegisterLoginAdapter extends FragmentPagerAdapter {
 
-    private Context context;
-    int totalTabs;
+    //Instance Variable
+    private int totalTabs;
 
-    public RegisterLoginAdapter(FragmentManager fm, Context context, int totalTabs){
+    //Constructor
+    public RegisterLoginAdapter(FragmentManager fm, int totalTabs) {
         super(fm);
-        this.context = context;
         this.totalTabs = totalTabs;
     }
 
@@ -27,17 +25,17 @@ public class RegisterLoginAdapter extends FragmentPagerAdapter {
         return totalTabs;
     }
 
-    //this method gets the fragment chosen by user on authentication... register|login
-    public Fragment getItem(int position){
-        switch(position){
+    //This method creates a new Fragment for register|login ViewPager based on the inputted position value
+    public Fragment getItem(int position) {
+        switch (position) {
+            //First position in ViewPager
             case 0:
-                //create and return LoginFragment
-                LoginFragment loginFragment = new LoginFragment();
-                return loginFragment;
+                //Return new LoginFragment
+                return new LoginFragment();
+            //Second position in ViewPager
             case 1:
-                //create and return RegisterFragment
-                RegisterFragment registerFragment = new RegisterFragment();
-                return registerFragment;
+                //Return new RegisterFragment
+                return new RegisterFragment();
             default:
                 return null;
         }

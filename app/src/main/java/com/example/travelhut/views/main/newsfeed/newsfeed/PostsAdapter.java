@@ -1,12 +1,9 @@
 package com.example.travelhut.views.main.newsfeed.newsfeed;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
-import android.os.Handler;
-import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,10 +22,10 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
 import com.example.travelhut.R;
-import com.example.travelhut.model.StringsRepository;
+import com.example.travelhut.model.utils.StringsRepository;
 import com.example.travelhut.views.main.newsfeed.NewsFeedStrings;
-import com.example.travelhut.views.main.newsfeed.newsfeed.utils.Post;
-import com.example.travelhut.views.authentication.utils.User;
+import com.example.travelhut.model.objects.Post;
+import com.example.travelhut.model.objects.User;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -41,17 +38,15 @@ import java.util.HashMap;
 import java.util.List;
 
 
-public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder>{
+public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> {
 
-    private static final String TAG = "PostAdapter";
-
+    //Instance Variables
+    private FirebaseUser firebaseUser;
     public Context context;
     public List<Post> posts;
+    private String userId, postId;
 
-    private FirebaseUser firebaseUser;
-
-
-    //constructor
+    //Constructor
     public PostsAdapter(Context context, List<Post> posts) {
         this.context = context;
         this.posts = posts;
@@ -60,118 +55,121 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder>{
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-
-        View view = LayoutInflater.from(context).inflate(R.layout.post_item, parent, false);
-
+        View view = LayoutInflater.from(context).inflate(R.layout.post_view, parent, false);
         return new PostsAdapter.ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ViewHolder viewHolder, int position) {
 
-        //current firebase user
+        //Initialize current firebase user
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
-        //get current post from mPost list
+        //Get current post from posts list
         Post post = posts.get(position);
+
+        //Initialize userId and postId
+        userId = post.getPublisher();
+        postId = post.getPostid();
+
+        //Set screenWidth variable to current screen width
         int screenWidth = Resources.getSystem().getDisplayMetrics().widthPixels;
 
-        //set image for post
+        //Set image for post
         Glide.with(context).load(post.getPostimage()).listener(new RequestListener<Drawable>() {
             @Override
             public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-                holder.progressBar.setVisibility(View.GONE);
+                //Show ProgressBar while image is loading
+                viewHolder.progressBar.setVisibility(View.GONE);
                 return false;
             }
 
             @Override
             public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-                holder.progressBar.setVisibility(View.GONE);
-
+                //Hide ProgressBar
+                viewHolder.progressBar.setVisibility(View.GONE);
                 return false;
             }
-        }).apply(new RequestOptions().override(screenWidth, screenWidth)).into(holder.post_image);
+        }).apply(new RequestOptions().override(screenWidth, screenWidth)).into(viewHolder.postImageView);
 
-        //checks if post description is empty or not -> makes visible or not based on string
-        if(post.getDescription().equals("")){
-            holder.description.setVisibility(View.GONE);
-        }else{
-            holder.description.setVisibility(View.VISIBLE);
-            holder.description.setText(post.getDescription());
+        //Checks if post description is empty or not -> makes visible or not based on value of post.getDescription()
+        if (post.getDescription().isEmpty()||post.getDescription().equals("")) {
+            viewHolder.descriptionTextView.setVisibility(View.GONE);
+        } else {
+            showDescription(viewHolder, post);
         }
 
-        //get data of user that published current post
-        publisherInfo(holder.profile_image, holder.username, holder.publisher, post.getPublisher());
+        //Get data of user that published current post
+        postOwnerDetails(viewHolder.ownerProfileImageView, viewHolder.usernameTextView, viewHolder.ownerTextView, post.getPublisher());
 
-        //check if current user already liked current post
-        checkIfLiked(post.getPostid(), holder.like);
+        //Check if current user already liked current post
+        checkIfLikedAndGetNumOfLikes(post.getPostid(), viewHolder);
 
-        //get number of likes on current post
-        getNumOfLikes(holder.likes, post.getPostid());
+        //Get comments for current post
+        loadCommentsOnPost(viewHolder, post.getPostid());
 
-        //get comments for current post
-        getComments(post.getPostid(), holder.comments);
+        //Set OnClickListener for like button
+        viewHolder.likeImageView.setOnClickListener(view -> {
 
-
-        //OnClickListener for like button
-        holder.like.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                //if not liked then like
-                ifNotLikedThenLike(holder, post);
-            }
+            //if not liked then like
+            ifNotLikedThenLike(viewHolder, post);
         });
 
-        //comment OnClickListener
-        holder.comment.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(context, CommentActivity.class);
-                intent.putExtra("postid", post.getPostid());
-                intent.putExtra("publisher", post.getPublisher());
-                context.startActivity(intent);
-            }
+        //Set OnClickListener for comment
+        viewHolder.commentImageView.setOnClickListener(v -> {
+            navigateToComments(post);
         });
 
-        //comments OnClickListener
-        holder.comments.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(context, CommentActivity.class);
-                intent.putExtra("postid", post.getPostid());
-                intent.putExtra("publisher", post.getPublisher());
-                context.startActivity(intent);
-            }
+        //Set OnClickListener for commentS
+        viewHolder.commentsTextView.setOnClickListener(v -> {
+            navigateToComments(post);
         });
 
-        holder.post_image.setOnClickListener(new DoubleClickListener() {
+        //Set OnClickListener for image post -> used to implement double click to like
+        viewHolder.postImageView.setOnClickListener(new DoubleClickListener() {
             @Override
             public void onSingleClick() {
-
             }
 
             @Override
             public void onDoubleClick() {
-                ifNotLikedThenLike(holder, post);
-
+                ifNotLikedThenLike(viewHolder, post);
             }
         });
 
+    }
 
+    //This method navigates to CommentActivity
+    private void navigateToComments(Post post) {
 
+        //Create Intent to go to CommentActivity
+        Intent intent = new Intent(context, CommentActivity.class);
+
+        //Put postId and publisher as string extras
+        intent.putExtra(StringsRepository.POST_ID, post.getPostid());
+        intent.putExtra(StringsRepository.PUBLISHER, post.getPublisher());
+        context.startActivity(intent);
+    }
+
+    private void showDescription(@NonNull ViewHolder viewHolder, Post post) {
+        viewHolder.descriptionTextView.setVisibility(View.VISIBLE);
+        viewHolder.descriptionTextView.setText(post.getDescription());
     }
 
     private void ifNotLikedThenLike(@NonNull ViewHolder holder, Post post) {
-        if (holder.like.getTag().equals(NewsFeedStrings.LIKE)) {
-            FirebaseDatabase.getInstance().getReference().child(NewsFeedStrings.LIKES_CAP).child(post.getPostid())
-                    .child(firebaseUser.getUid()).setValue(true);
-            addNotification(post.getPublisher(), post.getPostid());
+
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child(NewsFeedStrings.LIKES_CAP).child(post.getPostid())
+                .child(firebaseUser.getUid());
+
+        //If current use has not already liked current post
+        if (holder.likeImageView.getTag().equals(NewsFeedStrings.LIKE)) {
+            //Set user to like the post and add notification
+            reference.setValue(true);
+            addNotification();
         }
-        //if already liked then unlike
+        //If already liked then unlike
         else {
-            FirebaseDatabase.getInstance().getReference().child(NewsFeedStrings.LIKES_CAP).child(post.getPostid())
-                    .child(firebaseUser.getUid()).removeValue();
+            reference.removeValue();
         }
     }
 
@@ -180,45 +178,54 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder>{
         return posts.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder{
+    public class ViewHolder extends RecyclerView.ViewHolder {
 
-        public ImageView profile_image, post_image, like, comment;
-        public TextView username, likes, publisher, description, comments;
+        //Instance Variables
+        public ImageView ownerProfileImageView, postImageView, likeImageView, commentImageView;
+        public TextView usernameTextView, likesTextView, ownerTextView, descriptionTextView, commentsTextView;
         public ProgressBar progressBar;
 
+        //Constructor
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
-            //assigning views
-            profile_image = itemView.findViewById(R.id.post_profile_image);
-            post_image = itemView.findViewById(R.id.image_post);
-            like = itemView.findViewById(R.id.like_button);
-            comment = itemView.findViewById(R.id.comment_button);
-            username = itemView.findViewById(R.id.post_username);
-            likes = itemView.findViewById(R.id.likes);
-            publisher = itemView.findViewById(R.id.publisher);
-            description = itemView.findViewById(R.id.post_description);
-            comments = itemView.findViewById(R.id.comments);
+            //Initialize views
+            ownerProfileImageView = itemView.findViewById(R.id.post_profile_image);
+            postImageView = itemView.findViewById(R.id.image_post);
+            likeImageView = itemView.findViewById(R.id.like_button);
+            commentImageView = itemView.findViewById(R.id.comment_button);
+            usernameTextView = itemView.findViewById(R.id.post_username);
+            likesTextView = itemView.findViewById(R.id.likes);
+            ownerTextView = itemView.findViewById(R.id.publisher);
+            descriptionTextView = itemView.findViewById(R.id.post_description);
+            commentsTextView = itemView.findViewById(R.id.comments);
             progressBar = itemView.findViewById(R.id.post_item_progress_bar);
         }
     }
 
-    //this method retrieved all comments on current post
-    private void getComments(String postid, TextView comments){
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child(NewsFeedStrings.COMMENTS_CAP).child(postid);
+    //This method retrieves all comments on current post and sets text to display number of comments
+    private void loadCommentsOnPost(ViewHolder viewHolder, String postId) {
 
+        //DatabaseReference to comments on current post
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child(NewsFeedStrings.COMMENTS_CAP).child(postId);
+
+        //ValueEventListener for DatabaseReference to update Comment textview
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(snapshot.getChildrenCount()<1){
-                    comments.setText("Be first to comment!");
 
-                }else {
-                    comments.setText("View all " + snapshot.getChildrenCount() + " comments");
+                long childrenCount = snapshot.getChildrenCount();
+                //If there are no comments, else if there is 1 comment, else if there are more than 1 comments -> displays a different text for each scenario
+                if (childrenCount < 1) {
+                    viewHolder.commentsTextView.setText("Be first to comment!");
+
+                } else if(childrenCount==1) {
+                    viewHolder.commentsTextView.setText("View " + snapshot.getChildrenCount() + " comment");
+                }
+                else {
+                    viewHolder.commentsTextView.setText("View all " + snapshot.getChildrenCount() + " comments");
                 }
             }
-
-
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
 
@@ -227,89 +234,72 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder>{
     }
 
 
-    //this method checks if current user has already liked the current post
-    private void checkIfLiked(String postId, ImageView imageView){
+    //This method checks if current user has already liked the current post
+    private void checkIfLikedAndGetNumOfLikes(String postId, ViewHolder holder) {
 
-        //current firebase user
-        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-
-        //db ref
+        //DatabaseReference to likes on current post
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference()
                 .child(NewsFeedStrings.LIKES_CAP)
                 .child(postId);
 
-        //ref OnClickListener
+        //OnClickListener for DatabaseReference
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(snapshot.child(firebaseUser.getUid()).exists()){
-                    imageView.setImageResource(R.drawable.ic_liked);
-                    imageView.setTag(NewsFeedStrings.LIKED);
-                }else{
-                    imageView.setImageResource(R.drawable.ic_like);
-                    imageView.setTag(NewsFeedStrings.LIKE);
+
+                //Set number of likes to TextView
+                holder.likesTextView.setText(snapshot.getChildrenCount() + StringsRepository.SPACE_LIKES);
+
+                //If current user liked the post
+                if (snapshot.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).exists()) {
+                    showPostLiked(holder);
+                } else {
+                    showPostNotLiked(holder);
                 }
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
-
             }
         });
+
     }
 
-    //add notification *****NOT FINISHED*****
-    private void addNotification(String userid, String postid){
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Notifications").child(userid);
+    //Display post showing current user has not liked it
+    private void showPostNotLiked(ViewHolder holder) {
+        holder.likeImageView.setTag(NewsFeedStrings.LIKE);
+        holder.likeImageView.setImageResource(R.drawable.ic_like);
+    }
+
+
+    //This method adds a notification
+    private void addNotification() {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(StringsRepository.NOTIFICATIONS_CAP).child(userId);
 
         HashMap<String, Object> hashMap = new HashMap<>();
-        hashMap.put("userid", firebaseUser.getUid());
-        hashMap.put("text", "liked your post");
-        hashMap.put("postid", postid);
-        hashMap.put("ispost", true);
+        hashMap.put(StringsRepository.USER_ID, firebaseUser.getUid());
+        hashMap.put(StringsRepository.IS_POST, true);
+        hashMap.put(StringsRepository.TEXT, StringsRepository.LIKED_POST_NOTIFICATION_MESSAGE);
+        hashMap.put(StringsRepository.POST_ID, postId);
 
         reference.push().setValue(hashMap);
     }
 
 
-    //this method gets number of likes on current post
-    private void getNumOfLikes(final TextView likes_text, String postId){
+    //This method retrieves the owner information of the current post
+    private void postOwnerDetails(ImageView image_profile, TextView username, TextView owner, String userid) {
 
-        //db ref
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child(NewsFeedStrings.LIKES_CAP)
-                .child(postId);
-
-        //ref ValueEventListener
-        reference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                likes_text.setText(snapshot.getChildrenCount() + " likes");
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-    }
-
-    //this method retrieves the publisher information of the current post
-    private void publisherInfo(ImageView image_profile, TextView username, TextView publisher, String userid){
-
-        //db ref
+        //DatabaseReference of user info
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(StringsRepository.USERS_CAP).child(userid);
 
 
-        //ref ValueEventListener
+        //ValueEventListener for DatabaseReference
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 User user = snapshot.getValue(User.class);
                 Glide.with(context).load(user.getImageurl()).into(image_profile);
                 username.setText(user.getUsername());
-                publisher.setText(user.getUsername());
-
+                owner.setText(user.getUsername());
             }
 
             @Override
@@ -319,39 +309,9 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder>{
         });
     }
 
-    public abstract class DoubleClickListener implements View.OnClickListener {
-
-        private static final long DOUBLE_CLICK_TIME_DELTA = 200;//milliseconds
-
-        long lastClickTime = 0;
-        private boolean doubleClicked = false;
-
-        @Override
-        public void onClick(final View v) {
-            long clickTime = System.currentTimeMillis();
-            if (clickTime - lastClickTime < DOUBLE_CLICK_TIME_DELTA){
-                doubleClicked = true;
-                onDoubleClick();
-            } else {
-                doubleClicked = false;
-                Handler handler = new Handler();
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-
-                        if (!doubleClicked) {
-                            onSingleClick();
-                        }
-
-                    }
-                }, 180);
-
-            }
-            lastClickTime = clickTime;
-        }
-
-        public abstract void onSingleClick();
-        public abstract void onDoubleClick();
+    //This method shows that the current user has liked the current post already
+    private void showPostLiked(ViewHolder holder) {
+        holder.likeImageView.setImageResource(R.drawable.ic_liked);
+        holder.likeImageView.setTag(NewsFeedStrings.LIKED);
     }
-
 }

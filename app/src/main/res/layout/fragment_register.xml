@@ -6,23 +6,18 @@
     android:layout_height="match_parent"
     tools:context=".views.authentication.LoginFragment">
 
-    <EditText
-        android:id="@+id/usernameRegister"
+    <Button
+        android:id="@+id/registerBtn"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@drawable/edit_text_bg"
-        android:hint="@string/username"
-        android:paddingLeft="20dp"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp"
-        android:inputType="text"
-        android:textCursorDrawable="@drawable/cursor_color"
+        android:background="@drawable/btn_bg"
+        android:text="@string/register"
+        android:textColor="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias=".5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias=".3"
+        app:layout_constraintTop_toBottomOf="@id/passwordTwoRegister"
+        app:layout_constraintVertical_bias=".7"
         app:layout_constraintWidth_percent=".8" />
 
     <EditText
@@ -32,10 +27,10 @@
         android:layout_marginTop="20dp"
         android:background="@drawable/edit_text_bg"
         android:hint="@string/email"
+        android:inputType="text"
         android:paddingLeft="20dp"
         android:paddingTop="10dp"
         android:paddingBottom="10dp"
-        android:inputType="text"
         android:textCursorDrawable="@drawable/cursor_color"
         app:layout_constraintBottom_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -52,10 +47,10 @@
         android:layout_marginTop="20dp"
         android:background="@drawable/edit_text_bg"
         android:hint="@string/password"
+        android:inputType="textPassword"
         android:paddingLeft="20dp"
         android:paddingTop="10dp"
         android:paddingBottom="10dp"
-        android:inputType="textPassword"
         android:textCursorDrawable="@drawable/cursor_color"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -72,10 +67,10 @@
         android:layout_marginTop="20dp"
         android:background="@drawable/edit_text_bg"
         android:hint="@string/password"
+        android:inputType="textPassword"
         android:paddingLeft="20dp"
         android:paddingTop="10dp"
         android:paddingBottom="10dp"
-        android:inputType="textPassword"
         android:textCursorDrawable="@drawable/cursor_color"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -85,18 +80,23 @@
         app:layout_constraintVertical_bias="0"
         app:layout_constraintWidth_percent=".8" />
 
-    <Button
-        android:id="@+id/registerBtn"
+    <EditText
+        android:id="@+id/usernameRegister"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@drawable/btn_bg"
-        android:text="@string/register"
-        android:textColor="@color/white"
+        android:background="@drawable/edit_text_bg"
+        android:hint="@string/username"
+        android:inputType="text"
+        android:paddingLeft="20dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:textCursorDrawable="@drawable/cursor_color"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias=".5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/passwordTwoRegister"
-        app:layout_constraintVertical_bias=".7"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias=".3"
         app:layout_constraintWidth_percent=".8" />
 
 

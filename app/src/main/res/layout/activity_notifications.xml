@@ -10,19 +10,16 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@id/nav_bar"
-        android:id="@+id/notifications_frame_layout">
-    <!--        </RelativeLayout>-->
-    </FrameLayout>
+        <FrameLayout
+            android:id="@+id/notifications_frame_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@id/nav_bar"></FrameLayout>
 
-
-    <!--bottom navigation-->
-    <include
-        layout="@layout/layout_bottom_navigation_view"
-        android:id="@+id/nav_bar"/>
+        <!--bottom navigation-->
+        <include
+            android:id="@+id/nav_bar"
+            layout="@layout/layout_bottom_navigation_view" />
 
     </RelativeLayout>
 

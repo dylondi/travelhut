@@ -17,10 +17,11 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.example.travelhut.R;
+import com.example.travelhut.model.utils.StringsRepository;
 import com.example.travelhut.viewmodel.main.profile.toolbar.SinglePostFragmentViewModel;
 import com.example.travelhut.viewmodel.main.profile.toolbar.SinglePostFragmentViewModelFactory;
 import com.example.travelhut.views.main.newsfeed.newsfeed.PostsAdapter;
-import com.example.travelhut.views.main.newsfeed.newsfeed.utils.Post;
+import com.example.travelhut.model.objects.Post;
 import com.google.firebase.database.DataSnapshot;
 
 import java.util.ArrayList;
@@ -43,67 +44,44 @@ public class SinglePostFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_single_post, container, false);
 
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+
+        //Initialize views
         backArrow = view.findViewById(R.id.single_post_back_arrow);
+        recyclerView = view.findViewById(R.id.single_post_fragment_recycler_view);
 
-        SharedPreferences preferences = getContext().getSharedPreferences("PREFS", Context.MODE_PRIVATE);
+        //Get postid from SharedPreferences
+        SharedPreferences preferences = getContext().getSharedPreferences(StringsRepository.PREFS, Context.MODE_PRIVATE);
+        postid = preferences.getString(StringsRepository.POST_ID, "none");
 
-        postid = preferences.getString("postid", "none");
         singlePostFragmentViewModel = ViewModelProviders.of(this, new SinglePostFragmentViewModelFactory(getActivity().getApplication(), postid)).get(SinglePostFragmentViewModel.class);
 
-
-
-        recyclerView = view.findViewById(R.id.single_post_fragment_recycler_view);
         recyclerView.setHasFixedSize(true);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(linearLayoutManager);
 
         posts = new ArrayList<>();
         postsAdapter = new PostsAdapter(getContext(), posts);
         recyclerView.setAdapter(postsAdapter);
 
-
         readPost();
 
-
-        backArrow.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ((FragmentActivity)getContext()).getSupportFragmentManager().beginTransaction().replace(R.id.notifications_frame_layout, new NotificationsFragment()).commit();
-            }
-        });
+        backArrow.setOnClickListener(v -> ((FragmentActivity) getContext()).getSupportFragmentManager().beginTransaction().replace(R.id.notifications_frame_layout, new NotificationsFragment()).commit());
 
 
         return view;
     }
 
+    //Get LiveData object and observe to receive post object
     private void readPost() {
-
 
         LiveData<DataSnapshot> liveData = singlePostFragmentViewModel.getPostLiveData();
 
         liveData.observe(getViewLifecycleOwner(), databaseReference -> {
-                posts.clear();
-                Post post = databaseReference.getValue(Post.class);
-                posts.add(post);
+            posts.clear();
+            Post post = databaseReference.getValue(Post.class);
+            posts.add(post);
 
-                postsAdapter.notifyDataSetChanged();
+            postsAdapter.notifyDataSetChanged();
         });
-//        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Posts").child(postid);
-//
-//        reference.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                posts.clear();
-//                Post post = snapshot.getValue(Post.class);
-//                posts.add(post);
-//
-//                postAdapter.notifyDataSetChanged();
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//
-//            }
-//        });
     }
 }

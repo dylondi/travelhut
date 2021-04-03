@@ -7,64 +7,63 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import com.example.travelhut.model.FollowersAppRepository;
-import com.example.travelhut.model.FollowingAppRepository;
-import com.example.travelhut.model.PostsAppRepository;
-import com.example.travelhut.model.ProfileAppRepository;
-import com.example.travelhut.model.UserSearchAppRepository;
+import com.example.travelhut.model.main.profile.FollowersRepository;
+import com.example.travelhut.model.main.profile.FollowingRepository;
+import com.example.travelhut.model.main.posts.PostsRepository;
+import com.example.travelhut.model.main.profile.ProfileRepository;
 import com.google.firebase.database.DataSnapshot;
 
 public class ProfileFragmentViewModel extends AndroidViewModel {
 
-    private ProfileAppRepository profileAppRepository;
-    private FollowersAppRepository followersAppRepository;
-    private FollowingAppRepository followingAppRepository;
-    private PostsAppRepository postsAppRepository;
+    //Instance Variables
+    private ProfileRepository profileRepository;
+    private FollowersRepository followersRepository;
+    private FollowingRepository followingRepository;
+    private PostsRepository postsRepository;
 
-
+    //Constructor
     public ProfileFragmentViewModel(@NonNull Application application, String profileId) {
         super(application);
-        profileAppRepository = new ProfileAppRepository(profileId);
-        followersAppRepository = new FollowersAppRepository(profileId);
-        followingAppRepository = new FollowingAppRepository(profileId);
-        postsAppRepository = new PostsAppRepository();
-
-
+        profileRepository = new ProfileRepository(profileId);
+        followersRepository = new FollowersRepository(profileId);
+        followingRepository = new FollowingRepository(profileId);
+        postsRepository = new PostsRepository();
     }
 
     public void follow(String userId) {
-        profileAppRepository.follow(userId);
+        profileRepository.follow(userId);
     }
+
     public void unFollow(String userId) {
-        profileAppRepository.unFollow(userId);
+        profileRepository.unFollow(userId);
     }
+
     public void followNotification(String userId) {
-        profileAppRepository.followNotification(userId);
+        profileRepository.followNotification(userId);
     }
+
     @NonNull
     public LiveData<DataSnapshot> getDataSnapshotLiveData() {
-
-        return profileAppRepository;
+        return profileRepository;
     }
 
     @NonNull
-    public MutableLiveData<Boolean> getIsFollowing(){
-        return profileAppRepository.getIsFollowing();
+    public MutableLiveData<Boolean> getIsFollowing() {
+        return profileRepository.getIsFollowing();
     }
 
     @NonNull
     public LiveData<DataSnapshot> getFollowersSnapshot() {
-
-        return followersAppRepository;
+        return followersRepository;
     }
 
     @NonNull
     public LiveData<DataSnapshot> getFollowingSnapshot() {
-
-        return followingAppRepository;
+        return followingRepository;
     }
+
     @NonNull
     public LiveData<DataSnapshot> getPostsLiveData() {
-        return postsAppRepository;
+        return postsRepository;
     }
 }

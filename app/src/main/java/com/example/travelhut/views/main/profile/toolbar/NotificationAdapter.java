@@ -1,9 +1,7 @@
 package com.example.travelhut.views.main.profile.toolbar;
 
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.media.Image;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,17 +10,14 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.travelhut.R;
-import com.example.travelhut.model.NotificationsAdapterAppRepository;
-import com.example.travelhut.viewmodel.main.profile.toolbar.NotificationAdapterViewModel;
-import com.example.travelhut.viewmodel.main.profile.toolbar.NotificationsActivityViewModel;
-import com.example.travelhut.views.authentication.utils.User;
-import com.example.travelhut.views.main.newsfeed.newsfeed.utils.Post;
+import com.example.travelhut.model.utils.StringsRepository;
+import com.example.travelhut.model.objects.Notification;
+import com.example.travelhut.model.objects.User;
+import com.example.travelhut.model.objects.Post;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -31,13 +26,13 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.List;
 
-public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapter.ViewHolder>{
+public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapter.ViewHolder> {
 
-
+    //Instance Variables
     private Context mContext;
     private List<Notification> mNotifications;
-    private NotificationAdapterViewModel notificationAdapterViewModel;
 
+    //Constructor
     public NotificationAdapter(Context mContext, List<Notification> mNotifications) {
         this.mContext = mContext;
         this.mNotifications = mNotifications;
@@ -53,41 +48,31 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 
+        //Get current notification
         final Notification notification = mNotifications.get(position);
+
         holder.text.setText(notification.getText());
 
         getUserInfo(holder.profileImage, holder.username, notification.getUserid());
 
-        if(notification.isIspost()){
+        //If notification is post
+        if (notification.isIspost()) {
+
+            //Show and get post image
             holder.postImage.setVisibility(View.VISIBLE);
             getPostImage(holder.postImage, notification.getPostid());
-        }else{
+        } else {
+            //Set post image to be invisible
             holder.postImage.setVisibility(View.GONE);
         }
 
-        holder.postImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                SharedPreferences.Editor editor = mContext.getSharedPreferences("PREFS", Context.MODE_PRIVATE).edit();
-                editor.putString("postid", notification.getPostid());
-                editor.apply();
+        holder.postImage.setOnClickListener(v -> {
+            SharedPreferences.Editor editor = mContext.getSharedPreferences(StringsRepository.PREFS, Context.MODE_PRIVATE).edit();
+            editor.putString("postid", notification.getPostid());
+            editor.apply();
 
-                ((FragmentActivity)mContext).getSupportFragmentManager().beginTransaction().replace(R.id.notifications_frame_layout, new SinglePostFragment()).commit();
-            }
+            ((FragmentActivity) mContext).getSupportFragmentManager().beginTransaction().replace(R.id.notifications_frame_layout, new SinglePostFragment()).commit();
         });
-
-//        holder.itemView.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                if(notification.isIspost()){
-//                    SharedPreferences.Editor editor = mContext.getSharedPreferences("PREFS", Context.MODE_PRIVATE).edit();
-//                    editor.putString("postid", notification.getPostid());
-//                    editor.apply();
-//
-//                    ((FragmentActivity)mContext).getSupportFragmentManager().beginTransaction().replace(R.id.fr)
-//                }
-//            }
-//        });
     }
 
     @Override
@@ -95,7 +80,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         return mNotifications.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder{
+    public class ViewHolder extends RecyclerView.ViewHolder {
 
 
         public ImageView profileImage, postImage;
@@ -112,18 +97,20 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         }
     }
 
-    private void getUserInfo(ImageView imageView, TextView username, String publisherid){
+    private void getUserInfo(ImageView imageView, TextView username, String publisherId) {
 
-//        notificationAdapterViewModel = new NotificationAdapterViewModel(publisherid);
-//
-//        LiveData<DataSnapshot> liveData = notificationAdapterViewModel.getFollowingSnapshot();
-//
-//        liveData.observe(, dataSnapshot -> {});
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Users").child(publisherid);
+        //DatabaseReference for publisher user's info
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(StringsRepository.USERS_CAP).child(publisherId);
+
+        //ValueEventListener for DatabaseReference
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                //Get User object from snapshot
                 User user = snapshot.getValue(User.class);
+
+                //Set user image and username
                 Glide.with(mContext).load(user.getImageurl()).into(imageView);
                 username.setText(user.getUsername());
             }
@@ -136,12 +123,20 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
     }
 
 
-    private void getPostImage(final ImageView imagePost, String postid){
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Posts").child(postid);
+    private void getPostImage(final ImageView imagePost, String postId) {
+
+        //DatabaseReference to post
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(StringsRepository.POSTS_CAP).child(postId);
+
+        //ValueEventListener for DatabaseReference
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                //Get Post object from snapshot
                 Post post = snapshot.getValue(Post.class);
+
+                //Set post image
                 Glide.with(mContext).load(post.getPostimage()).into(imagePost);
             }
 

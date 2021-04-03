@@ -21,7 +21,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.example.travelhut.R;
 import com.example.travelhut.viewmodel.main.profile.EditProfileActivityViewModel;
-import com.example.travelhut.views.authentication.utils.User;
+import com.example.travelhut.model.objects.User;
 import com.example.travelhut.views.main.profile.ProfileActivity;
 import com.google.firebase.database.DataSnapshot;
 import com.rengwuxian.materialedittext.MaterialEditText;
@@ -31,9 +31,11 @@ import com.theartofdev.edmodo.cropper.CropImageView;
 import java.io.File;
 
 public class EditProfileActivity extends AppCompatActivity {
+
+    //Instance Variables
     private ImageView editProfileImage, save;
     private TextView changeProfilePic;
-    MaterialEditText displayName, username, bio, url;
+    private MaterialEditText displayName, username, bio, url;
     private Uri imageUri;
     private EditProfileActivityViewModel editProfileActivityViewModel;
 
@@ -44,44 +46,28 @@ public class EditProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_profile);
 
-        //assigning views
         editProfileActivityViewModel = ViewModelProviders.of(this).get(EditProfileActivityViewModel.class);
-        editProfileImage = findViewById(R.id.edit_profile_image);
-        save = findViewById(R.id.check);
-        changeProfilePic = findViewById(R.id.change_profile_image);
-        displayName = findViewById(R.id.display_name);
-        username = findViewById(R.id.username_edit_profile);
-        bio = findViewById(R.id.bio_edit_profile);
-        url = findViewById(R.id.url_edit_profile);
-
+        initViews();
         userInfo();
 
 
         //OnClickListener for change profile text
-        changeProfilePic.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                CropImage.activity()
-                        .setAspectRatio(1, 1)
-                        .setCropShape(CropImageView.CropShape.OVAL)
-                        .start(EditProfileActivity.this);
-            }
+        changeProfilePic.setOnClickListener(v -> CropImage.activity()
+                .setAspectRatio(1, 1)
+                .setCropShape(CropImageView.CropShape.OVAL)
+                .start(EditProfileActivity.this));
+
+        //Save profile changes OnClickListener
+        save.setOnClickListener(v -> {
+            updateProfile(displayName.getText().toString(),
+                    username.getText().toString(),
+                    bio.getText().toString(),
+                    url.getText().toString());
+
+            startActivity(new Intent(EditProfileActivity.this, ProfileActivity.class));
         });
 
-        //save profile changes OnClickListener
-        save.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                updateProfile(displayName.getText().toString(),
-                        username.getText().toString(),
-                        bio.getText().toString(),
-                        url.getText().toString());
-
-                startActivity(new Intent(EditProfileActivity.this, ProfileActivity.class));
-            }
-        });
-
-        //edit profile image OnClickListener
+        //Edit profile image OnClickListener
         editProfileImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -95,7 +81,7 @@ public class EditProfileActivity extends AppCompatActivity {
 
 
 
-        //assign back arrow view and set OnClickListener
+        //Assign back arrow view and set OnClickListener
         ImageView backArrow = findViewById(R.id.edit_profile_back_arrow);
         backArrow.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -106,12 +92,23 @@ public class EditProfileActivity extends AppCompatActivity {
         });
     }
 
-    //updates profile
+    //Initialize Views
+    private void initViews() {
+        editProfileImage = findViewById(R.id.edit_profile_image);
+        save = findViewById(R.id.check);
+        changeProfilePic = findViewById(R.id.change_profile_image);
+        displayName = findViewById(R.id.display_name);
+        username = findViewById(R.id.username_edit_profile);
+        bio = findViewById(R.id.bio_edit_profile);
+        url = findViewById(R.id.url_edit_profile);
+    }
+
+    //Updates profile
     private void updateProfile(String displayName, String username, String bio, String url){
         editProfileActivityViewModel.updateProfile(displayName, username, bio, url);
     }
 
-    //gets file extension from Uri
+    //Gets file extension from Uri
     public String getFileExtension(Context context, Uri uri) {
         String extension;
 
@@ -124,16 +121,14 @@ public class EditProfileActivity extends AppCompatActivity {
             //If scheme is a File
             //This will replace white spaces with %20 and also other special characters. This will avoid returning null values on file name with spaces and special characters.
             extension = MimeTypeMap.getFileExtensionFromUrl(Uri.fromFile(new File(uri.getPath())).toString());
-
         }
-
         return extension;
     }
 
 
 
 
-//uploads image to ViewModel
+//Uploads image to ViewModel
     private void uploadImage(){
         final ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Uploading");
@@ -154,7 +149,7 @@ public class EditProfileActivity extends AppCompatActivity {
         }
     }
 
-    //retrieves current user info and sets all views to display current data
+    //Retrieves current user info and sets all views to display current data
     private void userInfo(){
         LiveData<DataSnapshot> liveData = editProfileActivityViewModel.getDataSnapshotLiveData();
 

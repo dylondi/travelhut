@@ -12,33 +12,35 @@ import com.google.android.material.tabs.TabLayout;
 
 public class RegisterLoginActivity extends AppCompatActivity {
 
-    TabLayout tabLayout;
+    //Instance Variables
+    private TabLayout tabLayout;
     public static ViewPager viewPager;
-    FloatingActionButton google;
+    private FloatingActionButton google;
     float v = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+        setContentView(R.layout.activity_register_login);
 
-        //assigning views
-        assignViews();
+        //Initialize views
+        initViews();
 
-        //add login and register tabs to tabLayout
+        //Add login and register tabs to tabLayout
         configTabLayout();
 
-        //declaring and initializing the adapter which will adapt the login and register fragment to this viewpager
-        final RegisterLoginAdapter adapter = new RegisterLoginAdapter(getSupportFragmentManager(), this, tabLayout.getTabCount());
 
+        //Create and initialize RegisterLoginAdapter
+        final RegisterLoginAdapter adapter = new RegisterLoginAdapter(getSupportFragmentManager(), tabLayout.getTabCount());
+        //Set adapter of ViewPager
         viewPager.setAdapter(adapter);
-
+        //Add an OnPageChangeListener to handle swipe gesture
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
 
         animateViews();
 
-        //onTabSelectedListener to switch between login and register tabs when either one is clicked by user
-        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener(){
+        //OnTabSelectedListener to switch between login and register tabs when either one is clicked by user
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 viewPager.setCurrentItem(tab.getPosition());
@@ -56,6 +58,7 @@ public class RegisterLoginActivity extends AppCompatActivity {
         });
     }
 
+    //This method animates this activity's views
     private void animateViews() {
         google.setTranslationY(300);
         tabLayout.setTranslationY(300);
@@ -65,21 +68,23 @@ public class RegisterLoginActivity extends AppCompatActivity {
         tabLayout.animate().translationY(0).alpha(1).setDuration(1000).setStartDelay(400);
     }
 
+    //This method adds register and login tabs to the TabLayout
     private void configTabLayout() {
         tabLayout.addTab(tabLayout.newTab().setText(AuthViewStrings.LOGIN));
         tabLayout.addTab(tabLayout.newTab().setText(AuthViewStrings.REGISTER));
         tabLayout.setTabGravity(tabLayout.GRAVITY_FILL);
     }
 
-    private void assignViews() {
+    //This method initializes the view objects
+    private void initViews() {
         tabLayout = findViewById(R.id.tab_layout);
         viewPager = findViewById(R.id.view_pager);
         google = findViewById(R.id.fab_google);
     }
 
     @Override
+    //Do nothing when back button is pressed
     public void onBackPressed() {
-        // Simply Do noting!
     }
 
 

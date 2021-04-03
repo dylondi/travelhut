@@ -61,11 +61,18 @@
                                 android:layout_height="wrap_content"
                                 android:layout_below="@id/newsfeed_bar"
                                 android:layout_margin="5dp" />
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:id="@+id/view_splitter"
+                                android:background="#d9d9d9"
+                                android:visibility="gone"/>
 
 
                             <RelativeLayout
                                 android:layout_width="match_parent"
-                                android:layout_height="wrap_content">
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="5dp">
                             <androidx.recyclerview.widget.RecyclerView
                                 android:id="@+id/news_feed_recycler_view"
                                 android:layout_width="match_parent"

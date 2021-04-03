@@ -5,21 +5,20 @@ import android.app.Application;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.example.travelhut.viewmodel.main.profile.toolbar.SinglePostFragmentViewModel;
+public class ProfileFragmentViewModelFactory implements ViewModelProvider.Factory {
 
-public class ProfileFragmentViewModelFactory  implements ViewModelProvider.Factory{
-        private Application mApplication;
-        private String mProfileId;
+    //Instance Variables
+    private Application mApplication;
+    private String mProfileId;
 
+    //Constructor
+    public ProfileFragmentViewModelFactory(Application application, String profileId) {
+        mApplication = application;
+        mProfileId = profileId;
+    }
 
-        public ProfileFragmentViewModelFactory(Application application, String profileId) {
-            mApplication = application;
-            mProfileId = profileId;
-        }
-
-
-        @Override
-        public <T extends ViewModel> T create(Class<T> modelClass) {
-            return (T) new ProfileFragmentViewModel(mApplication, mProfileId);
-        }
+    @Override
+    public <T extends ViewModel> T create(Class<T> modelClass) {
+        return (T) new ProfileFragmentViewModel(mApplication, mProfileId);
+    }
 }

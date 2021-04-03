@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="70dp"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:layout_marginStart="10dp">
+    android:layout_marginStart="10dp"
+    android:orientation="vertical">
 
     <RelativeLayout
         android:layout_width="60dp"
@@ -13,32 +12,32 @@
         android:layout_marginTop="5dp">
 
         <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/profile_image_story"
             android:layout_width="55dp"
             android:layout_height="55dp"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="4dp"
-            android:id="@+id/profile_image_story"/>
+            android:layout_marginTop="4dp" />
 
 
         <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/post_story_icon"
             android:layout_width="20dp"
             android:layout_height="20dp"
-            android:src="@drawable/ic_post_story"
-            android:id="@+id/post_story_icon"
+            android:layout_alignParentEnd="true"
             android:layout_alignParentBottom="true"
-            android:layout_alignParentEnd="true"/>
+            android:src="@drawable/ic_post_story" />
     </RelativeLayout>
 
 
     <TextView
+        android:id="@+id/add_story_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/add_story_text"
-        android:textColor="@color/grey"
         android:layout_gravity="center"
+        android:layout_marginTop="4dp"
         android:maxLines="1"
-        android:layout_marginTop="4dp"/>
+        android:textColor="@color/grey" />
 
 
 </LinearLayout>

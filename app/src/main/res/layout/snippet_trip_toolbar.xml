@@ -7,9 +7,9 @@
         android:background="@color/dark_blue">
 
         <androidx.appcompat.widget.Toolbar
+            android:id="@+id/profile_toolbar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/profile_toolbar">
+            android:layout_height="wrap_content">
 
 
             <RelativeLayout
@@ -17,23 +17,24 @@
                 android:layout_height="wrap_content">
 
                 <ImageView
+                    android:id="@+id/trip_back_arrow"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
+                    android:layout_centerVertical="true"
                     android:layout_marginStart="10dp"
                     android:layout_marginEnd="20dp"
-                    android:layout_centerVertical="true"
-                    android:id="@+id/trip_back_arrow"
-                    android:src="@drawable/ic_back_arrow"/>
+                    android:src="@drawable/ic_back_arrow" />
+
                 <TextView
+                    android:id="@+id/options_account_settings_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
+                    android:layout_marginStart="5dp"
                     android:layout_toRightOf="@id/trip_back_arrow"
                     android:text="My Trip"
-                    android:textSize="20sp"
                     android:textColor="@color/white"
-                    android:layout_marginStart="5dp"
-                    android:id="@+id/options_account_settings_text"/>
+                    android:textSize="20sp" />
 
 
             </RelativeLayout>

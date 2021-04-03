@@ -5,22 +5,20 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LifecycleOwner;
 
 
-import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.example.travelhut.R;
-import com.example.travelhut.model.UniversalImageLoader;
-import com.example.travelhut.utils.BottomNavigationViewHelper;
+import com.example.travelhut.views.utils.BottomNavigationViewHelper;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
-import com.nostra13.universalimageloader.core.ImageLoader;
 
 public class NewsFeedActivity extends AppCompatActivity implements LifecycleOwner {
 
+
+    //Instance Variables
     private final static String TAG = "NewsFeedActivity";
-    private Context mContext = NewsFeedActivity.this;
     private static final int ACTIVITY_NUM = 2;
     private NewsFeedFragment newsFeedFragment;
 
@@ -29,14 +27,13 @@ public class NewsFeedActivity extends AppCompatActivity implements LifecycleOwne
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setupBottomNavigationView();
-        initImageLoader();
         if (savedInstanceState == null) {
             newsFeedFragment = new NewsFeedFragment();
             getSupportFragmentManager().beginTransaction().add(R.id.frame_layout, (Fragment) newsFeedFragment).commit();
         }
     }
 
-    //sets up botttom navigation view
+    //Sets up bottom navigation view
     private void setupBottomNavigationView() {
         Log.d(TAG, "setupBottomNavigationView: setting up BottomNavigationView");
         BottomNavigationViewEx bottomNavigationViewEx = findViewById(R.id.bottomNavViewBar);
@@ -47,10 +44,6 @@ public class NewsFeedActivity extends AppCompatActivity implements LifecycleOwne
         menuItem.setChecked(true);
     }
 
-    private void initImageLoader() {
-        UniversalImageLoader universalImageLoader = new UniversalImageLoader(mContext);
-        ImageLoader.getInstance().init(universalImageLoader.getConfig());
-    }
 
     @Override
     public void onBackPressed() {

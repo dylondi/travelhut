@@ -10,7 +10,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.travelhut.R;
-import com.example.travelhut.utils.BottomNavigationViewHelper;
+import com.example.travelhut.views.utils.BottomNavigationViewHelper;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 
 public class PlannerActivity extends AppCompatActivity {

@@ -1,0 +1,149 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_below="@id/card_view"
+    android:layout_marginTop="150dp"
+    android:id="@+id/maps_center_rel_layout"
+    android:background="@drawable/map_layout_bg"
+    android:layout_marginRight="10dp"
+    android:layout_marginLeft="10dp"
+    android:layout_marginBottom="10dp"
+    android:visibility="gone">
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/place_image_rounded_bg">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:background="@drawable/place_image_rounded_bg">
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="160dp"
+                android:background="@drawable/place_image_rounded_bg">
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:id="@+id/place_image_view"
+                    android:fadingEdge="horizontal"
+                    android:fadingEdgeLength="30dp"
+                    android:fillViewport="false"
+                    android:scaleType="fitXY"
+                    android:background="@drawable/place_image_rounded_bg"
+                    android:requiresFadingEdge="vertical"/>
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:baselineAligned="false" android:orientation="horizontal"
+                    android:layout_alignParentBottom="true"
+                    android:background="@drawable/transparent_gradient_top_bottom"
+                    android:weightSum="2">
+
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_gravity="bottom"
+                        android:layout_marginBottom="10dp">
+
+
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textSize="25sp"
+                            android:textColor="@color/white"
+                            android:paddingHorizontal="10dp"
+                            android:layout_gravity="bottom"
+                            android:id="@+id/place_name"/>
+
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textSize="10sp"
+                            android:textColor="@color/white"
+                            android:paddingHorizontal="15dp"
+                            android:id="@+id/place_address"/>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_weight="1"
+                        android:layout_marginBottom="10dp">
+                        <include layout="@layout/weather_item"/>
+                    </LinearLayout>
+                </LinearLayout>
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="215dp"
+                android:background="@color/white">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Events"
+                    android:layout_marginLeft="7dp"
+                    android:layout_marginTop="7dp"
+                    android:textSize="20sp"
+                    android:textColor="@color/light_blue"
+                    android:id="@+id/events_text"/>
+                <LinearLayout
+                    android:id="@+id/events_lin_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_below="@+id/events_text">
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="10dp"
+                        android:id="@+id/events_recycler_view"/>
+                </LinearLayout>
+
+            </RelativeLayout>
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingVertical="5dp">
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#d9d9d9"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/light_blue"
+                    android:id="@+id/covid_info_title"
+                    android:text="Covid-19 Info"
+                    android:textSize="20sp"
+                    android:layout_marginStart="5dp"/>
+
+                <include layout="@layout/snippet_coronavirus_stats"/>
+
+            </RelativeLayout>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+    <Button
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:background="@drawable/ic_new_trip"
+        android:id="@+id/floating_button"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="15dp"/>
+</RelativeLayout>

@@ -6,11 +6,11 @@
     tools:context=".views.main.profile.toolbar.NotificationsActivity">
 
     <RelativeLayout
+        android:id="@+id/toolbar_rel_layout_notifications"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/toolbar_rel_layout_notifications">
+        android:layout_height="wrap_content">
 
-        <include layout="@layout/snippet_top_notifications"/>
+        <include layout="@layout/snippet_top_notifications" />
     </RelativeLayout>
 
     <RelativeLayout
@@ -19,9 +19,9 @@
         android:layout_below="@id/toolbar_rel_layout_notifications">
 
         <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/notifications_recycler_view"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/notifications_recycler_view"/>
+            android:layout_height="wrap_content" />
 
     </RelativeLayout>
 
