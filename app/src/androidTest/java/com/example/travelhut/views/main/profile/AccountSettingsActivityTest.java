@@ -25,20 +25,26 @@ import static org.junit.Assert.*;
 
 public class AccountSettingsActivityTest {
 
+    //Create activity test rule
     @Rule
     public ActivityTestRule<AccountSettingsActivity> accountSettingsActivityActivityTestRule = new ActivityTestRule<>(AccountSettingsActivity.class);
 
+    //Declare a null AccountSettingsActivity object
     private AccountSettingsActivity accountSettingsActivity = null;
 
-    Instrumentation.ActivityMonitor monitor = getInstrumentation().addMonitor(EditProfileActivity.class.getName(), null, false);
+    //Activity Monitor
     Instrumentation.ActivityMonitor monitorSignOut = getInstrumentation().addMonitor(RegisterLoginActivity.class.getName(), null, false);
 
 
     @Before
     public void setUp() throws Exception {
+
+        //Initialize AccountSettingsActivity object
         accountSettingsActivity = accountSettingsActivityActivityTestRule.getActivity();
 
     }
+
+    //Test sign out function works
     @Test
     public void testSignOut(){
         assertNotNull(accountSettingsActivity.findViewById(R.id.acc_settings_logout_btn));

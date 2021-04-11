@@ -3,7 +3,6 @@ package com.example.travelhut.views.authentication;
 import android.view.View;
 
 import androidx.annotation.NonNull;
-import androidx.test.espresso.NoMatchingViewException;
 import androidx.test.espresso.UiController;
 import androidx.test.espresso.ViewAction;
 import androidx.test.espresso.contrib.RecyclerViewActions;
@@ -13,14 +12,8 @@ import androidx.test.rule.ActivityTestRule;
 import com.example.travelhut.R;
 import com.example.travelhut.views.main.newsfeed.NewsFeedActivity;
 import com.example.travelhut.views.main.newsfeed.newsfeed.CommentActivity;
-import com.example.travelhut.views.main.profile.AccountSettingsActivity;
 import com.example.travelhut.views.main.profile.ProfileActivity;
-import com.example.travelhut.views.main.profile.toolbar.EditProfileActivity;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.tabs.TabLayout;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
@@ -48,28 +41,14 @@ import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static java.lang.Thread.sleep;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.core.StringContains.containsString;
-import static org.junit.Assert.*;
 
 public class RegisterLoginActivityTest {
-
-
-    @Rule
-    public ActivityTestRule<RegisterLoginActivity> registerLoginActivityActivityTestRule = new ActivityTestRule<>(RegisterLoginActivity.class);
-
-    private RegisterLoginActivity registerLoginActivity = null;
-
-
-    @Before
-    public void setUp() {
-        registerLoginActivity = registerLoginActivityActivityTestRule.getActivity();
-
-    }
-
 
     @Test
     public void testSuccessfulLogin() throws InterruptedException {
 
-        String email = "test@test.ie";
+        //String auth values
+        String email = "testRegister@test.ie";
         String password = "Test12";
 
         onView(withId(R.id.tab_layout)).perform(selectTabAtPosition(0));
@@ -99,11 +78,12 @@ public class RegisterLoginActivityTest {
     @Test
     public void testSuccessfulRegisterAndLogin() throws InterruptedException {
 
+        //String auth values
         String email = "testRegister@test.ie";
         String username = "testRegister";
         String password = "Test12";
 
-        onView(withId(R.id.tab_layout)).perform(selectTabAtPosition(0));
+        //Delete user if already exists
         FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -111,6 +91,7 @@ public class RegisterLoginActivityTest {
             }
         });
 
+        //Go to register fragment
         onView(withId(R.id.tab_layout)).perform(selectTabAtPosition(1));
 
 
@@ -277,6 +258,8 @@ public class RegisterLoginActivityTest {
         Intents.release();
     }
 
+
+    //This method allows for switching between fragments in viewpager
     @NonNull
     private static ViewAction selectTabAtPosition(final int position) {
         return new ViewAction() {
@@ -287,7 +270,7 @@ public class RegisterLoginActivityTest {
 
             @Override
             public String getDescription() {
-                return "with tab at index" + String.valueOf(position);
+                return "with tab at index" + position;
             }
 
             @Override
@@ -303,11 +286,5 @@ public class RegisterLoginActivityTest {
             }
         };
     }
-
-    @After
-    public void tearDown() throws Exception {
-    }
-
-
 
 }

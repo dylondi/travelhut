@@ -70,7 +70,7 @@ public class WeatherAPIRepository extends LiveData<Weather> {
                 String urlIcon = StringsRepository.WEATHER_API_URL_ICON + nameIcon + "@2x.png";
 
                 //Post a Weather object containing data from response to the weatherMutableLiveData object
-                weatherMutableLiveData.postValue(new Weather(localTime, kelvin - kelvToCel, humidity, urlIcon ));
+                weatherMutableLiveData.postValue(new Weather(localTime, kelvin - kelvToCel, humidity, urlIcon));
 
             } catch (ExecutionException e) {
                 e.printStackTrace();
