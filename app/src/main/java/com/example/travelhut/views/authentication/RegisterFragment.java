@@ -45,6 +45,7 @@ public class RegisterFragment extends Fragment {
         //OnClickListener for register button which calls the register method in the RegisterViewModel
         registerButton.setOnClickListener(view -> {
 
+            //Boolean validators of the form info inputted by user
             boolean isEmailValid = registerViewModel.validateEmail(emailEditText);
             boolean isUsernameValid = registerViewModel.validateUsername(usernameEditText);
             boolean isPasswordValid = registerViewModel.validatePasswordOne(passwordEditText);
@@ -73,7 +74,6 @@ public class RegisterFragment extends Fragment {
                 });
             }
         });
-
         return root;
     }
 

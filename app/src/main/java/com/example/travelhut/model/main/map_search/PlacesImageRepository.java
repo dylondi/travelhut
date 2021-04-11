@@ -2,13 +2,11 @@ package com.example.travelhut.model.main.map_search;
 
 import android.graphics.Bitmap;
 import android.util.Log;
-import android.widget.ImageView;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.google.android.gms.common.api.ApiException;
-import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.PhotoMetadata;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.net.FetchPhotoRequest;
@@ -18,16 +16,21 @@ import java.util.List;
 
 public class PlacesImageRepository extends LiveData<Bitmap> {
 
-    private MutableLiveData<Bitmap> bitmapMutableLiveData;
+    //Instance Variables
     private static final String TAG = "PlacesImageRepository";
+    private MutableLiveData<Bitmap> bitmapMutableLiveData;
 
+    //Constructor
     public PlacesImageRepository() {
         bitmapMutableLiveData = new MutableLiveData<>();
     }
 
+    //This method sends an image request to the Google Places API -> posts Bitmap to MutableLiveData
     public void sendImageRequest(PlacesClient placesClient, Place place){
         //Declare and Initialize a list of PhotoMetaData Objects containing the current place's photo metadata info
         final List<PhotoMetadata> metadata = place.getPhotoMetadatas();
+
+        //Check for null or empty list
         if (metadata == null || metadata.isEmpty()) {
             return;
         }
@@ -40,19 +43,23 @@ public class PlacesImageRepository extends LiveData<Bitmap> {
                 .setMaxWidth(500)
                 .setMaxHeight(300)
                 .build();
-        placesClient.fetchPhoto(photoRequest).addOnSuccessListener((fetchPhotoResponse) -> {
 
-            //Get bitmap from response and set ImageView to this bitmap and configure viewBounds & scaleType
+            //Fetch photo request and attach an onSuccessListener and an onFailureListener
+            placesClient.fetchPhoto(photoRequest).addOnSuccessListener((fetchPhotoResponse) -> {
+
+            //Get bitmap from response and post it to bitmapMutableLiveData
             bitmapMutableLiveData.postValue(fetchPhotoResponse.getBitmap());
 
-
         }).addOnFailureListener((exception) -> {
+
+            //If ApiException -> log place not found
             if (exception instanceof ApiException) {
                 Log.e(TAG, "Place not found: " + exception.getMessage());
             }
         });
     }
 
+    //This method returns bitmapMutableLiveData, which is a MutableLiveData Object of type Bitmap
     public MutableLiveData<Bitmap> getBitmapMutableLiveData(){
         return bitmapMutableLiveData;
     }

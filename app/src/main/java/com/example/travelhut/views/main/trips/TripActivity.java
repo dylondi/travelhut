@@ -28,7 +28,7 @@ import com.example.travelhut.model.utils.StringsRepository;
 import com.example.travelhut.viewmodel.main.trips.TripActivityViewModel;
 import com.example.travelhut.viewmodel.main.trips.TripsActivityViewModelFactory;
 import com.example.travelhut.model.objects.Event;
-import com.example.travelhut.views.main.map_search.EventAdapter;
+import com.example.travelhut.views.main.map_search.utils.EventAdapter;
 import com.example.travelhut.model.objects.Trip;
 import com.example.travelhut.model.objects.CovidStatistics;
 import com.google.android.gms.common.api.ApiException;
@@ -39,7 +39,6 @@ import com.google.android.libraries.places.api.net.FetchPhotoRequest;
 import com.google.android.libraries.places.api.net.FetchPlaceRequest;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.material.datepicker.MaterialDatePicker;
-import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClickListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
@@ -47,7 +46,6 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 

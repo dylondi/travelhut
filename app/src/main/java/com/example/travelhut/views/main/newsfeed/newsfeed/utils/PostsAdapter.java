@@ -1,4 +1,4 @@
-package com.example.travelhut.views.main.newsfeed.newsfeed;
+package com.example.travelhut.views.main.newsfeed.newsfeed.utils;
 
 import android.content.Context;
 import android.content.Intent;
@@ -26,6 +26,7 @@ import com.example.travelhut.model.utils.StringsRepository;
 import com.example.travelhut.views.main.newsfeed.NewsFeedStrings;
 import com.example.travelhut.model.objects.Post;
 import com.example.travelhut.model.objects.User;
+import com.example.travelhut.views.main.newsfeed.newsfeed.CommentActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -151,11 +152,13 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         context.startActivity(intent);
     }
 
+    //This method shows description of post
     private void showDescription(@NonNull ViewHolder viewHolder, Post post) {
         viewHolder.descriptionTextView.setVisibility(View.VISIBLE);
         viewHolder.descriptionTextView.setText(post.getDescription());
     }
 
+    //This method either likes or unlikes current post depending on whether it was liked or not before
     private void ifNotLikedThenLike(@NonNull ViewHolder holder, Post post) {
 
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child(NewsFeedStrings.LIKES_CAP).child(post.getPostid())

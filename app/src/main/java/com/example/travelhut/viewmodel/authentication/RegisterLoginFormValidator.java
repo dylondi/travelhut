@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 
 public class RegisterLoginFormValidator {
 
+    //Password pattern for auth forms
     private static final Pattern PASSWORD_PATTERN =
             Pattern.compile("^" +
                     "(?=.*[0-9])" +         //At least 1 digit
@@ -16,6 +17,7 @@ public class RegisterLoginFormValidator {
                     ".{6,}" +               //At least 6 characters
                     "$");
 
+    //Email pattern for auth forms
     private static final Pattern EMAIL_ADDRESS
             = Pattern.compile(
             "[a-zA-Z0-9\\+\\.\\_\\%\\-\\+]{1,256}" +

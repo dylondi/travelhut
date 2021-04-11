@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.example.travelhut.model.utils.Common;
 import com.example.travelhut.model.utils.StringsRepository;
-import com.example.travelhut.views.main.map_search.DownloadStringFromURL;
+import com.example.travelhut.views.main.map_search.utils.DownloadStringFromURL;
 import com.example.travelhut.model.objects.Weather;
 
 import org.json.JSONException;
@@ -39,7 +39,7 @@ public class WeatherAPIRepository extends LiveData<Weather> {
             //Create string containing complete url for sending request
             String url = StringsRepository.WEATHER_API_URL_BASE + lat + "&lon=" + lon + "&exclude={part}&appid=" + weatherAPI;
 
-            //Create and initialize a DownloadJSON object
+            //Create and initialize a DownloadStringFromURL object
             DownloadStringFromURL downloadStringFromURL = new DownloadStringFromURL();
 
             String localTime;
@@ -60,10 +60,13 @@ public class WeatherAPIRepository extends LiveData<Weather> {
                 Long timeShift = jsonObject.getLong(StringsRepository.TIMEZONE_OFFSET);
                 Long kelvin = (Double.valueOf(Double.parseDouble(temp))).longValue();
 
+                //String containing the time in the selected location in hh:mm format
                 localTime = new SimpleDateFormat("hh:mm", Locale.ENGLISH)
                         .format(new Date((time + timeShift) * 1000));
 
+                //Get weather icon info from response in a string
                 String nameIcon = main.getJSONArray(StringsRepository.WEATHER).getJSONObject(0).getString(StringsRepository.ICON);
+
                 String urlIcon = StringsRepository.WEATHER_API_URL_ICON + nameIcon + "@2x.png";
 
                 //Post a Weather object containing data from response to the weatherMutableLiveData object

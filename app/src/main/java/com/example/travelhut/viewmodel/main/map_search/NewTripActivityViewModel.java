@@ -8,17 +8,19 @@ import androidx.lifecycle.AndroidViewModel;
 
 import com.example.travelhut.model.main.map_search.CreateTripRepository;
 import com.google.android.libraries.places.api.model.Place;
-import com.google.firebase.database.DatabaseReference;
 
 public class NewTripActivityViewModel extends AndroidViewModel {
 
+    //Instance Variable
     private CreateTripRepository createTripRepository;
 
+    //Constructor
     public NewTripActivityViewModel(@NonNull Application application) {
         super(application);
         createTripRepository = new CreateTripRepository();
     }
 
+    //This method notifies createTripRepository that a trip needs to be pushed to the database
     public void createTrip(Pair selectedDates, Place place, String startDate){
         createTripRepository.createTrip(selectedDates, place, startDate);
     }

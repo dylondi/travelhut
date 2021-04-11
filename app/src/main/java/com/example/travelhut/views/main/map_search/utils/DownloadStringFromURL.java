@@ -1,4 +1,4 @@
-package com.example.travelhut.views.main.map_search;
+package com.example.travelhut.views.main.map_search.utils;
 
 import android.os.AsyncTask;
 

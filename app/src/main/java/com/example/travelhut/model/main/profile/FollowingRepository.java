@@ -22,45 +22,44 @@ public class FollowingRepository extends LiveData<DataSnapshot> {
     private FirebaseUser firebaseUser;
 
     //Constructors
+    //For current user
     public FollowingRepository() {
-
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         following = FirebaseDatabase.getInstance().getReference(StringsRepository.FOLLOW_CAP).child(firebaseUser.getUid()).child(StringsRepository.FOLLOWING);
     }
+
+    //Used when current user needs following data of another user
     public FollowingRepository(String profileId) {
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         following = FirebaseDatabase.getInstance().getReference(StringsRepository.FOLLOW_CAP).child(profileId).child(StringsRepository.FOLLOWING);
     }
 
-
-    //method called when an observer is active
+    //Method called when an observer is active
     @Override
     protected void onActive() {
         Log.d(TAG, StringsRepository.ON_ACTIVE);
-        //assign event listener to find changes in number of following
+        //Assign event listener to find changes in number of following
         following.addValueEventListener(listenerFollowing);
-
     }
 
-    //method called when an observers lifecycle states has not started or resumed
+    //Method called when an observers lifecycle states has not started or resumed
     @Override
     protected void onInactive() {
         Log.d(TAG, StringsRepository.ON_INACTIVE);
-        //remove event listener
+        //Remove event listener
         following.removeEventListener(listenerFollowing);
     }
 
-    //event listener to find changes in data
+    //Event listener to find changes in data
     private class FollowingValueEventListener implements ValueEventListener {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
             setValue(dataSnapshot);
-
         }
 
         @Override
         public void onCancelled(DatabaseError databaseError) {
-            //Log.e(LOG_TAG, "Can't listen to query " + query, databaseError.toException());
+            Log.e(TAG, "Can't listen to reference " + following.toString(), databaseError.toException());
         }
     }
 }

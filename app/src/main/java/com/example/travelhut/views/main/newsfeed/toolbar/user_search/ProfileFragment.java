@@ -25,7 +25,7 @@ import com.example.travelhut.viewmodel.main.newsfeed.toolbar.users.ProfileFragme
 import com.example.travelhut.viewmodel.main.newsfeed.toolbar.users.ProfileFragmentViewModelFactory;
 import com.example.travelhut.model.objects.User;
 import com.example.travelhut.views.main.newsfeed.NewsFeedFragment;
-import com.example.travelhut.views.main.newsfeed.newsfeed.PostsAdapter;
+import com.example.travelhut.views.main.newsfeed.newsfeed.utils.PostsAdapter;
 import com.example.travelhut.model.objects.Post;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;

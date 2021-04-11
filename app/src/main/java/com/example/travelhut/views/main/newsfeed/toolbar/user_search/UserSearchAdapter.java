@@ -70,7 +70,7 @@ public class UserSearchAdapter extends RecyclerView.Adapter<UserSearchAdapter.Vi
         Log.i(TAG, "onBindViewHolder called, position: " + position);
 
         //Gets current user in recyclerView
-        final User user = mUsers.get(position);
+        User user = mUsers.get(position);
 
         //Initialize userSearchAdapterViewModel
         userSearchAdapterViewModel = new UserSearchAdapterViewModel(user.getId());
@@ -80,11 +80,11 @@ public class UserSearchAdapter extends RecyclerView.Adapter<UserSearchAdapter.Vi
 
 
         setUserItem(holder, user);
-        isFollowing(user.getId(), holder.btn_follow);
+        isFollowing(user.getId(), holder.followButtonSearch);
 
         //If this user is current user then remove option to follow/unfollow
         if (user.getId().equals(firebaseUser.getUid())) {
-            holder.btn_follow.setVisibility(View.GONE);
+            holder.followButtonSearch.setVisibility(View.GONE);
         }
 
         //OnClickListener for current user in search
@@ -96,7 +96,7 @@ public class UserSearchAdapter extends RecyclerView.Adapter<UserSearchAdapter.Vi
         });
 
         //OnClickListener for follow button in search
-        holder.btn_follow.setOnClickListener(v -> {
+        holder.followButtonSearch.setOnClickListener(v -> {
             Log.i(TAG, "itemView clicked in RecyclerView");
 
             //Follow or unfollow user
@@ -111,7 +111,7 @@ public class UserSearchAdapter extends RecyclerView.Adapter<UserSearchAdapter.Vi
 
         HashMap<String, Object> hashMap = new HashMap<>();
         hashMap.put(StringsRepository.USER_ID, firebaseUser.getUid());
-        hashMap.put(StringsRepository.TEXT, "started following you");
+        hashMap.put(StringsRepository.TEXT, StringsRepository.STARTED_FOLLOWING_YOU);
         hashMap.put(StringsRepository.POST_ID, "");
         hashMap.put(StringsRepository.IS_POST, false);
 
@@ -123,7 +123,7 @@ public class UserSearchAdapter extends RecyclerView.Adapter<UserSearchAdapter.Vi
     private void followOrUnfollowUser(@NonNull ViewHolder holder, User user) {
 
         //Checks if already following
-        if (holder.btn_follow.getText().toString().equals(StringsRepository.FOLLOW)) {
+        if (holder.followButtonSearch.getText().toString().equals(StringsRepository.FOLLOW)) {
             userSearchAdapterViewModel.follow(user.getId());
             addNotification(user.getId());
             Log.d("logging", "follow " + user.getId());
@@ -144,10 +144,10 @@ public class UserSearchAdapter extends RecyclerView.Adapter<UserSearchAdapter.Vi
 
     //This method sets the data for the current item in recyclerView
     private void setUserItem(@NonNull ViewHolder holder, User user) {
-        holder.btn_follow.setVisibility(View.VISIBLE);
-        holder.username.setText(user.getUsername());
-        holder.email.setText(user.getEmail());
-        Glide.with(mContext).load(user.getImageurl()).into(holder.image_profile);
+        holder.followButtonSearch.setVisibility(View.VISIBLE);
+        holder.usernameSearch.setText(user.getUsername());
+        holder.emailSearch.setText(user.getEmail());
+        Glide.with(mContext).load(user.getImageurl()).into(holder.profileImageSearch);
     }
 
 
@@ -160,21 +160,19 @@ public class UserSearchAdapter extends RecyclerView.Adapter<UserSearchAdapter.Vi
     public class ViewHolder extends RecyclerView.ViewHolder {
 
         //Instance Variables
-        public TextView username;
-        public TextView email;
-        public CircleImageView image_profile;
-        public Button btn_follow;
-
-
+        public TextView usernameSearch;
+        public TextView emailSearch;
+        public CircleImageView profileImageSearch;
+        public Button followButtonSearch;
 
         //Constructor
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
-            username = itemView.findViewById(R.id.username);
-            email = itemView.findViewById(R.id.email);
-            image_profile = itemView.findViewById(R.id.image_profile);
-            btn_follow = itemView.findViewById(R.id.btn_follow);
+            usernameSearch = itemView.findViewById(R.id.username);
+            emailSearch = itemView.findViewById(R.id.email);
+            profileImageSearch = itemView.findViewById(R.id.image_profile);
+            followButtonSearch = itemView.findViewById(R.id.btn_follow);
         }
     }
 

@@ -1,4 +1,4 @@
-package com.example.travelhut.views.main.trips.trip_fragments;
+package com.example.travelhut.views.main.trips.utils;
 
 import android.content.Context;
 import android.content.Intent;

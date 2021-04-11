@@ -22,6 +22,7 @@ public class OnboardingScreensViewModel extends AndroidViewModel {
         userMutableLiveData = authRepository.getUserMutableLiveData();
     }
 
+    //This method returns a LiveData object containing the current FirebaseUser
     public MutableLiveData<FirebaseUser> getUserMutableLiveData() {
         return userMutableLiveData;
     }

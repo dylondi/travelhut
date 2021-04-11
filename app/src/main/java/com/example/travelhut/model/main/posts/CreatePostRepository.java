@@ -2,14 +2,12 @@ package com.example.travelhut.model.main.posts;
 
 import android.app.Application;
 import android.app.ProgressDialog;
-import android.content.Intent;
 import android.net.Uri;
-import android.widget.Toast;
 
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 
 import com.example.travelhut.model.utils.StringsRepository;
-import com.example.travelhut.views.main.profile.ProfileActivity;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -27,23 +25,29 @@ public class CreatePostRepository extends LiveData<DataSnapshot> {
     //Instance Variables
     private StorageReference storageReference;
     private StorageTask uploadTask;
+    private MutableLiveData<Boolean> imageUploadedMutableLiveData;
+    private MutableLiveData<String> uploadFailedMessage;
 
     //Constructor
     public CreatePostRepository() {
         storageReference = FirebaseStorage.getInstance().getReference(StringsRepository.POSTS);
+        imageUploadedMutableLiveData = new MutableLiveData<>();
+        uploadFailedMessage = new MutableLiveData<>();
     }
 
     //This method will upload the post to firebase
-    public void uploadImage(Uri imageUri, String fileExtension, Application application, ProgressDialog progressDialog, String description){
+    public void uploadImage(Uri imageUri, String fileExtension, String description){
 
+        //Check null imageUri
         if(imageUri != null){
 
+            //Unique name(using timestamp) assigned for the image reference stored in our database
             StorageReference fileRef = storageReference.child(System.currentTimeMillis() + StringsRepository.FULL_STOP + fileExtension);
 
+            //Initialize storageTask by setting the image Uri Object to the storage reference
             uploadTask = fileRef.putFile(imageUri);
 
             //Returns a new Task that will be completed with the result of applying the specified Continuation to this Task
-            //If task completion fails -> display toast
             uploadTask.continueWithTask((Continuation) task -> {
                 if(!task.isComplete()){
                     throw task.getException();
@@ -61,41 +65,60 @@ public class CreatePostRepository extends LiveData<DataSnapshot> {
                     //Retrieve the database reference to all users posts
                     DatabaseReference reference = FirebaseDatabase.getInstance().getReference(StringsRepository.POSTS_CAP);
 
-                    //Retrieve post key for post to be uploaded
+                    //Retrieve post key for post to be uploaded to
                     String postId = reference.push().getKey();
 
                     //Calling uploadPostToDatabase with our current post values
                     uploadPostToDatabase(myUrl, reference, postId, description);
 
-                    progressDialog.dismiss();
+                    //Post true too imageUploadedMutableLiveData containing boolean
+                    imageUploadedMutableLiveData.postValue(true);
+                }
+                //If task is unsuccessful -> post false value to imageUploadedMutableLiveData and post failed string message
+                else {
+                    imageUploadedMutableLiveData.postValue(false);
+                    uploadFailedMessage.postValue(StringsRepository.FAILED_CAP);
+                }
 
-                    //Create and start intent to navigate to the ProfileActivity upon successful task completion
-                    Intent profileIntent = new Intent(application, ProfileActivity.class);
-                    profileIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    application.startActivity(profileIntent);
-                    //application.finish();
-                }
-                //If task is unsuccessful -> display toast
-                else{
-                    Toast.makeText(application, StringsRepository.FAILED_CAP, Toast.LENGTH_SHORT).show();
-                }
-            }).addOnFailureListener(e -> Toast.makeText(application, ""+e.getMessage(), Toast.LENGTH_SHORT).show());
+                //If task completion fails -> post false value to imageUploadedMutableLiveData and post failed string message
+            }).addOnFailureListener(e -> {
+                imageUploadedMutableLiveData.postValue(false);
+                uploadFailedMessage.postValue(e.getMessage());
+            });
         }
-        //Else -> display toast informing no image was selected
-        else{
-            Toast.makeText(application, StringsRepository.NO_IMAGE_SELECTED, Toast.LENGTH_SHORT).show();
 
+        //Else -> post false value to imageUploadedMutableLiveData and post failed string message
+        else {
+            imageUploadedMutableLiveData.postValue(false);
+            uploadFailedMessage.postValue(StringsRepository.NO_IMAGE_SELECTED);
         }
     }
 
     //This method uploads a HashMap object containing a post's details for Firebase Database
     private void uploadPostToDatabase(String myUrl, DatabaseReference reference, String postId, String description) {
+
+        //Create HashMap
         HashMap<String, Object> hashMap = new HashMap<>();
+
+        //Put all story data into HashMap
         hashMap.put(StringsRepository.POST_ID, postId);
         hashMap.put(StringsRepository.POST_IMAGE, myUrl);
         hashMap.put(StringsRepository.DESCRIPTION, description);
         hashMap.put(StringsRepository.PUBLISHER, FirebaseAuth.getInstance().getCurrentUser().getUid());
 
+        //Set the value of the HashMap to the DatabaseReference referencing an empty reference
         reference.child(postId).setValue(hashMap);
     }
+
+
+    //This method returns the boolean valued MutableLiveData object called imageUploadedMutableLiveData
+    public MutableLiveData<Boolean> getImageUploadedMutableLiveData(){
+        return imageUploadedMutableLiveData;
+    }
+
+    //This method returns the String valued MutableLiveData object called imageUploadedMutableLiveData
+    public MutableLiveData<String> getUploadFailedMessage(){
+        return uploadFailedMessage;
+    }
+
 }

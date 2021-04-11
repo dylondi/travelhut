@@ -42,7 +42,7 @@ public class StoryActivityRepository extends LiveData<DataSnapshot> {
     @Override
     protected void onActive() {
         Log.d(TAG, StringsRepository.ON_ACTIVE);
-        //assign event listener to find changes in posts data
+        //Assign event listener to find changes in posts data
         reference.addValueEventListener(storyEventListener);
     }
 
@@ -50,7 +50,7 @@ public class StoryActivityRepository extends LiveData<DataSnapshot> {
     @Override
     protected void onInactive() {
         Log.d(TAG, StringsRepository.ON_INACTIVE);
-        //remove event listener
+        //Remove event listener
         reference.removeEventListener(storyEventListener);
     }
 
@@ -63,7 +63,7 @@ public class StoryActivityRepository extends LiveData<DataSnapshot> {
 
         @Override
         public void onCancelled(DatabaseError databaseError) {
-            //Log.e(LOG_TAG, "Can't listen to query " + query, databaseError.toException());
+            Log.e(TAG, "Can't listen to reference " + reference.toString(), databaseError.toException());
         }
     }
 
@@ -77,11 +77,16 @@ public class StoryActivityRepository extends LiveData<DataSnapshot> {
 
     //This method retrieves the number of views on current story and posts number of views to LiveData object seenNumber
     public void seenNumber(String storyId){
+
+        //DatabaseReference to story views
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(StringsRepository.STORY_CAP)
                 .child(userId).child(storyId).child(StringsRepository.VIEWS);
+
+        //Add ListenerForSingleValueEvent to DatabaseReference
         reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                //Set Value of number of children in dataSnapshot
                 seenNumber.setValue(dataSnapshot.getChildrenCount());
             }
 
@@ -111,8 +116,5 @@ public class StoryActivityRepository extends LiveData<DataSnapshot> {
         return seenNumber;
     }
 
-    public MutableLiveData<Boolean> getStoryDeleted(){
-        return storyDeleted;
-    }
 
 }

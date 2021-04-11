@@ -1,10 +1,7 @@
 package com.example.travelhut.model.main.profile;
 
-import android.app.Application;
-import android.app.ProgressDialog;
 import android.net.Uri;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
@@ -38,17 +35,20 @@ public class ProfileRepository extends LiveData<DataSnapshot> {
     private DatabaseReference reference;
     private FirebaseUser firebaseUser;
     private MutableLiveData<Boolean> isFollowing;
-
+    private MutableLiveData<Boolean> imageUploadedMutableLiveData;
+    private MutableLiveData<String> uploadFailedMessage;
 
     //Constructors
+    //Called when dealing with current users page
     public ProfileRepository() {
-
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         reference = FirebaseDatabase.getInstance().getReference(USERS_CAP).child(firebaseUser.getUid());
+        imageUploadedMutableLiveData = new MutableLiveData<>();
+        uploadFailedMessage = new MutableLiveData<>();
     }
 
+    //Called when viewing another users page
     public ProfileRepository(String profileId) {
-
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         reference = FirebaseDatabase.getInstance().getReference(USERS_CAP).child(profileId);
         isFollowing = new MutableLiveData<>();
@@ -57,18 +57,22 @@ public class ProfileRepository extends LiveData<DataSnapshot> {
 
     //This method checks if the current user is following another user matching the profileId parameter
     private void checkIfFollows(String profileId) {
+
+        //DatabaseReference to current users following accounts
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child(StringsRepository.FOLLOW_CAP).child(firebaseUser.getUid()).child(StringsRepository.FOLLOWING);
 
+        //Add Single Value Event Listener to DatabaseReference
         reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                //Check if current user follows user with profileId
                 if (snapshot.child(profileId).exists()) {
                     isFollowing.setValue(true);
                 } else {
                     isFollowing.setValue(false);
                 }
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
 
@@ -80,7 +84,7 @@ public class ProfileRepository extends LiveData<DataSnapshot> {
     @Override
     protected void onActive() {
         Log.d(LOG_TAG, StringsRepository.ON_ACTIVE);
-        //assign event listener to find changes in profile data
+        //Assign event listener to find changes in profile data
         reference.addValueEventListener(profileEventListener);
     }
 
@@ -88,38 +92,45 @@ public class ProfileRepository extends LiveData<DataSnapshot> {
     @Override
     protected void onInactive() {
         Log.d(LOG_TAG, StringsRepository.ON_INACTIVE);
-        //remove event listener
+        //Remove event listener
         reference.removeEventListener(profileEventListener);
     }
 
-    //event listener to find changes in data
+    //Event listener to find changes in data
     private class ProfileEventListener implements ValueEventListener {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
+            //Set value for dataSnapshot
             setValue(dataSnapshot);
             if (this == null) {
                 return;
             }
         }
-
         @Override
         public void onCancelled(DatabaseError databaseError) {
         }
     }
 
-
+    //This method updates current user's profile data
     public void updateProfile(String displayName, String username, String bio, String url) {
+
+        //DatabaseReference to current user in database
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(USERS_CAP).child(firebaseUser.getUid());
 
+        //Create HashMap
         HashMap<String, Object> hashMap = new HashMap<>();
+
+        //Put all updated data in HashMap
         hashMap.put(StringsRepository.DISPLAY_NAME, displayName);
         hashMap.put(StringsRepository.USERNAME, username);
         hashMap.put(StringsRepository.BIO, bio);
         hashMap.put(StringsRepository.URL, url);
 
+        //Update database reference to contain new data
         reference.updateChildren(hashMap);
     }
 
+    //This method is called when current user follows another user
     public void follow(String userId) {
         //Updates db -> currentUser -> following -> otherUser -> true
         FirebaseDatabase.getInstance().getReference()
@@ -159,17 +170,18 @@ public class ProfileRepository extends LiveData<DataSnapshot> {
 
     }
 
-    //This method returns a boolean isFollowing when on another user's profile
+    //This method returns a MutableLiveData object containing a boolean isFollowing representing if the current user if following the user's account their on
     public MutableLiveData<Boolean> getIsFollowing() {
         return isFollowing;
     }
 
     //This method creates a notification and uploads the object to firebase
-    public void followNotification(String profileid) {
-        //Database reference to new notification data
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(StringsRepository.NOTIFICATIONS_CAP).child(profileid);
+    public void followNotification(String profileId) {
 
-        //Hashmap to store the notification details
+        //Database reference to new notification data
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(StringsRepository.NOTIFICATIONS_CAP).child(profileId);
+
+        //HashMap to store the notification details
         HashMap<String, Object> hashMap = new HashMap<>();
         hashMap.put(StringsRepository.USER_ID, firebaseUser.getUid());
         hashMap.put(StringsRepository.TEXT, StringsRepository.STARTED_FOLLOWING_YOU);
@@ -181,11 +193,12 @@ public class ProfileRepository extends LiveData<DataSnapshot> {
     }
 
     //This method uploads a new image to firebase when user updates profile image
-    public void uploadImage(Uri imageUri, String fileExtension, Application application, ProgressDialog progressDialog) {
+    public void uploadImage(Uri imageUri, String fileExtension) {
 
         //Storage reference to firebase storage for image uploads
         StorageReference storageRef = FirebaseStorage.getInstance().getReference(StringsRepository.UPLOADS);
 
+        //Check null imageUri
         if (imageUri != null) {
 
             //Uniquely naming the image file reference to current time stamp and the file extension
@@ -194,6 +207,8 @@ public class ProfileRepository extends LiveData<DataSnapshot> {
 
             //Create a storage task to upload the imageUri to the file reference
             StorageTask uploadTask = fileRef.putFile(imageUri);
+
+            //Returns a new Task that will be completed with the result of applying the specified Continuation to this Task
             uploadTask.continueWithTask((Continuation<UploadTask.TaskSnapshot, Task<Uri>>) task -> {
                 if (!task.isSuccessful()) {
                     throw task.getException();
@@ -201,11 +216,11 @@ public class ProfileRepository extends LiveData<DataSnapshot> {
                 return fileRef.getDownloadUrl();
             }).addOnCompleteListener((OnCompleteListener<Uri>) task -> {
                 if (task.isSuccessful()) {
-                    //Get new image Uri and store as a String
+                    //Get image Uri result and store as a String
                     Uri downloadUri = task.getResult();
                     String myUrl = downloadUri.toString();
 
-                    //Get current database reference
+                    //Get current user's database reference
                     DatabaseReference reference = FirebaseDatabase.getInstance().getReference(USERS_CAP).child(firebaseUser.getUid());
 
                     //Create HashMap to update existing user data with new image url
@@ -215,13 +230,36 @@ public class ProfileRepository extends LiveData<DataSnapshot> {
                     //update data with HashMap
                     reference.updateChildren(hashMap);
 
-                    progressDialog.dismiss();
-                } else {
-                    Toast.makeText(application, StringsRepository.FAILED_CAP, Toast.LENGTH_SHORT).show();
+                    //Post true too imageUploadedMutableLiveData containing boolean
+                    imageUploadedMutableLiveData.postValue(true);
                 }
-            }).addOnFailureListener(e -> Toast.makeText(application, "" + e.getMessage(), Toast.LENGTH_SHORT).show());
-        } else {
-            Toast.makeText(application, StringsRepository.NO_IMAGE_SELECTED, Toast.LENGTH_SHORT).show();
+                //If task is unsuccessful -> post false value to imageUploadedMutableLiveData and post failed string message
+                else {
+                    imageUploadedMutableLiveData.postValue(false);
+                    uploadFailedMessage.postValue(StringsRepository.FAILED_CAP);
+                }
+
+                //If task completion fails -> post false value to imageUploadedMutableLiveData and post failed string message
+            }).addOnFailureListener(e -> {
+                imageUploadedMutableLiveData.postValue(false);
+                uploadFailedMessage.postValue(e.getMessage());
+            });
         }
+
+        //Else -> post false value to imageUploadedMutableLiveData and post failed string message
+        else {
+            imageUploadedMutableLiveData.postValue(false);
+            uploadFailedMessage.postValue(StringsRepository.NO_IMAGE_SELECTED);
+        }
+    }
+
+    //This method returns the boolean valued MutableLiveData object called imageUploadedMutableLiveData
+    public MutableLiveData<Boolean> getImageUploadedMutableLiveData(){
+        return imageUploadedMutableLiveData;
+    }
+
+    //This method returns the String valued MutableLiveData object called imageUploadedMutableLiveData
+    public MutableLiveData<String> getUploadFailedMessage(){
+        return uploadFailedMessage;
     }
 }

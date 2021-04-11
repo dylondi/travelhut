@@ -1,4 +1,4 @@
-package com.example.travelhut.views.main.newsfeed.newsfeed;
+package com.example.travelhut.views.main.newsfeed.newsfeed.utils;
 
 import android.content.Context;
 import android.content.Intent;
@@ -17,7 +17,10 @@ import com.example.travelhut.R;
 import com.example.travelhut.model.utils.StringsRepository;
 import com.example.travelhut.model.objects.User;
 import com.example.travelhut.model.objects.Story;
+import com.example.travelhut.views.main.newsfeed.newsfeed.StoryActivity;
+import com.example.travelhut.views.main.newsfeed.newsfeed.UploadStoryActivity;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -43,17 +46,17 @@ public class StoryAdapter extends RecyclerView.Adapter<StoryAdapter.ViewHolder> 
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 
         //If current user has no stories
+        View view;
         if (viewType == 0) {
 
             //Initialize view to be add_story_item
-            View view = LayoutInflater.from(mContext).inflate(R.layout.add_story_item, parent, false);
-            return new StoryAdapter.ViewHolder(view);
+            view = LayoutInflater.from(mContext).inflate(R.layout.add_story_view, parent, false);
         } else {
 
             //Initialize view to be story_item
-            View view = LayoutInflater.from(mContext).inflate(R.layout.story_view, parent, false);
-            return new StoryAdapter.ViewHolder(view);
+            view = LayoutInflater.from(mContext).inflate(R.layout.story_view, parent, false);
         }
+        return new ViewHolder(view);
     }
 
     @Override
@@ -62,17 +65,19 @@ public class StoryAdapter extends RecyclerView.Adapter<StoryAdapter.ViewHolder> 
         //Current story
         final Story story = stories.get(position);
 
+        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+
         //Get user info
-        userInfo(holder, story.getUserid(), position);
+        currentStoryUserData(holder, story.getUserid(), position);
 
         //If current story is not current user's story
         if (holder.getAdapterPosition() != 0) {
-            checkIfSeenStory(holder, story.getUserid());
+            checkIfSeenStory(holder, firebaseUser, story.getUserid());
         }
 
         //If current story is current user's story
         if (holder.getAdapterPosition() == 0) {
-            myStory(holder.postStoryText, holder.storyPlus, false);
+            myStory(holder.postStoryText, holder.storyPlus, firebaseUser, false);
         }
 
 
@@ -81,7 +86,7 @@ public class StoryAdapter extends RecyclerView.Adapter<StoryAdapter.ViewHolder> 
 
             //If story clicked is current user's story
             if (holder.getAdapterPosition() == 0) {
-                myStory(holder.postStoryText, holder.storyImage, true);
+                myStory(holder.postStoryText, holder.storyImage, firebaseUser, true);
             } else {
                 //Create Intent for StoryActivity, put storyId as String extra and start activity
                 Intent intent = new Intent(mContext, StoryActivity.class);
@@ -129,13 +134,13 @@ public class StoryAdapter extends RecyclerView.Adapter<StoryAdapter.ViewHolder> 
 
 
     //This method gets user info of current story to set image and username
-    private void userInfo(final ViewHolder viewHolder, String userId, final int pos) {
+    private void currentStoryUserData(ViewHolder viewHolder, String userId, final int pos) {
 
         //DatabaseReference for user of current story
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(StringsRepository.USERS_CAP).child(userId);
+        DatabaseReference authorUserDataRef = FirebaseDatabase.getInstance().getReference(StringsRepository.USERS_CAP).child(userId);
 
         //SingleValueEventListener for DatabaseReference
-        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+        authorUserDataRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -158,11 +163,11 @@ public class StoryAdapter extends RecyclerView.Adapter<StoryAdapter.ViewHolder> 
     }
 
     //This method configures Views for current user's story
-    private void myStory(final TextView textView, ImageView imageView, boolean click) {
+    private void myStory(final TextView textView, ImageView imageView, FirebaseUser firebaseUser, boolean wasStoryClicked) {
 
         //DatabaseReference of current user's stories
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(StringsRepository.STORY_CAP)
-                .child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+                .child(firebaseUser.getUid());
 
         //SingleValueEventListener for DatabaseReference
         reference.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -185,7 +190,7 @@ public class StoryAdapter extends RecyclerView.Adapter<StoryAdapter.ViewHolder> 
                 }
 
                 //If user clicked on own story
-                if (click) {
+                if (wasStoryClicked) {
 
                     //Declare Intent object
                     Intent intent;
@@ -225,14 +230,14 @@ public class StoryAdapter extends RecyclerView.Adapter<StoryAdapter.ViewHolder> 
     }
 
     //This method checks if the current story has already been viewed, if so -> update views to indicate
-    private void checkIfSeenStory(final ViewHolder viewHolder, String userid) {
+    private void checkIfSeenStory(final ViewHolder viewHolder, FirebaseUser firebaseUser, String userId) {
 
         //DatabaseReference to current story
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(StringsRepository.STORY_CAP)
-                .child(userid);
+        DatabaseReference storyRef = FirebaseDatabase.getInstance().getReference(StringsRepository.STORY_CAP)
+                .child(userId);
 
         //ValueEventListener for DatabaseReference
-        reference.addValueEventListener(new ValueEventListener() {
+        storyRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
 
@@ -242,7 +247,7 @@ public class StoryAdapter extends RecyclerView.Adapter<StoryAdapter.ViewHolder> 
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
 
                     //If current user has not viewed the current story and the story has not expired yet
-                    if (!dataSnapshot.child(StringsRepository.VIEWS).child(FirebaseAuth.getInstance().getCurrentUser().getUid()).exists()
+                    if (!dataSnapshot.child(StringsRepository.VIEWS).child(firebaseUser.getUid()).exists()
                             && System.currentTimeMillis() < dataSnapshot.getValue(Story.class).getTimeend()) {
                         storyViewed = false;
                     }
@@ -250,13 +255,9 @@ public class StoryAdapter extends RecyclerView.Adapter<StoryAdapter.ViewHolder> 
 
                 //If story is not already viewed
                 if (!storyViewed) {
-                    //Make unseen view visible (dark blue circle surrounding story)
-                    viewHolder.storyFrame.setVisibility(View.VISIBLE);
-                    viewHolder.storySeenFrame.setVisibility(View.GONE);
+                    storyNotSeenView(viewHolder);
                 } else {
-                    //Make unseen view visible (light blue circle surrounding story)
-                    viewHolder.storyFrame.setVisibility(View.GONE);
-                    viewHolder.storySeenFrame.setVisibility(View.VISIBLE);
+                    storySeenView(viewHolder);
                 }
             }
 
@@ -265,5 +266,17 @@ public class StoryAdapter extends RecyclerView.Adapter<StoryAdapter.ViewHolder> 
 
             }
         });
+    }
+
+    private void storySeenView(ViewHolder viewHolder) {
+        //Make unseen view visible (light blue circle surrounding story)
+        viewHolder.storyFrame.setVisibility(View.GONE);
+        viewHolder.storySeenFrame.setVisibility(View.VISIBLE);
+    }
+
+    private void storyNotSeenView(ViewHolder viewHolder) {
+        //Make unseen view visible (dark blue circle surrounding story)
+        viewHolder.storyFrame.setVisibility(View.VISIBLE);
+        viewHolder.storySeenFrame.setVisibility(View.GONE);
     }
 }

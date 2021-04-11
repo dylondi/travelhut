@@ -28,11 +28,14 @@ public class TicketMasterAPIRepository extends LiveData<List<Event>> {
     //Instance Variable
     private MutableLiveData<List<Event>> mutableEventList;
 
-    //Constructor
+    //Constructors
+    //This constructor for Trip page
     public TicketMasterAPIRepository(String tripId) {
         mutableEventList = new MutableLiveData<>();
         getPlaceName(tripId);
     }
+
+    //This constructor for Map search page
     public TicketMasterAPIRepository() {
         mutableEventList = new MutableLiveData<>();
     }
@@ -47,7 +50,10 @@ public class TicketMasterAPIRepository extends LiveData<List<Event>> {
         reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                //Get Trip object from snapshot
                 Trip trip = snapshot.getValue(Trip.class);
+
                 loadEvents(trip.getPlacename());
             }
 
@@ -82,6 +88,7 @@ public class TicketMasterAPIRepository extends LiveData<List<Event>> {
 
                 //Post eventsList List to the MutableLiveData object mutableEventList
                 mutableEventList.postValue(eventsList);
+                return;
 
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -103,7 +110,7 @@ public class TicketMasterAPIRepository extends LiveData<List<Event>> {
         eventsList.add(new Event(eventName, eventPlace, eventDate, eventId, eventImageUrl));
     }
 
-
+    //This method returns a MutableLiveData object containing a list of Event objects
     public MutableLiveData<List<Event>> getMutableEventList() {
         return mutableEventList;
     }

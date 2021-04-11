@@ -23,19 +23,23 @@ public class CommentActivityViewModel extends AndroidViewModel {
         commentImageRepository = new CommentImageRepository();
     }
 
+    //This method notifies commentRepository that a comment needs to be created with message as param
     public void createComment(String comment){
         commentRepository.createComment(comment);
     }
 
+    //This method notifies commentRepository that a notification needs to be created
     public void addNotification(String comment){
         commentRepository.addNotification(comment);
     }
 
+    //This method returns the LiveData object from commentRepository containing image for comment
     @NonNull
     public LiveData<DataSnapshot> getCommentImageLiveData() {
         return commentImageRepository;
     }
 
+    //This method returns the LiveData object from commentRepository containing list of comments in dataSnapshot
     @NonNull
     public LiveData<DataSnapshot> getCommentsLiveData() {
         return commentRepository;

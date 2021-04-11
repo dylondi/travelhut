@@ -16,6 +16,7 @@ import android.widget.ImageView;
 import com.example.travelhut.R;
 import com.example.travelhut.model.objects.Notification;
 import com.example.travelhut.viewmodel.main.profile.toolbar.NotificationsActivityViewModel;
+import com.example.travelhut.views.main.profile.toolbar.utils.NotificationsAdapter;
 import com.google.firebase.database.DataSnapshot;
 
 import java.util.ArrayList;
@@ -26,7 +27,7 @@ public class NotificationsFragment extends Fragment {
 
     //Instance Variables
     private RecyclerView recyclerView;
-    private NotificationAdapter notificationAdapter;
+    private NotificationsAdapter notificationsAdapter;
     private List<Notification> notificationList;
     private ImageView backArrow;
     private NotificationsActivityViewModel notificationsActivityViewModel;
@@ -45,12 +46,12 @@ public class NotificationsFragment extends Fragment {
         recyclerView = view.findViewById(R.id.notifications_recycler_view);
         backArrow = view.findViewById(R.id.notifications_back_arrow);
         notificationList = new ArrayList<>();
-        notificationAdapter = new NotificationAdapter(getContext(), notificationList);
+        notificationsAdapter = new NotificationsAdapter(getContext(), notificationList);
 
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(linearLayoutManager);
 
-        recyclerView.setAdapter(notificationAdapter);
+        recyclerView.setAdapter(notificationsAdapter);
         readNotifications();
 
         backArrow.setOnClickListener(v -> getActivity().finish());
@@ -71,7 +72,7 @@ public class NotificationsFragment extends Fragment {
                 notificationList.add(notification);
             }
             Collections.reverse(notificationList);
-            notificationAdapter.notifyDataSetChanged();
+            notificationsAdapter.notifyDataSetChanged();
         });
 
     }

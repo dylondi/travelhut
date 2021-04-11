@@ -13,58 +13,13 @@ import com.google.firebase.database.ValueEventListener;
 
 public class PostsRepository extends LiveData<DataSnapshot> {
 
-
-    //Instance Variable
+    //Instance Variables
     private static final String TAG = "PostsAppRepository";
     private PostsEventListener postsEventListener = new PostsEventListener();
     private DatabaseReference reference;
 
     //Constructor
-    public
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    PostsRepository() {
+    public PostsRepository() {
         reference = FirebaseDatabase.getInstance().getReference(StringsRepository.POSTS_CAP);
     }
 
@@ -72,7 +27,7 @@ public class PostsRepository extends LiveData<DataSnapshot> {
     @Override
     protected void onActive() {
         Log.d(TAG, StringsRepository.ON_ACTIVE);
-        //assign event listener to find changes in posts data
+        //Assign event listener to find changes in posts data
         reference.addValueEventListener(postsEventListener);
     }
 
@@ -80,7 +35,7 @@ public class PostsRepository extends LiveData<DataSnapshot> {
     @Override
     protected void onInactive() {
         Log.d(TAG, StringsRepository.ON_INACTIVE);
-        //remove event listener
+        //Remove event listener
         reference.removeEventListener(postsEventListener);
     }
 
@@ -88,13 +43,13 @@ public class PostsRepository extends LiveData<DataSnapshot> {
     private class PostsEventListener implements ValueEventListener {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
+
+            //Set value to new DataSnapshot
             setValue(dataSnapshot);
         }
-
         @Override
         public void onCancelled(DatabaseError databaseError) {
-            //Log.e(LOG_TAG, "Can't listen to query " + query, databaseError.toException());
+            Log.e(TAG, "onCancelled(): ", databaseError.toException());
         }
     }
-
 }

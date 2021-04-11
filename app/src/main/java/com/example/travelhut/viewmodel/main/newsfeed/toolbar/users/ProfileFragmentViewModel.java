@@ -30,38 +30,46 @@ public class ProfileFragmentViewModel extends AndroidViewModel {
         postsRepository = new PostsRepository();
     }
 
+    //This method notifies profileRepository to follow a user with userId
     public void follow(String userId) {
         profileRepository.follow(userId);
     }
 
+    //This method notifies profileRepository to unfollow a user with userId
     public void unFollow(String userId) {
         profileRepository.unFollow(userId);
     }
 
+    //This method notifies profileRepository to send a follow notification to user with userId
     public void followNotification(String userId) {
         profileRepository.followNotification(userId);
     }
 
+    //This method returns profile data from MutableLiveData object
     @NonNull
     public LiveData<DataSnapshot> getDataSnapshotLiveData() {
         return profileRepository;
     }
 
+    //This method returns boolean indicating if current user follows the profile data
     @NonNull
     public MutableLiveData<Boolean> getIsFollowing() {
         return profileRepository.getIsFollowing();
     }
 
+    //This method returns followers data from MutableLiveData object
     @NonNull
     public LiveData<DataSnapshot> getFollowersSnapshot() {
         return followersRepository;
     }
 
+    //This method returns following data from MutableLiveData object
     @NonNull
     public LiveData<DataSnapshot> getFollowingSnapshot() {
         return followingRepository;
     }
 
+    //This method returns profile data from MutableLiveData object
     @NonNull
     public LiveData<DataSnapshot> getPostsLiveData() {
         return postsRepository;

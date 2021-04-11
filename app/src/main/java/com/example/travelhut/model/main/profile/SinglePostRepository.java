@@ -18,6 +18,7 @@ public class SinglePostRepository extends LiveData<DataSnapshot> {
     private DatabaseReference postReference;
     private static final String TAG = "SinglePostAppRepository";
 
+    //Constructor
     public SinglePostRepository(String postid) {
         postReference = FirebaseDatabase.getInstance().getReference(StringsRepository.POSTS_CAP).child(postid);
     }
@@ -47,7 +48,7 @@ public class SinglePostRepository extends LiveData<DataSnapshot> {
 
         @Override
         public void onCancelled(DatabaseError databaseError) {
-            //Log.e(LOG_TAG, "Can't listen to query " + query, databaseError.toException());
+            Log.e(TAG, "Can't listen to reference " + postReference.toString(), databaseError.toException());
         }
     }
 }

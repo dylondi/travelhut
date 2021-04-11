@@ -25,8 +25,8 @@ import com.example.travelhut.R;
 import com.example.travelhut.viewmodel.main.newsfeed.NewsFeedActivityViewModel;
 import com.example.travelhut.model.objects.User;
 import com.example.travelhut.views.main.newsfeed.newsfeed.UploadStoryActivity;
-import com.example.travelhut.views.main.newsfeed.newsfeed.PostsAdapter;
-import com.example.travelhut.views.main.newsfeed.newsfeed.StoryAdapter;
+import com.example.travelhut.views.main.newsfeed.newsfeed.utils.PostsAdapter;
+import com.example.travelhut.views.main.newsfeed.newsfeed.utils.StoryAdapter;
 import com.example.travelhut.model.objects.Post;
 import com.example.travelhut.model.objects.Story;
 import com.example.travelhut.views.main.newsfeed.toolbar.user_search.UserSearchAdapter;
@@ -39,7 +39,6 @@ import java.util.List;
 public class NewsFeedFragment extends Fragment {
 
     //Instance Variables
-    private static final String TAG = "NewsFeedFragment";
     public RecyclerView recyclerViewSearch, recyclerView, storyRecyclerView;
     private UserSearchAdapter userSearchAdapter;
     private PostsAdapter postsAdapter;

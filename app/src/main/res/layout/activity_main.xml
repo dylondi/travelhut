@@ -22,7 +22,8 @@
 
         <include
             android:id="@+id/nav_bar"
-            layout="@layout/layout_bottom_navigation_view" />
+            layout="@layout/layout_bottom_navigation_view"
+            />
 
     </RelativeLayout>
 

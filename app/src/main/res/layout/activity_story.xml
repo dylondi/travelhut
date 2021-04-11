@@ -16,26 +16,27 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:id="@+id/story_splitter_lin_layout">
 
         <View
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:id="@+id/reverse"/>
+            android:id="@+id/previous_story"/>
         <View
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:id="@+id/skip"/>
+            android:id="@+id/next_story"/>
     </LinearLayout>
 
     <jp.shts.android.storiesprogressview.StoriesProgressView
         android:layout_width="match_parent"
         android:layout_height="3dp"
-        android:id="@+id/stories"
-        android:paddingLeft="8dp"
-        android:paddingRight="8dp"
+        android:id="@+id/stories_progress_view"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
         android:layout_gravity="top"
         android:layout_marginTop="8dp"/>
 
@@ -43,7 +44,7 @@
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/stories"
+        android:layout_below="@id/stories_progress_view"
         android:layout_margin="10dp">
 
         <de.hdodenhof.circleimageview.CircleImageView

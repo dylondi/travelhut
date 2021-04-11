@@ -13,16 +13,16 @@ import com.google.firebase.database.ValueEventListener;
 
 public class StoryUserInfoRepository extends LiveData<DataSnapshot> {
 
-
+    //Instance Variables
     private static final String TAG = "StoryUserInfoRepository";
     private StoryUserInfoEventListener storyUserInfoEventListener = new StoryUserInfoEventListener();
     private DatabaseReference databaseReference;
 
+    //Constructor
     public StoryUserInfoRepository(String userId){
         databaseReference = FirebaseDatabase.getInstance().getReference(StringsRepository.USERS_CAP)
                 .child(userId);
     }
-
 
     //Method called when an observer is active
     @Override
@@ -49,7 +49,7 @@ public class StoryUserInfoRepository extends LiveData<DataSnapshot> {
 
         @Override
         public void onCancelled(DatabaseError databaseError) {
-            //Log.e(LOG_TAG, "Can't listen to query " + query, databaseError.toException());
+                Log.e(TAG, "Can't listen to query " + databaseReference.toString(), databaseError.toException());
         }
     }
 

@@ -29,10 +29,12 @@ public class UploadStoryActivityViewModel extends AndroidViewModel {
         uploadStoryRepository.uploadStory(imageUri,fileExtension);
     }
 
+    //This method calls uploadStory method of the UploadStoryRepository class
     public MutableLiveData<Boolean> getImageUploadedMutableLiveData(){
         return uploadStoryRepository.getImageUploadedMutableLiveData();
     }
 
+    //This method calls getUploadFailedMessage method of the UploadStoryRepository class returning a LiveData object containing error message
     public MutableLiveData<String> getUploadFailedMessage(){
         return uploadStoryRepository.getUploadFailedMessage();
     }

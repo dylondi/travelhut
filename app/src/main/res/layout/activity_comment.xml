@@ -36,15 +36,15 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:background="@color/white"
-        android:padding="4dp">
+        android:padding="8dp">
 
         <EditText
             android:id="@+id/write_comment"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp"
             android:layout_toLeftOf="@+id/comment_post"
             android:layout_toRightOf="@id/comment_profile_image"
             android:background="@android:color/transparent"
@@ -63,7 +63,8 @@
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/comment_profile_image"
             android:layout_width="40dp"
-            android:layout_height="40dp" />
+            android:layout_height="40dp"
+            android:layout_marginStart="5dp"/>
     </RelativeLayout>
 
 </RelativeLayout>

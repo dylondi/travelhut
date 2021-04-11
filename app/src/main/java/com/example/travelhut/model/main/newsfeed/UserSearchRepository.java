@@ -7,7 +7,6 @@ import com.example.travelhut.model.utils.StringsRepository;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 
@@ -22,6 +21,7 @@ public class UserSearchRepository extends LiveData<DataSnapshot> {
         userMutableLiveData = new MutableLiveData<>();
         firebaseAuth = FirebaseAuth.getInstance();
 
+        //If a user is signed in, post the FirebaseUser object to the MutableLiveData object
         if (firebaseAuth.getCurrentUser() != null) {
             userMutableLiveData.postValue(firebaseAuth.getCurrentUser());
         }
@@ -61,8 +61,8 @@ public class UserSearchRepository extends LiveData<DataSnapshot> {
                 .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).removeValue();
     }
 
+    //This method returns a MutableLiveData object containing a FirebaseUser object
     public MutableLiveData<FirebaseUser> getUserMutableLiveData() {
         return userMutableLiveData;
     }
-
 }

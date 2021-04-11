@@ -1,4 +1,4 @@
-package com.example.travelhut.views.main.trips;
+package com.example.travelhut.views.main.trips.utils;
 
 import android.content.Context;
 

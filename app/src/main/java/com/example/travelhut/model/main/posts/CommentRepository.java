@@ -19,12 +19,12 @@ public class CommentRepository extends LiveData<DataSnapshot> {
 
 
     //Instance Variables
+    private static final String TAG = "CommentAppRepository";
     private String postId;
     private String publisherId;
     private FirebaseUser firebaseUser;
     private DatabaseReference commentsReference;
     private CommentsEventListener commentsEventListener = new CommentsEventListener();
-    private static final String TAG = "CommentAppRepository";
 
     //Constructor
     public CommentRepository(String postId, String publisherId) {
@@ -34,26 +34,27 @@ public class CommentRepository extends LiveData<DataSnapshot> {
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
     }
 
-    //method called when an observer is active
+    //Method called when an observer is active
     @Override
     protected void onActive() {
         Log.d(TAG, StringsRepository.ON_ACTIVE);
-        //assign event listener to find changes in posts data
+        //Assign event listener to find changes in posts data
         commentsReference.addValueEventListener(commentsEventListener);
     }
 
-    //method called when an observers lifecycle states has not started or resumed
+    //Method called when an observers lifecycle states has not started or resumed
     @Override
     protected void onInactive() {
         Log.d(TAG, StringsRepository.ON_INACTIVE);
-        //remove event listener
+        //Remove event listener
         commentsReference.removeEventListener(commentsEventListener);
     }
 
-    //event listener to find changes in data
+    //Event listener to find changes in data
     private class CommentsEventListener implements ValueEventListener {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
+            //Update dataSnapshot with new data
             setValue(dataSnapshot);
         }
 
@@ -65,11 +66,11 @@ public class CommentRepository extends LiveData<DataSnapshot> {
     //This method creates a comment HashMap and pushes the HashMap to the database with the commentsReference DatabaseReference
     public void createComment(String comment){
 
-        //Create HashMap and put comment and publisher into HashMap
+        //Start a background thread, create HashMap and put comment and publisher into HashMap
         new Thread(() -> {
             HashMap<String, Object> hashMap = new HashMap<>();
             hashMap.put(StringsRepository.COMMENT, comment);
-            hashMap.put(StringsRepository.PUBLISHER, firebaseUser.getUid());
+            hashMap.put(StringsRepository.AUTHOR, firebaseUser.getUid());
 
             commentsReference.push().setValue(hashMap);
         }).start();
@@ -78,8 +79,9 @@ public class CommentRepository extends LiveData<DataSnapshot> {
     //This method adds a notification to the receiving users notifications database section
     public void addNotification(String comment){
 
-
+        //Start a background thread, create HashMap and put comment and publisher into HashMap
         new Thread(() -> {
+
             //Get reference to receiving users Notifications database section
             DatabaseReference reference = FirebaseDatabase.getInstance().getReference(StringsRepository.NOTIFICATIONS_CAP).child(publisherId);
 

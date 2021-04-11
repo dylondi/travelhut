@@ -24,6 +24,7 @@ public class StringsRepository {
     public final static String POST_IMAGE = "postimage";
     public final static String DESCRIPTION = "description";
     public final static String PUBLISHER = "publisher";
+    public final static String AUTHOR = "author";
     public final static String FAILED_CAP = "Failed";
     public final static String NO_IMAGE_SELECTED = "No Image Selected";
     public final static String SOMETHING_GONE_WRONG = "Something Gone Wrong";
@@ -107,6 +108,7 @@ public class StringsRepository {
     public final static String DT = "dt";
     public final static String SPACE_LIKES = " likes";
     public final static String LIKED_POST_NOTIFICATION_MESSAGE = "liked your post";
-
+    public final static String MY_STORY = "My Story";
+    public final static String ADD_STORY = "Add Story";
 
 }

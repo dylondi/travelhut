@@ -2,7 +2,6 @@ package com.example.travelhut.model.main.profile;
 
 import android.util.Log;
 
-import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 
 import com.example.travelhut.model.utils.StringsRepository;
@@ -18,17 +17,16 @@ import com.google.firebase.database.ValueEventListener;
 public class NotificationsRepository extends LiveData<DataSnapshot> {
 
     //Instance Variables
+    private static final String TAG = "NotificationsRepository";
     private FirebaseUser firebaseUser;
     private DatabaseReference reference;
     private final NotificationsEventListener notificationsEventListener = new NotificationsEventListener();
-    private static final String TAG = "NotificationsRepository";
 
     //Constructor
     public NotificationsRepository() {
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         reference = FirebaseDatabase.getInstance().getReference("Notifications").child(firebaseUser.getUid());
     }
-
 
     //Method called when an observer is active
     @Override
@@ -44,21 +42,6 @@ public class NotificationsRepository extends LiveData<DataSnapshot> {
         reference.removeEventListener(notificationsEventListener);
     }
 
-    private void readNotifications(){
-
-        reference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                setValue(dataSnapshot);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-    }
-
     private class NotificationsEventListener implements ValueEventListener {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
@@ -67,7 +50,7 @@ public class NotificationsRepository extends LiveData<DataSnapshot> {
 
         @Override
         public void onCancelled(DatabaseError databaseError) {
-            //Log.e(LOG_TAG, "Can't listen to query " + query, databaseError.toException());
+            Log.e(TAG, "Can't listen to reference " + reference.toString(), databaseError.toException());
         }
     }
 }

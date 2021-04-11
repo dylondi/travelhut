@@ -27,7 +27,7 @@ public class StoriesRepository extends LiveData<DataSnapshot> {
     @Override
     protected void onActive() {
         Log.d(TAG, StringsRepository.ON_ACTIVE);
-        //assign event listener to find changes in posts data
+        //Assign event listener to find changes in posts data
         reference.addValueEventListener(storiesEventListener);
     }
 
@@ -35,7 +35,7 @@ public class StoriesRepository extends LiveData<DataSnapshot> {
     @Override
     protected void onInactive() {
         Log.d(TAG, StringsRepository.ON_INACTIVE);
-        //remove event listener
+        //Remove event listener
         reference.removeEventListener(storiesEventListener);
     }
 
@@ -48,7 +48,7 @@ public class StoriesRepository extends LiveData<DataSnapshot> {
 
         @Override
         public void onCancelled(DatabaseError databaseError) {
-            //Log.e(LOG_TAG, "Can't listen to query " + query, databaseError.toException());
+            Log.e(TAG, "Can't listen to reference " + reference.toString(), databaseError.toException());
         }
     }
 }

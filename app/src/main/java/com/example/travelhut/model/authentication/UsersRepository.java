@@ -38,7 +38,7 @@ public class UsersRepository extends LiveData<DataSnapshot> {
     //Constructor without search by user
     public UsersRepository() {
         reference = FirebaseDatabase.getInstance().getReference(StringsRepository.USERS_CAP);
-        query = (Query) reference;
+        query = reference;
     }
 
     public Query getUserSearchQuery() {
@@ -67,24 +67,14 @@ public class UsersRepository extends LiveData<DataSnapshot> {
     private class UserEventListener implements ValueEventListener {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
+            //Update dataSnapshot with new data
             setValue(dataSnapshot);
         }
 
         @Override
         public void onCancelled(DatabaseError databaseError) {
-            //Log.e(LOG_TAG, "Can't listen to query " + query, databaseError.toException());
+            Log.e(LOG_TAG, "Can't listen to reference " + reference.toString(), databaseError.toException());
         }
-    }
-
-    //This method returns a boolean MutableLiveData object indicating if the current user is logged in or out
-    public MutableLiveData<Boolean> getLoggedOutMutableLiveData() {
-        return loggedOutMutableLiveData;
-    }
-
-    //This method will logout the current user
-    public void logout() {
-        firebaseAuth.signOut();
-        loggedOutMutableLiveData.postValue(true);
     }
 
 }

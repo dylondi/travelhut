@@ -20,6 +20,7 @@ public class NotificationsActivityViewModel extends AndroidViewModel {
         notificationsRepository = new NotificationsRepository();
     }
 
+    //This method returns a MutableLiveData object containing a list of notifications
     @NonNull
     public LiveData<DataSnapshot> getFollowingSnapshot() {
         return notificationsRepository;

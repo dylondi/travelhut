@@ -26,7 +26,6 @@ public class Trip {
     public Trip() {
     }
 
-
     //Getters and Setters
     public long getStartdate() {
         return startdate;

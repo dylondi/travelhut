@@ -27,32 +27,33 @@ public class CommentImageRepository extends LiveData<DataSnapshot> {
         reference = FirebaseDatabase.getInstance().getReference(StringsRepository.USERS_CAP).child(firebaseUser.getUid());
     }
 
-    //method called when an observer is active
+    //Method called when an observer is active
     @Override
     protected void onActive() {
         Log.d(TAG, StringsRepository.ON_ACTIVE);
-        //assign event listener to find changes in posts data
+        //Assign event listener to find changes in posts data
         reference.addValueEventListener(commentImageEventListener);
     }
 
-    //method called when an observers lifecycle states has not started or resumed
+    //Method called when an observers lifecycle states has not started or resumed
     @Override
     protected void onInactive() {
         Log.d(TAG, StringsRepository.ON_INACTIVE);
-        //remove event listener
+        //Remove event listener
         reference.removeEventListener(commentImageEventListener);
     }
 
-    //event listener to find changes in data
+    //Event listener to find changes in data
     private class CommentImageEventListener implements ValueEventListener {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
+            //Update dataSnapshot with new data
             setValue(dataSnapshot);
         }
 
         @Override
         public void onCancelled(DatabaseError databaseError) {
-            //Log.e(LOG_TAG, "Can't listen to query " + query, databaseError.toException());
+            Log.e(TAG, "Can't listen to reference " + reference.toString(), databaseError.toException());
         }
     }
 }

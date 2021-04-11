@@ -61,24 +61,27 @@ public class NewTripActivity extends AppCompatActivity {
 
         final MaterialDatePicker materialDatePicker = builder.build();
         final List<Place.Field> placeFields = Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.ADDRESS);
-        final FetchPlaceRequest request = FetchPlaceRequest.newInstance(placeid, placeFields);
 
-        //Fetch place with PlacesClient and given request
-        placesClient.fetchPlace(request).addOnSuccessListener((response) -> {
+        if(getIntent().getStringExtra(StringsRepository.PLACE_ID)!=null) {
+            placeid = getIntent().getStringExtra(StringsRepository.PLACE_ID);
+            final FetchPlaceRequest request = FetchPlaceRequest.newInstance(placeid, placeFields);
 
-            //Get place object from response
-            Place place = response.getPlace();
-            placeArray[0] = place;
+            //Fetch place with PlacesClient and given request
+            placesClient.fetchPlace(request).addOnSuccessListener((response) -> {
 
-            //Set text of autocompleteFragment to selected place's name
-            autocompleteFragment.setText(place.getName());
-            Log.i(TAG, "Place found: " + place.getName());
-        }).addOnFailureListener((exception) -> {
-            if (exception instanceof ApiException) {
-                Log.e(TAG, "Place not found: " + exception.getMessage());
-            }
-        });
+                //Get place object from response
+                Place place = response.getPlace();
+                placeArray[0] = place;
 
+                //Set text of autocompleteFragment to selected place's name
+                autocompleteFragment.setText(place.getName());
+                Log.i(TAG, "Place found: " + place.getName());
+            }).addOnFailureListener((exception) -> {
+                if (exception instanceof ApiException) {
+                    Log.e(TAG, "Place not found: " + exception.getMessage());
+                }
+            });
+        }
         //Set OnClickListener to newTripCheckButton
         newTripCheckButton.setOnClickListener(v -> {
 
@@ -105,7 +108,7 @@ public class NewTripActivity extends AppCompatActivity {
             @Override
             public void onPlaceSelected(@NotNull Place place) {
                 if (place.getName() != null || !place.getName().equals(StringsRepository.EMPTY_STRING)) {
-
+                    placeArray[0] = place;
                 }
             }
 
@@ -127,13 +130,13 @@ public class NewTripActivity extends AppCompatActivity {
         ));
     }
 
+    //This method initializes objects
     private void initVariables() {
         chooseDatesButton = findViewById(R.id.choose_dates_button);
         startDate = findViewById(R.id.start_date);
         newTripBackButton = findViewById(R.id.new_trip_back_arrow);
         newTripCheckButton = findViewById(R.id.new_trip_check);
         apiKey = getString(R.string.google_api_key);
-        placeid = getIntent().getStringExtra(StringsRepository.PLACE_ID);
         builder = MaterialDatePicker.Builder.dateRangePicker();
         autocompleteFragment = (AutocompleteSupportFragment) getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
     }

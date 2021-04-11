@@ -4,12 +4,12 @@ public class Comment {
 
     //Instance Variables
     private String comment;
-    private String publisher;
+    private String author;
 
     //Constructors
-    public Comment(String comment, String publisher) {
+    public Comment(String comment, String author) {
         this.comment = comment;
-        this.publisher = publisher;
+        this.author = author;
     }
     public Comment() {
     }
@@ -23,11 +23,11 @@ public class Comment {
         this.comment = comment;
     }
 
-    public String getPublisher() {
-        return publisher;
+    public String getAuthor() {
+        return author;
     }
 
-    public void setPublisher(String publisher) {
-        this.publisher = publisher;
+    public void setAuthor(String author) {
+        this.author = author;
     }
 }

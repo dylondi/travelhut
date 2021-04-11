@@ -38,6 +38,8 @@ public class CovidStatisticsRepository extends LiveData<CovidStatistics> {
     private MutableLiveData<List<DataEntry>> mutableGraphData;
 
     //Constructors
+
+    //Constructor for Trip page
     public CovidStatisticsRepository(String tripIdOrPlaceName, boolean isTripId) {
         mutableCovidStatistics = new MutableLiveData<>();
         mutableGraphData = new MutableLiveData<>();
@@ -45,11 +47,13 @@ public class CovidStatisticsRepository extends LiveData<CovidStatistics> {
             getPlaceName(tripIdOrPlaceName);
         }
     }
+    //Constructor for Map page
     public CovidStatisticsRepository() {
         mutableCovidStatistics = new MutableLiveData<>();
         mutableGraphData = new MutableLiveData<>();
     }
 
+    //This method returns the place from the the tripId param
     private void getPlaceName(String tripId) {
 
         //Database reference to the current users selected trip
@@ -59,15 +63,17 @@ public class CovidStatisticsRepository extends LiveData<CovidStatistics> {
         reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                //Get Trip object from snapshot
                 Trip trip = snapshot.getValue(Trip.class);
                 try {
+                    //Call both corona stat methods
                     loadCoronaVirusStats(trip.getPlacename());
                     loadCoronaVirusStatsChart(trip.getPlacename());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
 
@@ -79,6 +85,7 @@ public class CovidStatisticsRepository extends LiveData<CovidStatistics> {
     //This method retrieves data to advise users of Covid situation in the location searched (
     public void loadCoronaVirusStats(String placeName){
 
+        //Init OkHttpClient
         OkHttpClient client = new OkHttpClient();
 
         //Request builder with header info and url
@@ -87,6 +94,7 @@ public class CovidStatisticsRepository extends LiveData<CovidStatistics> {
                 .url(StringsRepository.TRAVEL_ADVICE_BASE_URL + placeName)
                 .build();
 
+        //Create a new call with the Request object
         client.newCall(request).enqueue(new Callback() {
 
             @Override
@@ -116,14 +124,6 @@ public class CovidStatisticsRepository extends LiveData<CovidStatistics> {
         });
     }
 
-    public MutableLiveData<CovidStatistics> getMutableCovidStats() {
-        return mutableCovidStatistics;
-    }
-
-    public MutableLiveData<List<DataEntry>> getMutableCovidGraphStats() {
-        return mutableGraphData;
-    }
-
     //This method queries an airport API with a Name and receive a three letter IATA representation of the airport name. eg Dublin -> DUB or London Heathrow -> LHR
     //It then calls the getDailyCovidInfo method
     public void loadCoronaVirusStatsChart(String placeName) {
@@ -138,6 +138,7 @@ public class CovidStatisticsRepository extends LiveData<CovidStatistics> {
                 .url(StringsRepository.AIRPORT_CODES_URL + placeName)
                 .build();
 
+        //Create a new call with the Request object
         client.newCall(requestOne).enqueue(new Callback() {
 
             @Override
@@ -200,5 +201,15 @@ public class CovidStatisticsRepository extends LiveData<CovidStatistics> {
                 }
             }
         });
+    }
+
+    //This method returns covid info on selected place
+    public MutableLiveData<CovidStatistics> getMutableCovidStats() {
+        return mutableCovidStatistics;
+    }
+
+    //This method returns covid graph data on selected place
+    public MutableLiveData<List<DataEntry>> getMutableCovidGraphStats() {
+        return mutableGraphData;
     }
 }

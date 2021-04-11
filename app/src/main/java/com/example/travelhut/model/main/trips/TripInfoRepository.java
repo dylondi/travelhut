@@ -16,9 +16,9 @@ import com.google.firebase.database.ValueEventListener;
 public class TripInfoRepository extends LiveData<DataSnapshot> {
 
     //Instance Variables
+    private static final String TAG = "TripInfoAppRepository";
     private DatabaseReference tripInfoReference;
     private TripInfoEventListener tripInfoEventListener = new TripInfoEventListener();
-    private static final String TAG = "TripInfoAppRepository";
 
     //Constructor
     public TripInfoRepository(String tripId) {

@@ -22,6 +22,8 @@ import com.bumptech.glide.Glide;
 import com.example.travelhut.R;
 import com.example.travelhut.viewmodel.main.profile.EditProfileActivityViewModel;
 import com.example.travelhut.model.objects.User;
+import com.example.travelhut.views.main.newsfeed.NewsFeedActivity;
+import com.example.travelhut.views.main.newsfeed.newsfeed.UploadStoryActivity;
 import com.example.travelhut.views.main.profile.ProfileActivity;
 import com.google.firebase.database.DataSnapshot;
 import com.rengwuxian.materialedittext.MaterialEditText;
@@ -134,7 +136,23 @@ public class EditProfileActivity extends AppCompatActivity {
         progressDialog.setMessage("Uploading");
         progressDialog.show();
 
-        editProfileActivityViewModel.uploadImage(imageUri,getFileExtension(this, imageUri),progressDialog);
+        editProfileActivityViewModel.uploadImage(imageUri,getFileExtension(this, imageUri));
+
+        //Observe boolean from ViewModel representing if the story was published successfully
+        editProfileActivityViewModel.getImageUploadedMutableLiveData().observe(this, imageUploaded -> {
+            if (imageUploaded) {
+
+                //Dismiss dialog and create new intent to navigate to news feed
+                progressDialog.dismiss();
+
+            } else {
+                //Observe image upload failed message from ViewModel and display in toast if message is not empty
+                editProfileActivityViewModel.getUploadFailedMessage().observe(this, message -> {
+                    if (!message.isEmpty())
+                        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+                });
+            }
+        });
     }
 
     @Override

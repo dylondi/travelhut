@@ -1,4 +1,4 @@
-package com.example.travelhut.views.main.map_search;
+package com.example.travelhut.views.main.map_search.utils;
 
 import android.content.Context;
 import android.content.Intent;
@@ -81,6 +81,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
         return eventsList.size();
     }
 
+    //ViewHolder class to give access to UI views
     public class ViewHolder extends RecyclerView.ViewHolder {
 
 

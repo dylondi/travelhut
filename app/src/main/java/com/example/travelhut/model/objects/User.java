@@ -1,6 +1,8 @@
 package com.example.travelhut.model.objects;
 
 public class User {
+
+    //Instance Variable
     private String id;
     private String email;
     private String username;
@@ -9,6 +11,7 @@ public class User {
     private String bio;
     private String url;
 
+    //Constructors
     public User(String id, String username, String displayname, String bio, String email, String imageurl, String url) {
         this.id = id;
         this.email = email;
@@ -18,10 +21,11 @@ public class User {
         this.imageurl = imageurl;
         this.url = url;
     }
-
     public User() {
 
     }
+
+    //Getter and Setters
 
     public String getUrl() {
         return url;

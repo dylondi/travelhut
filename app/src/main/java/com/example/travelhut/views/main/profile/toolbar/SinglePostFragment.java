@@ -20,7 +20,7 @@ import com.example.travelhut.R;
 import com.example.travelhut.model.utils.StringsRepository;
 import com.example.travelhut.viewmodel.main.profile.toolbar.SinglePostFragmentViewModel;
 import com.example.travelhut.viewmodel.main.profile.toolbar.SinglePostFragmentViewModelFactory;
-import com.example.travelhut.views.main.newsfeed.newsfeed.PostsAdapter;
+import com.example.travelhut.views.main.newsfeed.newsfeed.utils.PostsAdapter;
 import com.example.travelhut.model.objects.Post;
 import com.google.firebase.database.DataSnapshot;
 

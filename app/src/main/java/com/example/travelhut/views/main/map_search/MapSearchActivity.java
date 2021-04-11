@@ -41,6 +41,7 @@ import com.bumptech.glide.Glide;
 import com.example.travelhut.R;
 import com.example.travelhut.model.utils.StringsRepository;
 import com.example.travelhut.model.objects.Event;
+import com.example.travelhut.views.main.map_search.utils.EventAdapter;
 import com.example.travelhut.views.utils.BottomNavigationViewHelper;
 import com.example.travelhut.viewmodel.main.map_search.MapSearchActivityViewModel;
 import com.example.travelhut.model.objects.CovidStatistics;
@@ -102,8 +103,10 @@ public class MapSearchActivity extends AppCompatActivity implements OnMapReadyCa
         setContentView(R.layout.activity_map_search);
         Log.d(TAG, "onCreate: started.");
 
-
+        //Google API key
         apiKey = getString(R.string.google_api_key);
+
+        //Initialize ViewModel
         mapSearchActivityViewModel = ViewModelProviders.of(this).get(MapSearchActivityViewModel.class);
 
         initializeViews();
@@ -292,7 +295,7 @@ public class MapSearchActivity extends AppCompatActivity implements OnMapReadyCa
 
             //Update view info to display current weather info & image
             //timeText.setText(weather.getTime());
-            timeText.setText("7:00PM");
+            timeText.setText("3:24PM");
             tempText.setText(weather.getTemp() + "°C");
             humidityText.setText("Humidity: " + weather.getHumidity() + "%");
 

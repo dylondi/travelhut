@@ -2,12 +2,14 @@ package com.example.travelhut.model.objects;
 
 public class Event {
 
+    //Instance Variables
     private String name;
     private String venue;
     private String date;
     private String eventid;
     private String imageUrl;
 
+    //Constructor
     public Event(String name, String venue, String date, String eventid,String imageUrl) {
         this.name = name;
         this.venue = venue;
@@ -16,6 +18,7 @@ public class Event {
         this.imageUrl = imageUrl;
     }
 
+    //Getters and Setters
     public String getImageUrl() {
         return imageUrl;
     }

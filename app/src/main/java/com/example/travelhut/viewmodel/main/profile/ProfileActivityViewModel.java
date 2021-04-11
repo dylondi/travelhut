@@ -24,24 +24,28 @@ public class ProfileActivityViewModel extends ViewModel{
         followersRepository = new FollowersRepository(profileId);
         followingRepository = new FollowingRepository(profileId);
         postsRepository = new PostsRepository();
-
     }
 
+
+    //This method returns a LiveData object containing a DataSnapshot
     @NonNull
     public LiveData<DataSnapshot> getDataSnapshotLiveData() {
         return profileRepository;
     }
 
+    //This method returns a LiveData object containing a DataSnapshot containing the followers of the current user
     @NonNull
     public LiveData<DataSnapshot> getFollowersSnapshot() {
         return followersRepository;
     }
 
+    //This method returns a LiveData object containing a DataSnapshot containing the following of the current user
     @NonNull
     public LiveData<DataSnapshot> getFollowingSnapshot() {
         return followingRepository;
     }
 
+    //This method returns a LiveData object containing a DataSnapshot posts
     @NonNull
     public LiveData<DataSnapshot> getPostsLiveData() {
         return postsRepository;

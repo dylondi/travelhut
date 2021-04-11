@@ -38,30 +38,26 @@ public class TripActivityViewModel extends AndroidViewModel {
         placesImageRepository = new PlacesImageRepository();
     }
 
+    //This method returns a LiveData object containing a DataSnapshot containing trip information
     public LiveData<DataSnapshot> getTripInfo(){
         return tripInfoRepository;
     }
 
+    //This method returns a LiveData object containing a List of events for a trip
     @NonNull
     public MutableLiveData<List<Event>> getEventsList(){
         return ticketMasterAPIRepository.getMutableEventList();
     }
 
+    //This method returns a LiveData object containing a CovidStatistics object
     @NonNull
     public MutableLiveData<CovidStatistics> getCovidStats(){
         return covidStatisticsRepository.getMutableCovidStats();
     }
 
+    //This method returns a LiveData object containing a List of DataEntry objects for graph
     @NonNull
     public MutableLiveData<List<DataEntry>> getCovidGraphStats(){
         return covidStatisticsRepository.getMutableCovidGraphStats();
-    }
-
-    public void sendImageRequest(PlacesClient placesClient, Place place){
-        placesImageRepository.sendImageRequest(placesClient, place);
-    }
-
-    public MutableLiveData<Bitmap> getBitmapMutableLiveData(){
-        return placesImageRepository.getBitmapMutableLiveData();
     }
 }

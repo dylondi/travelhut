@@ -6,6 +6,7 @@ import androidx.viewpager.widget.ViewPager;
 import android.os.Bundle;
 
 import com.example.travelhut.R;
+import com.example.travelhut.views.authentication.utils.AuthViewStrings;
 import com.example.travelhut.views.authentication.utils.RegisterLoginAdapter;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;

@@ -30,7 +30,7 @@ public class UploadStoryActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_story);
+        setContentView(R.layout.activity_upload_story);
 
         //Initialize ViewModel
         uploadStoryActivityViewModel = ViewModelProviders.of(this).get(UploadStoryActivityViewModel.class);

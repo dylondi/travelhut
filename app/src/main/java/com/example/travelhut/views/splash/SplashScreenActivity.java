@@ -13,8 +13,8 @@ import com.example.travelhut.views.onboarding.OnboardingScreensActivity;
 
 public class SplashScreenActivity extends AppCompatActivity {
 
-    ImageView logo, appName, splashImage;
-    LottieAnimationView lottieAnimationView;
+    private ImageView logo, appName, splashImage;
+    private LottieAnimationView lottieAnimationView;
 
 
     @Override
@@ -29,14 +29,10 @@ public class SplashScreenActivity extends AppCompatActivity {
 
 
         splashScreenAnimation();
-        Runnable r = new Runnable() {
+        Runnable r = () -> {
+            // if you are redirecting from a fragment then use getActivity() as the context.
+            startActivity(new Intent(SplashScreenActivity.this, OnboardingScreensActivity.class));
 
-            @Override
-            public void run() {
-                // if you are redirecting from a fragment then use getActivity() as the context.
-                startActivity(new Intent(SplashScreenActivity.this, OnboardingScreensActivity.class));
-
-            }
         };
 
 
@@ -46,6 +42,7 @@ public class SplashScreenActivity extends AppCompatActivity {
 
     }
 
+    //This method animates each view of th splash screen
     private void splashScreenAnimation() {
         splashImage.animate().translationY(-4600).setDuration(700).setStartDelay(2000);
         logo.animate().translationY(3400).setDuration(700).setStartDelay(2000);

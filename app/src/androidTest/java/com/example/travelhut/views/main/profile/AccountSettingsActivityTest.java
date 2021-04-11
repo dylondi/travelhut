@@ -39,19 +39,6 @@ public class AccountSettingsActivityTest {
         accountSettingsActivity = accountSettingsActivityActivityTestRule.getActivity();
 
     }
-
-    @Test
-    public void testLaunchOfEditProfileActivity(){
-        assertNotNull(accountSettingsActivity.findViewById(R.id.acc_settings_settings_btn));
-
-        onView(withId(R.id.acc_settings_settings_btn)).perform(click());
-
-        Activity editProfileActivity = getInstrumentation().waitForMonitorWithTimeout(monitor, 5000);
-
-        assertNotNull(editProfileActivity);
-
-        editProfileActivity.finish();
-    }
     @Test
     public void testSignOut(){
         assertNotNull(accountSettingsActivity.findViewById(R.id.acc_settings_logout_btn));
@@ -64,9 +51,6 @@ public class AccountSettingsActivityTest {
 
         registerLoginActivity.finish();
     }
-
-
-
 
 
 

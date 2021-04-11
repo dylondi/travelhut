@@ -20,10 +20,9 @@ public class SinglePostFragmentViewModel extends AndroidViewModel {
         singlePostRepository = new SinglePostRepository(postId);
     }
 
+    //This method returns a LiveData object containing a DataSnapshot of a post
     @NonNull
     public LiveData<DataSnapshot> getPostLiveData() {
         return singlePostRepository;
     }
-
-
 }

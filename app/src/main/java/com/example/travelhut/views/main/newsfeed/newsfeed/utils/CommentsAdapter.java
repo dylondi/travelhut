@@ -1,4 +1,4 @@
-package com.example.travelhut.views.main.newsfeed.newsfeed;
+package com.example.travelhut.views.main.newsfeed.newsfeed.utils;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -15,8 +15,6 @@ import com.example.travelhut.R;
 import com.example.travelhut.model.utils.StringsRepository;
 import com.example.travelhut.model.objects.Comment;
 import com.example.travelhut.model.objects.User;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -32,14 +30,12 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
     //Instance Variables
     private Context context;
     private List<Comment> comments;
-    private FirebaseUser firebaseUser;
 
     //Constructor
     public CommentsAdapter(Context context, List<Comment> comments) {
         this.context = context;
         this.comments = comments;
     }
-
 
     @NonNull
     @Override
@@ -48,19 +44,16 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-
-        //Initialize firebaseUser to current user
-        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+    public void onBindViewHolder(@NonNull ViewHolder viewHolder, int position) {
 
         //Create comment object of current comment
-        Comment comment = comments.get(position);
+        Comment currentComment = comments.get(position);
 
         //Sets text of comment
-        holder.comment.setText(comment.getComment());
+        viewHolder.commentText.setText(currentComment.getComment());
 
         //Sets the user data for user that commented
-        getUserInfo(holder.profileImage, holder.username, comment.getPublisher());
+        retrieveProfileData(currentComment.getAuthor() ,viewHolder.profileImageComment, viewHolder.usernameComment);
 
     }
 
@@ -72,36 +65,38 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
     public class ViewHolder extends RecyclerView.ViewHolder{
 
         //Instance Variables
-        public ImageView profileImage;
-        public TextView username, comment;
+        public ImageView profileImageComment;
+        public TextView usernameComment, commentText;
 
         //Constructor
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
             //Initialize views
-            profileImage = itemView.findViewById(R.id.comment_item_profile_image);
-            username = itemView.findViewById(R.id.comment_item_username);
-            comment = itemView.findViewById(R.id.comment_item_comment);
+            usernameComment = itemView.findViewById(R.id.comment_item_username);
+            profileImageComment = itemView.findViewById(R.id.comment_item_profile_image);
+            commentText = itemView.findViewById(R.id.comment_item_comment);
         }
     }
 
 
     //This method retrieves user info of use current comment
-    private void getUserInfo(ImageView imageView, TextView username, String publisherId){
+    private void retrieveProfileData(String authorId, ImageView imageView, TextView username){
 
         //DatabaseReference to user
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child(StringsRepository.USERS_CAP).child(publisherId);
+        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().child(StringsRepository.USERS_CAP).child(authorId);
 
         //ValueEventListener for DatabaseReference
-        reference.addValueEventListener(new ValueEventListener() {
+        userRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                //Get User object from snapshot
                 User user = snapshot.getValue(User.class);
 
                 //Next two lines set profile image and username of user comment
-                Glide.with(context).load(user.getImageurl()).into(imageView);
                 username.setText(user.getUsername());
+                Glide.with(context).load(user.getImageurl()).into(imageView);
             }
 
             @Override

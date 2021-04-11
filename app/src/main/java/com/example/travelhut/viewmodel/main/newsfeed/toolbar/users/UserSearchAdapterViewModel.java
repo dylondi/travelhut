@@ -24,19 +24,17 @@ public class UserSearchAdapterViewModel extends ViewModel {
         followersRepository = new FollowersRepository(userId);
     }
 
-    public MutableLiveData<FirebaseUser> getUserMutableLiveData() {
-        return userMutableLiveData;
-    }
-
-
-    public void follow(String userId) {
-        userSearchRepository.follow(userId);
-    }
-
+    //This method returns a LiveData object containing list of users the current user follows
     public LiveData<DataSnapshot> getFollowing() {
         return followersRepository;
     }
 
+    //This method notifies userSearchRepository to follow user with userId
+    public void follow(String userId) {
+        userSearchRepository.follow(userId);
+    }
+
+    //This method notifies userSearchRepository to unfollow user with userId
     public void unFollow(String userId) {
         userSearchRepository.unFollow(userId);
     }

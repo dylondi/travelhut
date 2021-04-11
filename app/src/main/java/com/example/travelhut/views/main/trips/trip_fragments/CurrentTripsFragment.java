@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.travelhut.R;
 import com.example.travelhut.model.utils.StringsRepository;
 import com.example.travelhut.model.objects.Trip;
+import com.example.travelhut.views.main.trips.utils.TripsAdapter;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;

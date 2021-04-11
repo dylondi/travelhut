@@ -20,6 +20,7 @@ import com.example.travelhut.viewmodel.main.newsfeed.newsfeed.CommentActivityVie
 import com.example.travelhut.views.main.newsfeed.NewsFeedStrings;
 import com.example.travelhut.model.objects.Comment;
 import com.example.travelhut.model.objects.User;
+import com.example.travelhut.views.main.newsfeed.newsfeed.utils.CommentsAdapter;
 import com.google.firebase.database.DataSnapshot;
 
 import java.util.ArrayList;
@@ -85,11 +86,8 @@ public class CommentActivity extends AppCompatActivity {
             }
         });
 
-
         getImage();
         loadComments();
-
-
     }
 
 

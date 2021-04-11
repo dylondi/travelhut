@@ -12,6 +12,7 @@ import com.example.travelhut.R;
 import com.example.travelhut.viewmodel.OnboardingScreensViewModel;
 import com.example.travelhut.views.authentication.RegisterLoginActivity;
 import com.example.travelhut.views.main.newsfeed.NewsFeedActivity;
+import com.example.travelhut.views.onboarding.util.SlideViewPagerAdapter;
 
 public class OnboardingScreensActivity extends AppCompatActivity {
 

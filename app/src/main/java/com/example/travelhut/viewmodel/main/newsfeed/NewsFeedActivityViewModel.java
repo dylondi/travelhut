@@ -43,28 +43,31 @@ public class NewsFeedActivityViewModel extends ViewModel {
         storiesRepository = new StoriesRepository();
     }
 
+    //This method returns a LiveData object containing a firebase DataSnapshot
     @NonNull
     public LiveData<DataSnapshot> getDataSnapshotLiveData() {
         return liveData;
     }
 
+    //This method returns a LiveData object containing a firebase DataSnapshot containing a list of posts
     @NonNull
     public LiveData<DataSnapshot> getPostsLiveData() {
         return postsRepository;
     }
 
+    //This method returns a LiveData object containing a firebase DataSnapshot containing a list of users which current user follows
     @NonNull
     public LiveData<DataSnapshot> getFollowingSnapshot() {
-
         return followingRepository;
     }
 
+    //This method returns a LiveData object containing a firebase DataSnapshot containing a list of stories
     @NonNull
     public LiveData<DataSnapshot> getStoriesLiveData() {
-
         return storiesRepository;
     }
 
+    //This method returns a LiveData object containing the current FirebaseUser
     @NonNull
     public LiveData<FirebaseUser> getUserMutableLiveData() {
         return authRepository.getUserMutableLiveData();

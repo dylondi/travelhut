@@ -40,18 +40,18 @@ public class FollowersRepository extends LiveData<DataSnapshot> {
         followers.removeEventListener(listenerFollowers);
     }
 
-
     //event listener to find changes in data
     private class FollowersValueEventListener implements ValueEventListener {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
-            setValue(dataSnapshot);
 
+            //Set value to new DataSnapshot
+            setValue(dataSnapshot);
         }
 
         @Override
         public void onCancelled(DatabaseError databaseError) {
-            //Log.e(LOG_TAG, "Can't listen to query " + query, databaseError.toException());
+            Log.e(TAG, "Can't listen to reference " + followers.toString(), databaseError.toException());
         }
     }
 }

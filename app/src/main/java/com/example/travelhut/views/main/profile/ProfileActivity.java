@@ -25,7 +25,7 @@ import com.example.travelhut.model.utils.StringsRepository;
 import com.example.travelhut.model.objects.User;
 import com.example.travelhut.views.utils.BottomNavigationViewHelper;
 import com.example.travelhut.viewmodel.main.profile.ProfileActivityViewModel;
-import com.example.travelhut.views.main.newsfeed.newsfeed.PostsAdapter;
+import com.example.travelhut.views.main.newsfeed.newsfeed.utils.PostsAdapter;
 import com.example.travelhut.model.objects.Post;
 import com.example.travelhut.views.main.profile.toolbar.NotificationsActivity;
 import com.google.firebase.database.DataSnapshot;

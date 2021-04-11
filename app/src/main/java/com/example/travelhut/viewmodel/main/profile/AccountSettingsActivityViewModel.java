@@ -22,11 +22,12 @@ public class AccountSettingsActivityViewModel extends AndroidViewModel {
 
     }
 
-
+    //This method notifies authRepository to sign out the current FirebaseUser
     public void logout() {
         authRepository.logout();
     }
 
+    //This method returns a MutableLiveData object containing a boolean which indicates if the current user has logged out
     public MutableLiveData<Boolean> getLoggedOutMutableLiveData() {
         return loggedOutLiveData;
     }

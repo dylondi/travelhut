@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.webkit.MimeTypeMap;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -18,10 +19,21 @@ import androidx.lifecycle.ViewModelProviders;
 import com.example.travelhut.R;
 import com.example.travelhut.model.utils.StringsRepository;
 import com.example.travelhut.viewmodel.main.profile.CreatePostActivityViewModel;
+import com.example.travelhut.views.main.newsfeed.NewsFeedActivity;
+import com.example.travelhut.views.main.newsfeed.newsfeed.UploadStoryActivity;
 import com.example.travelhut.views.main.profile.ProfileActivity;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.net.FetchPlaceRequest;
+import com.google.android.libraries.places.api.net.PlacesClient;
+import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
+import com.google.android.material.datepicker.MaterialDatePicker;
 import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.List;
 
 public class CreatePostActivity extends AppCompatActivity {
 
@@ -36,7 +48,7 @@ public class CreatePostActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_post);
 
-        initViews();
+        initObjects();
         createPostActivityViewModel = ViewModelProviders.of(this).get(CreatePostActivityViewModel.class);
 
         //Discard post
@@ -44,7 +56,6 @@ public class CreatePostActivity extends AppCompatActivity {
             //Go to profile page
             startActivity(new Intent(CreatePostActivity.this, ProfileActivity.class));
         });
-
 
         //Confirm post
         post.setOnClickListener(v -> {
@@ -62,7 +73,7 @@ public class CreatePostActivity extends AppCompatActivity {
     }
 
     //Initialize Views
-    private void initViews() {
+    private void initObjects() {
         close = findViewById(R.id.create_post_back_arrow);
         imageAdded = findViewById(R.id.image_posted);
         post = findViewById(R.id.create_post_check);
@@ -95,7 +106,27 @@ public class CreatePostActivity extends AppCompatActivity {
         progressDialog.setMessage(StringsRepository.POSTING_CAP);
         progressDialog.show();
 
-        createPostActivityViewModel.uploadImage(imageUri, getFileExtension(this,imageUri), progressDialog, description.getText().toString());
+        createPostActivityViewModel.uploadImage(imageUri, getFileExtension(this,imageUri), description.getText().toString());
+
+        //Observe boolean from ViewModel representing if the story was published successfully
+        createPostActivityViewModel.getImageUploadedMutableLiveData().observe(this, imageUploaded -> {
+            if (imageUploaded) {
+
+                //Dismiss dialog and create new intent to navigate to news feed
+                progressDialog.dismiss();
+
+                //Create and start intent to navigate to the ProfileActivity upon successful task completion
+                Intent profileIntent = new Intent(this, ProfileActivity.class);
+                profileIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(profileIntent);
+            } else {
+                //Observe image upload failed message from ViewModel and display in toast if message is not empty
+                createPostActivityViewModel.getUploadFailedMessage().observe(this, message -> {
+                    if (!message.isEmpty())
+                        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+                });
+            }
+        });
 
     }
 

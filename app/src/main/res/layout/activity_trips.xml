@@ -43,6 +43,15 @@
             app:tabRippleColor="@android:color/transparent"
             app:tabSelectedTextColor="@color/white"
             app:tabTextColor="@color/light_blue" />
+
+        <Button
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:background="@drawable/ic_new_trip"
+            android:id="@+id/floating_button_trips"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:layout_margin="30dp"/>
     </RelativeLayout>
 
     <RelativeLayout

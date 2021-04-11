@@ -38,7 +38,7 @@ public class StoryActivity extends AppCompatActivity implements StoriesProgressV
     private LinearLayout viewsLayout;
     private List<String> images, storyIds;
     private String userId;
-    private View reverse, skip;
+    private View previous, skip;
     private StoryActivityViewModel storyActivityViewModel;
 
     //OnTouchListener to allow story time to pause while user touches screen
@@ -85,10 +85,10 @@ public class StoryActivity extends AppCompatActivity implements StoriesProgressV
         userInfo();
 
         //Set OnClickListener for reverse view (left half of screen) to go to previous story if one exists
-        reverse.setOnClickListener(v -> storiesProgressView.reverse());
+        previous.setOnClickListener(v -> storiesProgressView.reverse());
 
         //Set OnTouchListener for reverse view to allow user to pause timer by holding on the screen
-        reverse.setOnTouchListener(onTouchListener);
+        previous.setOnTouchListener(onTouchListener);
 
         //Set OnClickListener for skip view (right half of screen) to go to next story if one exists
         skip.setOnClickListener(v -> storiesProgressView.skip());
@@ -109,15 +109,15 @@ public class StoryActivity extends AppCompatActivity implements StoriesProgressV
     }
 
     private void initViews() {
-        storiesProgressView = findViewById(R.id.stories);
+        storiesProgressView = findViewById(R.id.stories_progress_view);
         storyImage = findViewById(R.id.image);
         storyProfileImage = findViewById(R.id.story_photo);
         storyUsername = findViewById(R.id.story_username);
         viewsLayout = findViewById(R.id.r_seen);
         storyViews = findViewById(R.id.seen_number);
         deleteStory = findViewById(R.id.story_delete);
-        reverse = findViewById(R.id.reverse);
-        skip = findViewById(R.id.skip);
+        previous = findViewById(R.id.previous_story);
+        skip = findViewById(R.id.next_story);
     }
 
     @Override

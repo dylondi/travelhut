@@ -41,12 +41,13 @@ public class UploadStoryRepository extends LiveData<DataSnapshot> {
     //This method will upload the story to firebase
     public void uploadStory(Uri imageUri, String fileExtension) {
 
+        //Check for null imageUri
         if (imageUri != null) {
 
             //Unique name(using timestamp) assigned for the image reference stored in our database
             StorageReference imgRef = storyStorageReference.child(System.currentTimeMillis() + StringsRepository.FULL_STOP + fileExtension);
 
-            //Add the image Uri Object to the storage reference
+            //Initialize storageTask by setting the image Uri Object to the storage reference
             storageTask = imgRef.putFile(imageUri);
 
             //Returns a new Task that will be completed with the result of applying the specified Continuation to this Task
@@ -80,6 +81,7 @@ public class UploadStoryRepository extends LiveData<DataSnapshot> {
                     //Calling uploadStoryToDatabase with our current story values
                     uploadStoryToDatabase(imageUrl, currentUserId, storyDatabaseReference, storyId, timeEnd);
 
+                    //Post true too imageUploadedMutableLiveData containing boolean
                     imageUploadedMutableLiveData.postValue(true);
                 }
                 //If task is unsuccessful -> post false value to imageUploadedMutableLiveData and post failed string message
@@ -104,12 +106,18 @@ public class UploadStoryRepository extends LiveData<DataSnapshot> {
 
     //This method uploads a HashMap object containing a story's details for Firebase Database
     private void uploadStoryToDatabase(String myUrl, String myId, DatabaseReference storyDatabaseReference, String storyId, long timeEnd) {
+
+        //Create HashMap
         HashMap<String, Object> hashMap = new HashMap<>();
+
+        //Put all story data into HashMap
         hashMap.put(StringsRepository.IMAGE_URL, myUrl);
         hashMap.put(StringsRepository.STORY_START_TIME, ServerValue.TIMESTAMP);
         hashMap.put(StringsRepository.STORY_END_TIME, timeEnd);
         hashMap.put(StringsRepository.STORY_ID, storyId);
         hashMap.put(StringsRepository.USER_ID, myId);
+
+        //Set the value of the HashMap to the DatabaseReference referencing an empty reference
         storyDatabaseReference.child(storyId).setValue(hashMap);
     }
 
